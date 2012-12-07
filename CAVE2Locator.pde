@@ -1,18 +1,21 @@
 /**
  * ---------------------------------------------
- * OmicronKinectExample.pde
+ * CAVE2Locator.pde
  * Description: Omicron Processing Kinect example.
  *
  * Class: 
- * System: Processing 2.0a5, SUSE 12.1, Windows 7 x64
+ * System: Processing 2.0b6, SUSE 12.1, Windows 7 x64
  * Author: Arthur Nishimoto
- * Version: 0.1 (alpha)
+ * Version: 0.2 (alpha)
  *
  * Version Notes:
- * 8/3/12      - Initial version
+ * 11/6/12      - Initial version
+ * 12/7/12      - Audio support, 3D view
  * ---------------------------------------------
  */
 
+import oscP5.*;
+import netP5.*;
 import processing.net.*;
 //import omicronAPI.*;
 
@@ -24,6 +27,8 @@ Hashtable userSkeletons;
 PApplet applet;
 PFont font;
 float programTimer;
+float deltaTime;
+float lastFrameTime;
 float startTime;
 
 float displayScale =  65;
@@ -75,6 +80,12 @@ Button wandButton2;
 PVector CAVE2_screenPos;
 PVector CAVE2_3Drotation = new PVector();
 
+// Audio data
+OscP5 oscP5;
+int recvPort = 8000;
+
+boolean demoMode = false; // No active contollers and trackables enables demo mode (rotates CAVE2 image)
+
 // Override of PApplet init() which is called before setup()
 public void init() {
   super.init();
@@ -104,6 +115,7 @@ void setup() {
   size( 540, 960, P3D ); // Droid Razr
    
   applet = this;
+  oscP5 = new OscP5(this,recvPort);
   CAVE2_screenPos = new PVector( width/2, height * CAVE2_verticalScale );
    
   startTime = millis() / 1000.0;
@@ -165,6 +177,7 @@ void setup() {
 
 void draw() {
   programTimer = millis() / 1000.0;
+  deltaTime = programTimer - lastFrameTime;
   
   // Sets the background color
   background(24);
@@ -182,7 +195,21 @@ void draw() {
   {
     fill(250,250,50);
     text("No active controllers or trackables in CAVE2", 16, 16 * 4);
+    
+    CAVE2_3Drotation.x = constrain( CAVE2_3Drotation.x + deltaTime * 0.1, 0, radians(45) );
+    CAVE2_3Drotation.y += deltaTime * 0.1;
+    demoMode = true;
   }
+  else
+  {
+    if( demoMode )
+    {
+      CAVE2_3Drotation.x = 0;
+      CAVE2_3Drotation.y = 0;
+    }
+    demoMode = false;
+  }
+  
   
   /*
   if( timeSinceLastTrackerUpdate < 2 )
@@ -286,8 +313,9 @@ void draw() {
   ellipse( 0, 0, CAVE2_innerDiameter * displayScale, CAVE2_innerDiameter * displayScale );
   popMatrix();
   
-  // Cover entrance
-  //shape(entranceTriangle);
+  // Audio display
+  drawSpeakers();
+  drawSounds();
   // -----------------------------------------------------------------------------
 
   drawCoordinateSystem( 0, 0 );
@@ -339,6 +367,7 @@ void draw() {
   
   // For event and fullscreen processing, this must be called in draw()
   omicronManager.process();
+  lastFrameTime = programTimer;
 }// draw
 
 void mouseDragged()
@@ -346,7 +375,8 @@ void mouseDragged()
   float dy = pmouseY - mouseY;
   float dx = pmouseX - mouseX;
   
-  CAVE2_3Drotation.x += dy / 500.0;
+  
+  CAVE2_3Drotation.x = constrain( CAVE2_3Drotation.x + dy / 500.0, 0, radians(90) );
   CAVE2_3Drotation.y += dx / 500.0;
   
   println("Dragged: "+CAVE2_3Drotation);
@@ -355,9 +385,10 @@ void mouseDragged()
 void mousePressed()
 {
   PVector meters = screenToMeters( mouseX, mouseY );
-  println( "ScreenPos "+ mouseX  + " " + mouseY );
-  println( "MetersPos "+meters.x  + " " + meters.y );
-  println( "-----" );
+  PVector displayPos = metersToScreen( meters );
+  //println( "ScreenPos "+ displayPos.x  + " " + displayPos.y );
+  //println( "MetersPos "+meters.x  + " " + meters.z );
+  //println( "-----" );
   
   //meters.x *= 1;
   //meters.y = meters.y * CAVE2_verticalScale + (screenToMeters(width,height).y *CAVE2_verticalScale);
@@ -405,7 +436,7 @@ void mousePressed()
 
 PVector screenToMeters( int xPos, int yPos )
 {
-  return new PVector( (xPos - CAVE2_screenPos.x)/displayScale, (yPos - CAVE2_screenPos.y)/displayScale );
+  return new PVector( (xPos - CAVE2_screenPos.x)/displayScale, 0, (yPos - CAVE2_screenPos.y)/displayScale );
 }
 
 PVector metersToScreen( PVector position )

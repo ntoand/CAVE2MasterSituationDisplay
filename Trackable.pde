@@ -357,7 +357,7 @@ class Trackable
     
     float distance = abs(dist( position.x, position.y, xPos, yPos ));
     //println(name + " dist " + distance );
-    println("Pos: "+position + " InputPos " + xPos + " " + yPos );
+    //println("Pos: "+position + " InputPos " + xPos + " " + yPos );
     if( distance <= clickableRadius )
       return true;
     else
