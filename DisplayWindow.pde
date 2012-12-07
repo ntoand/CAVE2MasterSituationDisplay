@@ -18,6 +18,13 @@ void displayTrackableWindow( Trackable t, int xPos, int yPos )
   text( t.name+" Trackable Status", 16, 16 * -1 );
   text( "x: " + t.position.x + "\ny: " + t.position.y + "\nz: " + t.position.z, 16 * 1, 16 );
   text( "roll: " + t.rotation.x + "\npitch: " + t.rotation.y + "\nyaw: " + t.rotation.z, 16 + 200, 16 );
+  
+  fill( t.colorMinor );
+  text( "Minor Tracking Drops: " + t.minorDrops, 16 * 1, 16 * 6 );
+  fill( t.colorModerate );
+  text( "Moderate Tracking Drops: " + t.moderateDrops, 16 * 1, 16 * 7 );
+  fill( t.colorMajor );
+  text( "Major Tracking Drops: " + t.majorDrops, 16 * 1, 16 * 8 );
   popMatrix();
 }// displayTrackable
 

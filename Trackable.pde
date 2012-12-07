@@ -9,8 +9,8 @@ class Trackable
   
   float timeSinceLastUpdate;
   float timeSinceLastMocapUpdate;
-  float updateTimer;
-  float mocapUpdateTimer;
+  float updateTimer = 3;
+  float mocapUpdateTimer = 3;
   int drawPriority = 0;
   
   boolean button1; // Triangle
@@ -41,6 +41,10 @@ class Trackable
   final int Moderate = 2;
   final int Major = 3;
   int trackingError = -1;
+  
+  int minorDrops = 0;
+  int moderateDrops = 0;
+  int majorDrops = 0;
   
   ArrayList errorLog;
   
@@ -255,8 +259,11 @@ class Trackable
       currentMocapColor = color(10, 250, 50, 128);
       
       if( trackingError != Minor )
+      {
         errorLog.add( new Error( programTimer, position, rotation, Minor ) );
-        
+        minorDrops++;
+      }
+      
       trackingError = Minor;
     }
     else if( timeSinceLastMocapUpdate < 5 )
@@ -264,18 +271,27 @@ class Trackable
       currentMocapColor = color(250, 250, 50, 128);
       
       if( trackingError != Moderate )
+      {
         errorLog.add( new Error( programTimer, position, rotation, Moderate ) );
-        
+        minorDrops--;
+        moderateDrops++;
+      }
+      
       trackingError = Moderate;
+      
     }
     else
     {
       currentMocapColor = color(250, 50, 50, 128);
       
       if( trackingError != Major )
+      {
         errorLog.add( new Error( programTimer, position, rotation, Major ) );
-      
+        moderateDrops--;
+        majorDrops++;
+      }
       trackingError = Major;
+      
     }
     
     if( timeSinceLastUpdate < 1 )
@@ -290,9 +306,9 @@ class Trackable
     }
     
     pushMatrix();
-    translate( displayX, displayY, displayZ );
+    translate( displayX, displayY );
     rotateX( -CAVE2_3Drotation.x );
-    //rotateY( -CAVE2_3Drotation.y );
+    rotateY( CAVE2_3Drotation.y );
     
     fill(currentMocapColor);
     
@@ -307,13 +323,6 @@ class Trackable
       noFill();
       ellipse( 0, 0, 18, 18 );
     }
-    
-    //pushMatrix();
-    //translate( displayX, displayZ );
-    //rotate( radians(rotation.y) );
-    //stroke(currentMocapColor);
-    //line( 0, 0, 0, -15 );
-    //popMatrix();
     
     float distanceFromCenter = PVector.dist( new PVector(0,0,0), new PVector(position.x,0,position.z) );
     float angleFromCenter = atan2( 0 - position.y, 0 - position.x );
@@ -337,11 +346,6 @@ class Trackable
       
     
   }// draw
-  
-  void drawText()
-  {
-
-  }
   
   boolean isPressed( float xPos, float yPos )
   {

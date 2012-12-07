@@ -63,6 +63,7 @@ PImage psNavigation_right;
 PImage psNavigation_L1;
 PImage psNavigation_L2;
 
+boolean connectToTracker = false;
 String trackerIP = "cave2tracker.evl.uic.edu";
 int msgport = 28000;
 int dataport = 7734;
@@ -85,6 +86,9 @@ OscP5 oscP5;
 int recvPort = 8000;
 
 boolean demoMode = false; // No active contollers and trackables enables demo mode (rotates CAVE2 image)
+
+float lastInteractionTime;
+float timeSinceLastInteractionEvent;
 
 // Override of PApplet init() which is called before setup()
 public void init() {
@@ -116,13 +120,13 @@ void setup() {
    
   applet = this;
   oscP5 = new OscP5(this,recvPort);
-  CAVE2_screenPos = new PVector( width/2, height * CAVE2_verticalScale );
+  CAVE2_screenPos = new PVector( width/2, height * CAVE2_verticalScale, -100 );
    
   startTime = millis() / 1000.0;
 
   // Make the connection to the tracker machine
-  omicronManager.connectToTracker(dataport, msgport, trackerIP);
-  //omicronManager.ConnectToTracker(7739, 28000, "131.193.77.211");
+  if( connectToTracker )
+    omicronManager.connectToTracker(dataport, msgport, trackerIP);
   
   // Create a listener to get events
   eventListener = new EventListener();
@@ -178,27 +182,38 @@ void setup() {
 void draw() {
   programTimer = millis() / 1000.0;
   deltaTime = programTimer - lastFrameTime;
+  timeSinceLastInteractionEvent = programTimer - lastInteractionTime;
   
   // Sets the background color
   background(24);
   
   fill(0,250,250);
-  text("CAVE2(TM) System Locator (Version 0.2 - alpha)", 16, 16);
+  text("CAVE2(TM) System Master Situation Display (Version 0.2 - alpha)", 16, 16);
   
   float timeSinceLastTrackerUpdate = programTimer - lastTrackerUpdateTime;
   
+  if( connectToTracker )
+  {
+    text("Connected to '"+ trackerIP + "' on msgport: " + msgport, 16, 16 * 2);
+    text("Receiving data on dataport: " + dataport, 16, 16 * 3);
+  }
+  else
+  {
+    text("Not connected to tracker", 16, 16 * 2);
+    text("Running in demo mode", 16, 16 * 3);
+  }
   
-  text("Connected to '"+ trackerIP + "' on msgport: " + msgport, 16, 16 * 2);
-  text("Receiving data on dataport: " + dataport, 16, 16 * 3);
-
   if( timeSinceLastTrackerUpdate >= 5 )
   {
     fill(250,250,50);
     text("No active controllers or trackables in CAVE2", 16, 16 * 4);
     
-    CAVE2_3Drotation.x = constrain( CAVE2_3Drotation.x + deltaTime * 0.1, 0, radians(45) );
-    CAVE2_3Drotation.y += deltaTime * 0.1;
-    demoMode = true;
+    if( timeSinceLastInteractionEvent >= 30 )
+    {
+      CAVE2_3Drotation.x = constrain( CAVE2_3Drotation.x + deltaTime * 0.1, 0, radians(45) );
+      CAVE2_3Drotation.y += deltaTime * 0.1;
+      demoMode = true;
+    }
   }
   else
   {
@@ -272,7 +287,7 @@ void draw() {
   rotateX( CAVE2_3Drotation.x ); 
   rotateZ( CAVE2_3Drotation.y );
   
-  translate( 0, 0, -100 );
+  translate( 0, 0, CAVE2_screenPos.z );
   
   // CAVE2 vertical supports
   noFill();
@@ -316,18 +331,16 @@ void draw() {
   // Audio display
   drawSpeakers();
   drawSounds();
+  
   // -----------------------------------------------------------------------------
-
-  drawCoordinateSystem( 0, 0 );
   wandTrackable2.draw();
   wandTrackable1.draw();
   headTrackable.draw();
-
+  
+  drawCoordinateSystem( 0, 0 );
   popMatrix();
   
-  wandTrackable2.drawText();
-  wandTrackable1.drawText();
-  headTrackable.drawText();
+
   
   headButton.draw();
   wandButton1.draw();
@@ -372,6 +385,7 @@ void draw() {
 
 void mouseDragged()
 {
+  lastInteractionTime = programTimer;
   float dy = pmouseY - mouseY;
   float dx = pmouseX - mouseX;
   
@@ -379,11 +393,13 @@ void mouseDragged()
   CAVE2_3Drotation.x = constrain( CAVE2_3Drotation.x + dy / 500.0, 0, radians(90) );
   CAVE2_3Drotation.y += dx / 500.0;
   
-  println("Dragged: "+CAVE2_3Drotation);
+  //println("Dragged: "+CAVE2_3Drotation);
 }// mouseDragged
 
 void mousePressed()
 {
+  lastInteractionTime = programTimer;
+  
   PVector meters = screenToMeters( mouseX, mouseY );
   PVector displayPos = metersToScreen( meters );
   //println( "ScreenPos "+ displayPos.x  + " " + displayPos.y );
@@ -436,15 +452,18 @@ void mousePressed()
 
 PVector screenToMeters( int xPos, int yPos )
 {
-  return new PVector( (xPos - CAVE2_screenPos.x)/displayScale, 0, (yPos - CAVE2_screenPos.y)/displayScale );
+  float screenOffsetX = CAVE2_screenPos.x;
+  float screenOffsetY = CAVE2_screenPos.y;
+  return new PVector( (xPos - screenOffsetX)/displayScale, 0, (yPos - screenOffsetY)/displayScale );
 }
 
 PVector metersToScreen( PVector position )
 {
   float displayX = (position.x * displayScale) + CAVE2_screenPos.x;
-  float displayZ = (position.z * displayScale) + CAVE2_screenPos.y;
+  float displayY = (position.z * displayScale) + CAVE2_screenPos.y;
+  float displayZ = 0;
   
-  return new PVector( displayX, displayZ );
+  return new PVector( displayX, displayY, displayZ );
 }
 
 void drawCoordinateSystem( int x, float y )
