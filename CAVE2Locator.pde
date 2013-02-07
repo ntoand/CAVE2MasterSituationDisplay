@@ -17,7 +17,7 @@
 import oscP5.*;
 import netP5.*;
 import processing.net.*;
-//import omicronAPI.*;
+import omicronAPI.*;
 
 OmicronAPI omicronManager;
 

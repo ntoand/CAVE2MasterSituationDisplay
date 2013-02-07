@@ -88,11 +88,11 @@ void displayControllerWindow( Trackable t, int xPos, int yPos )
     fill(currentColor);
   }
   
-  text( "Analog 1: " + t.analogStick1.x, 16, 16 * 15 );
-  text( "Analog 2: " + t.analogStick1.y, 16, 16 * 16 );
-  text( "Analog 3: " + t.analogStick2.x, 16, 16 * 17 );
-  text( "Analog 4: " + t.analogStick2.y, 16, 16 * 18 );
-  text( "Analog 5: " + t.analogStick3.x, 16, 16 * 19 );
+  text( "Analog 0: " + t.analogStick1.x, 16, 16 * 15 );
+  text( "Analog 1: " + t.analogStick1.y, 16, 16 * 16 );
+  text( "Analog 2: " + t.analogStick2.x, 16, 16 * 17 );
+  text( "Analog 3: " + t.analogStick2.y, 16, 16 * 18 );
+  text( "Analog 4: " + t.analogStick3.x, 16, 16 * 19 );
   
   if( t.timeSinceLastMocapUpdate >= 5 && t.timeSinceLastUpdate < 5 )
   {

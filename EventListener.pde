@@ -62,11 +62,17 @@ class EventListener implements OmicronListener{
     {
         if( objectID == wandTrackable1.secondID )
           wandTrackable1.updateButton( flag, true );
+        else if( objectID == wandTrackable2.secondID )
+          wandTrackable2.updateButton( flag, true );
+      //println("Wand ID " + objectID + " event: DOWN - Flag: " + flag);
     }
     else if( e.getEventType() == OmicronAPI.Type.Up )
     {
       if( objectID == wandTrackable1.secondID )
           wandTrackable1.updateButton( flag, false );
+      else if( objectID == wandTrackable2.secondID )
+          wandTrackable2.updateButton( flag, false );
+      //println("Wand ID " + objectID + " event: UP - Flag: " + flag);
     }
     else if( e.getEventType() == OmicronAPI.Type.Update )
     {
@@ -76,6 +82,21 @@ class EventListener implements OmicronListener{
           wandTrackable1.updateAnalog( 2, e.getFloatData(2), e.getFloatData(3) );
           wandTrackable1.updateAnalog( 3, e.getFloatData(4), 0 );
       }
+      else if( objectID == wandTrackable2.secondID )
+      {
+          wandTrackable2.updateAnalog( 1, e.getFloatData(0), e.getFloatData(1) );
+          wandTrackable2.updateAnalog( 2, e.getFloatData(2), e.getFloatData(3) );
+          wandTrackable2.updateAnalog( 3, e.getFloatData(4), 0 );
+      }
+      
+      
+      println("Wand ID " + objectID + " event: UPDATE");
+      println("  Analog 0 " + e.getFloatData(0));
+      println("  Analog 1 " + e.getFloatData(1));
+      println("  Analog 2 " + e.getFloatData(2));
+      println("  Analog 3 " + e.getFloatData(3));
+      println("  Analog 4 " + e.getFloatData(4));
+      
     }
   }
 }// EventListener
