@@ -33,9 +33,21 @@ class Trackable
   PVector analogStick2;
   PVector analogStick3;
   
+  color currentStatusColor;
   color currentMocapColor;
   color currentUpdateColor;
   
+  // Wand Status
+  final int Normal = 0;
+  final int Partial = 1; // No tracking or no controller data
+  final int Offline = 2; // No tracking and no controller data
+  int wandStatus = -1;
+  color colorNormal = color(10, 250, 50);
+  color colorPartial = color( 250, 150, 50 );
+  color colorOffline = color( 250, 50, 50 );
+  color colorDisabled = color( 105, 105, 105 );
+  
+  // Tracking error state
   final int None = 0;
   final int Minor = 1;
   final int Moderate = 2;
@@ -48,10 +60,11 @@ class Trackable
   
   ArrayList errorLog;
   
-  color colorNone = color(10, 250, 50);
-  color colorMinor = color(10, 250, 50, 128);
-  color colorModerate = color(250, 250, 50, 128);
-  color colorMajor = color(250, 50, 50, 128);
+  // Tracking error colors
+  color colorNone = color(10, 250, 50); // Green
+  color colorMinor = color(10, 250, 50, 128); // Faded Green
+  color colorModerate = color(250, 250, 50, 128); // Yellow
+  color colorMajor = color(250, 50, 50, 128); // Red
   
   boolean selected = false;
   
@@ -239,11 +252,59 @@ class Trackable
     }
   }// updateAnalog
   
+  // Update status without displaying
+  void update()
+  {
+    timeSinceLastUpdate = programTimer - updateTimer;
+    timeSinceLastMocapUpdate = programTimer - mocapUpdateTimer;
+    
+    if( timeSinceLastMocapUpdate >= 5 && timeSinceLastUpdate < 5 )
+    {
+      wandStatus = Partial;
+      currentStatusColor = colorPartial;
+    }
+    else if( timeSinceLastMocapUpdate < 5 && timeSinceLastUpdate >= 5 )
+    {
+      wandStatus = Partial;
+      currentStatusColor = colorPartial;
+    }
+    else if( timeSinceLastMocapUpdate >= 5 && timeSinceLastUpdate >= 5 )
+    {
+      wandStatus = Offline;
+      currentStatusColor = colorOffline;
+    }
+    else
+    {
+      wandStatus = Normal;
+      currentStatusColor = colorNormal;
+    }
+  }
   void draw()
   {
     timeSinceLastUpdate = programTimer - updateTimer;
     timeSinceLastMocapUpdate = programTimer - mocapUpdateTimer;
     
+    if( timeSinceLastMocapUpdate >= 5 && timeSinceLastUpdate < 5 )
+    {
+      wandStatus = Partial;
+      currentStatusColor = colorPartial;
+    }
+    else if( timeSinceLastMocapUpdate < 5 && timeSinceLastUpdate >= 5 )
+    {
+      wandStatus = Partial;
+      currentStatusColor = colorPartial;
+    }
+    else if( timeSinceLastMocapUpdate >= 5 && timeSinceLastUpdate >= 5 )
+    {
+      wandStatus = Offline;
+      currentStatusColor = colorOffline;
+    }
+    else
+    {
+      wandStatus = Normal;
+      currentStatusColor = colorNormal;
+    }
+  
     float displayX = position.x * displayScale;
     float displayY = position.z * displayScale;
     float displayZ = position.y * displayScale;

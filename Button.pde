@@ -27,14 +27,20 @@ class Button
  
   void draw()
   {
+    //if( pressed )
+    //  fill(pressedFillColor);
+    //else if( selected )
+    //  fill(selectedFillColor);
+    //else
+    fill(fillColor);
+    
     if( pressed )
-      fill(pressedFillColor);
+      stroke(pressedFillColor);
     else if( selected )
-      fill(selectedFillColor);
+      stroke(selectedFillColor);
     else
-      fill(fillColor);
-      
-    stroke(strokeColor);
+      stroke(strokeColor);
+    strokeWeight(3);
     rect( position.x, position.y, buttonSize.x, buttonSize.y );
     
     if( hasText )

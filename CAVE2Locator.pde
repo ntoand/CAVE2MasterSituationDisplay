@@ -6,7 +6,7 @@
  * Class: 
  * System: Processing 2.0b6, SUSE 12.1, Windows 7 x64
  * Author: Arthur Nishimoto
- * Version: 0.2 (alpha)
+ * Version: 0.3 (alpha)
  *
  * Version Notes:
  * 11/6/12      - Initial version
@@ -50,6 +50,8 @@ PShape entranceTriangle;
 Trackable headTrackable;
 Trackable wandTrackable1;
 Trackable wandTrackable2;
+Trackable wandTrackable3;
+Trackable wandTrackable4;
 
 PImage psNavigationOutline;
 
@@ -62,8 +64,9 @@ PImage psNavigation_right;
 
 PImage psNavigation_L1;
 PImage psNavigation_L2;
+PImage psNavigation_L3;
 
-boolean connectToTracker = false;
+boolean connectToTracker = true;
 String trackerIP = "cave2tracker.evl.uic.edu";
 int msgport = 28000;
 int dataport = 7734;
@@ -77,6 +80,8 @@ float connectionTime = 0;
 Button headButton;
 Button wandButton1;
 Button wandButton2;
+Button wandButton3;
+Button wandButton4;
 
 PVector CAVE2_screenPos;
 PVector CAVE2_3Drotation = new PVector();
@@ -112,12 +117,17 @@ void exit()
     wandTrackable1.outputErrorsToFile();
   if( wandTrackable2!= null )
     wandTrackable2.outputErrorsToFile();
+  if( wandTrackable3!= null )
+    wandTrackable1.outputErrorsToFile();
+  if( wandTrackable4!= null )
+    wandTrackable2.outputErrorsToFile();
 }// exit
 
 // Program initializations
 void setup() {
-  size( 540, 960, P3D ); // Droid Razr
-   
+  //size( 540, 960, P3D ); // Droid Razr
+  size( 640, 960, P3D ); // Droid Razr
+  
   applet = this;
   oscP5 = new OscP5(this,recvPort);
   CAVE2_screenPos = new PVector( width/2, height * CAVE2_verticalScale, -100 );
@@ -145,21 +155,29 @@ void setup() {
   psNavigation_right = loadImage("PS3Navigation_right.png");
   psNavigation_L1 = loadImage("PS3Navigation_L1.png");
   psNavigation_L2 = loadImage("PS3Navigation_L2.png");
+  psNavigation_L3 = loadImage("PS3Navigation_L3.png");
   
   userSkeletons = new Hashtable();
   
   headTrackable = new Trackable( 0, "Head 1" );
-  wandTrackable1 = new Trackable( 1, "Wand 1 (Batman/Kirk)" );
+  
+  wandTrackable1 = new Trackable( 1, "Wand 1 Type A (Batman/Kirk)" );
   wandTrackable1.secondID = 0; // Controller 0 is mapped to Wand 1
   
-  wandTrackable2 = new Trackable( 2, "Wand 2 (Robin/Spock)" );
+  wandTrackable2 = new Trackable( 2, "Wand 2 Type B (Robin/Spock)" );
   wandTrackable2.secondID = 1; // Controller 1 is mapped to Wand 2
+  
+  wandTrackable3 = new Trackable( 3, "Wand 3 Type A (Batman/Kirk)" );
+  wandTrackable3.secondID = 2; // Controller 1 is mapped to Wand 2
+  
+  wandTrackable4 = new Trackable( 4, "Wand 4 Type B (Robin/Spock)" );
+  wandTrackable4.secondID = 3; // Controller 1 is mapped to Wand 2
   
   entranceTriangle = createShape();
   entranceTriangle.fill(24);
   entranceTriangle.noStroke();
   entranceTriangle.vertex(0,0);
-   entranceTriangle.vertex(-0.8 * displayScale , 3.6 * displayScale);
+  entranceTriangle.vertex(-0.8 * displayScale , 3.6 * displayScale);
   entranceTriangle.vertex(1.72 * displayScale , 3.27 * displayScale);
   entranceTriangle.end(CLOSE);
   
@@ -176,6 +194,14 @@ void setup() {
   wandButton2.setText("Wand 2", font, 16);
   wandButton2.fillColor = color( 10, 200, 125, 128 );
   
+  wandButton3 = new Button( 16 * 1, 16 * 6 + 35 * 3, 80, 30 );
+  wandButton3.setText("Wand 3", font, 16);
+  wandButton3.fillColor = color( 10, 200, 125, 128 );
+  
+  wandButton4 = new Button( 16 * 1, 16 * 6 + 35 * 4, 80, 30 );
+  wandButton4.setText("Wand 4", font, 16);
+  wandButton4.fillColor = color( 10, 200, 125, 128 );
+  
   ortho();
 }// setup
 
@@ -188,7 +214,7 @@ void draw() {
   background(24);
   
   fill(0,250,250);
-  text("CAVE2(TM) System Master Situation Display (Version 0.2 - alpha)", 16, 16);
+  text("CAVE2(TM) System Master Situation Display (Version 0.3 - alpha)", 16, 16);
   
   float timeSinceLastTrackerUpdate = programTimer - lastTrackerUpdateTime;
   
@@ -291,7 +317,7 @@ void draw() {
   
   // CAVE2 vertical supports
   noFill();
-  stroke(0,250,250);
+  stroke(20,200,200);
   strokeWeight(2);
   for( int i = 0; i < 9; i++ )
   {
@@ -322,7 +348,7 @@ void draw() {
   // CAVE2 diameter (inner-screen, outer ring) - upper ring
   pushMatrix();
   translate( 0, 0, CAVE2_legHeight * displayScale );
-  stroke(0,250,250);
+  stroke(20,200,200);
   ellipse( 0, 0, CAVE2_diameter * displayScale, CAVE2_diameter * displayScale );
   stroke(0,50,200);
   ellipse( 0, 0, CAVE2_innerDiameter * displayScale, CAVE2_innerDiameter * displayScale );
@@ -333,6 +359,8 @@ void draw() {
   drawSounds();
   
   // -----------------------------------------------------------------------------
+  wandTrackable4.update();
+  wandTrackable3.update();
   wandTrackable2.draw();
   wandTrackable1.draw();
   headTrackable.draw();
@@ -340,42 +368,89 @@ void draw() {
   drawCoordinateSystem( 0, 0 );
   popMatrix();
   
-
+  headButton.fillColor = headTrackable.currentStatusColor;
+  wandButton1.fillColor = wandTrackable1.currentStatusColor;
+  wandButton2.fillColor = wandTrackable2.currentStatusColor;
+  wandButton3.fillColor = wandTrackable3.colorDisabled;
+  wandButton4.fillColor = wandTrackable4.colorDisabled;
   
   headButton.draw();
   wandButton1.draw();
   wandButton2.draw();
+  wandButton3.draw();
+  wandButton4.draw();
   
   if( headButton.selected )
   {
     headTrackable.selected = true;
     wandTrackable1.selected = false;
     wandTrackable2.selected = false;
+    wandTrackable3.selected = false;
+    wandTrackable4.selected = false;
     
     displayTrackableWindow( headTrackable, 0, height - 328 );
     wandButton1.selected = false;
     wandButton2.selected = false;
+    wandButton3.selected = false;
+    wandButton4.selected = false;
   }
   else if( wandButton1.selected )
   {
     displayControllerWindow( wandTrackable1, 0, height - 328 );
     headButton.selected = false;
     wandButton2.selected = false;
+    wandButton3.selected = false;
+    wandButton4.selected = false;
     
     headTrackable.selected = false;
     wandTrackable1.selected = true;
     wandTrackable2.selected = false;
-    
+    wandTrackable3.selected = false;
+    wandTrackable4.selected = false;
   }
   else if( wandButton2.selected )
   {
     displayControllerWindow( wandTrackable2, 0, height - 328 );
     headButton.selected = false;
     wandButton1.selected = false;
+    wandButton3.selected = false;
+    wandButton4.selected = false;
     
     headTrackable.selected = false;
     wandTrackable1.selected = false;
     wandTrackable2.selected = true;
+    wandTrackable3.selected = false;
+    wandTrackable4.selected = false;
+  }
+  else if( wandButton3.selected )
+  {
+    displayControllerWindow( wandTrackable3, 0, height - 328 );
+    headButton.selected = false;
+    wandButton1.selected = false;
+    wandButton2.selected = false;
+    wandButton3.selected = true;
+    wandButton4.selected = false;
+    
+    headTrackable.selected = false;
+    wandTrackable1.selected = false;
+    wandTrackable2.selected = false;
+    wandTrackable3.selected = true;
+    wandTrackable4.selected = false;
+  }
+  else if( wandButton4.selected )
+  {
+    displayControllerWindow( wandTrackable4, 0, height - 328 );
+    headButton.selected = false;
+    wandButton1.selected = false;
+    wandButton2.selected = false;
+    wandButton3.selected = false;
+    wandButton4.selected = true;
+    
+    headTrackable.selected = false;
+    wandTrackable1.selected = false;
+    wandTrackable2.selected = false;
+    wandTrackable3.selected = false;
+    wandTrackable4.selected = true;
   }
   
   // For event and fullscreen processing, this must be called in draw()
@@ -425,6 +500,22 @@ void mousePressed()
   {
       headButton.selected = false;
       wandButton1.selected = false;
+  }
+  
+  if( wandButton3.isPressed( mouseX, mouseY ) )
+  {
+      headButton.selected = false;
+      wandButton1.selected = false;
+      wandButton2.selected = false;
+      wandButton4.selected = false;
+  }
+  
+  if( wandButton4.isPressed( mouseX, mouseY ) )
+  {
+      headButton.selected = false;
+      wandButton1.selected = false;
+      wandButton2.selected = false;
+      wandButton3.selected = false;
   }
   
   if( headTrackable.isPressed( meters.x, meters.y ) )
@@ -482,13 +573,17 @@ void drawCoordinateSystem( int x, float y )
   line( 30, 0, 0, 0 );
   text("x", 35, 0 );
 
-  fill(0,200,0,128); // y
+  fill(0,100,0,128); // y
   noStroke();
   ellipse( 0, 0, 5, 5);
   text("y", 5, -5 );
   noFill();
-  stroke(0,200,0,128);
+  stroke(0,100,0,128);
   strokeWeight(1);
   ellipse( 0, 0, 10, 10);
+  
+  rotateY( radians(270) );
+  line( 30, 0, 0, 0 );
+  
   popMatrix();
 }

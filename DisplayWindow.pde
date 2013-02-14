@@ -88,11 +88,11 @@ void displayControllerWindow( Trackable t, int xPos, int yPos )
     fill(currentColor);
   }
   
-  text( "Analog 0: " + t.analogStick1.x, 16, 16 * 15 );
-  text( "Analog 1: " + t.analogStick1.y, 16, 16 * 16 );
-  text( "Analog 2: " + t.analogStick2.x, 16, 16 * 17 );
-  text( "Analog 3: " + t.analogStick2.y, 16, 16 * 18 );
-  text( "Analog 4: " + t.analogStick3.x, 16, 16 * 19 );
+  text( "Analog 0: " + String.format("%.3f",t.analogStick1.x), 16, 16 * 15 );
+  text( "Analog 1: " + String.format("%.3f",t.analogStick1.y), 16, 16 * 16 );
+  text( "Analog 2: " + String.format("%.3f",t.analogStick2.x), 16, 16 * 17 );
+  text( "Analog 3: " + String.format("%.3f",t.analogStick2.y), 16, 16 * 18 );
+  text( "Analog 4: " + String.format("%.3f",t.analogStick3.x), 16, 16 * 19 );
   
   if( t.timeSinceLastMocapUpdate >= 5 && t.timeSinceLastUpdate < 5 )
   {
@@ -110,7 +110,7 @@ void displayControllerWindow( Trackable t, int xPos, int yPos )
   {
     fill( 250, 50, 50 );
     text( t.name+" Controller Status - CONNECTION LOST", 16, 16 * -1 );
-    text( "IS CONTROLLER ON? - TIME SINCE LAST UPDATE: " + String.format("%.2f", t.timeSinceLastUpdate), 16, 16 * 0 );
+    text( "IS CONTROLLER ON? TRACKED? - TIME SINCE LAST UPDATE: " + String.format("%.2f", t.timeSinceLastUpdate), 16, 16 * 0 );
   }
   else
   {
@@ -124,9 +124,17 @@ void displayControllerWindow( Trackable t, int xPos, int yPos )
   line( analogCenter.x, analogCenter.y, analogCenter.x + analogStick.x * 25, analogCenter.y + analogStick.y * 25 );
   ellipse( analogCenter.x + analogStick.x * 25, analogCenter.y + analogStick.y * 25, 15, 15 );
   
+  if( t.analogStick3.x > 0 )
+  {
+    tint( red(currentColor) * t.analogStick3.x, green(currentColor) * t.analogStick3.x, blue(currentColor) * t.analogStick3.x, alpha(currentColor) );
+    image( psNavigation_L2, width - 282, 0 );
+  }
+  
   noStroke();
   tint(currentColor);
   fill(currentColor);
+  
+  
   if( t.button1 )
   {
     text( "Button 1", 16, 16 * 1 );
@@ -154,6 +162,7 @@ void displayControllerWindow( Trackable t, int xPos, int yPos )
   {
     text( "Button 6", 16, 16 * 6 ); // L3
     ellipse( analogCenter.x + analogStick.x * 25, analogCenter.y + analogStick.y * 25, 15, 15 );
+    image( psNavigation_L3, width - 282, 0 );
   }
   if( t.specialButton1 )
   {
