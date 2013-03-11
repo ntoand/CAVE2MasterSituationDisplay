@@ -52,13 +52,14 @@ void displayControllerWindow( Trackable t, int xPos, int yPos )
   text( "Button 4", 16, 16 * 4 );
   text( "Button 5", 16, 16 * 5 );
   text( "Button 6", 16, 16 * 6 );
-  text( "Special Button 1", 16, 16 * 7 );
-  text( "Special Button 2", 16, 16 * 8 );
-  text( "Special Button 3", 16, 16 * 9 );
-  text( "Button Up", 16, 16 * 10 );
-  text( "Button Right", 16, 16 * 11 );
-  text( "Button Down", 16, 16 * 12 );
-  text( "Button Left", 16, 16 * 13 );
+  text( "Button 7", 16, 16 * 7 );
+  text( "Special Button 1", 16, 16 * 8 );
+  text( "Special Button 2", 16, 16 * 9 );
+  text( "Special Button 3", 16, 16 * 10 );
+  text( "Button Up", 16, 16 * 11 );
+  text( "Button Right", 16, 16 * 12 );
+  text( "Button Down", 16, 16 * 13 );
+  text( "Button Left", 16, 16 * 14 );
   
   color currentColor;
   if( t.timeSinceLastUpdate < 1 )
@@ -164,36 +165,41 @@ void displayControllerWindow( Trackable t, int xPos, int yPos )
     ellipse( analogCenter.x + analogStick.x * 25, analogCenter.y + analogStick.y * 25, 15, 15 );
     image( psNavigation_L3, width - 282, 0 );
   }
+  if( t.button7 )
+  {
+    text( "Button 7", 16, 16 * 7 ); // L2
+    image( psNavigation_L2, width - 282, 0 );
+  }
   if( t.specialButton1 )
   {
-    text( "Special Button 1", 16, 16 * 7 );
+    text( "Special Button 1", 16, 16 * 8 );
   }
   if( t.specialButton2 )
   {
-    text( "Special Button 2", 16, 16 * 8 );
+    text( "Special Button 2", 16, 16 * 9 );
   }
   if( t.specialButton3 )
   {
-    text( "Special Button 3", 16, 16 * 9 );
+    text( "Special Button 3", 16, 16 * 10 );
   }
   if( t.buttonUp )
   {
-    text( "Button Up", 16, 16 * 10 );
+    text( "Button Up", 16, 16 * 11 );
     image( psNavigation_up, width - 282, 0 );
   }
   if( t.buttonDown )
   {
-    text( "Button Down", 16, 16 * 12 );
+    text( "Button Down", 16, 16 * 13 );
     image( psNavigation_down, width - 282, 0 );
   }
   if( t.buttonLeft )
   {
-    text( "Button Left", 16, 16 * 13 );
+    text( "Button Left", 16, 16 * 14 );
     image( psNavigation_left, width - 282, 0 );
   }
   if( t.buttonRight )
   {
-    text( "Button Right", 16, 16 * 11 );
+    text( "Button Right", 16, 16 * 12 );
     image( psNavigation_right, width - 282, 0 );
   }
 

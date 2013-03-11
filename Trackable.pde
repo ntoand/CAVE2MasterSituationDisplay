@@ -19,6 +19,7 @@ class Trackable
   boolean button4; // Square
   boolean button5; // L1
   boolean button6; // L3
+  boolean button7; // L2
   
   boolean specialButton1; // Select
   boolean specialButton2; // Start
@@ -37,11 +38,11 @@ class Trackable
   color currentMocapColor;
   color currentUpdateColor;
   
-  // Wand Status
+  // Status
   final int Normal = 0;
   final int Partial = 1; // No tracking or no controller data
   final int Offline = 2; // No tracking and no controller data
-  int wandStatus = -1;
+  int trackableStatus = -1;
   color colorNormal = color(10, 250, 50);
   color colorPartial = color( 250, 150, 50 );
   color colorOffline = color( 250, 50, 50 );
@@ -209,6 +210,7 @@ class Trackable
       case(64): button4 = state; break;
       case(128): button5 = state; break;
       case(256): button6 = state; break;
+      case(512): button7 = state; break;
       
       case(1024): buttonUp = state; break;
       case(2048): buttonDown = state; break;
@@ -228,6 +230,7 @@ class Trackable
       button4 = false;
       button5 = false;
       button6 = false;
+      button7 = false;
       
       buttonUp = false;
       buttonDown = false;
@@ -260,22 +263,22 @@ class Trackable
     
     if( timeSinceLastMocapUpdate >= 5 && timeSinceLastUpdate < 5 )
     {
-      wandStatus = Partial;
+      trackableStatus = Partial;
       currentStatusColor = colorPartial;
     }
     else if( timeSinceLastMocapUpdate < 5 && timeSinceLastUpdate >= 5 )
     {
-      wandStatus = Partial;
+      trackableStatus = Partial;
       currentStatusColor = colorPartial;
     }
     else if( timeSinceLastMocapUpdate >= 5 && timeSinceLastUpdate >= 5 )
     {
-      wandStatus = Offline;
+      trackableStatus = Offline;
       currentStatusColor = colorOffline;
     }
     else
     {
-      wandStatus = Normal;
+      trackableStatus = Normal;
       currentStatusColor = colorNormal;
     }
   }
@@ -286,22 +289,30 @@ class Trackable
     
     if( timeSinceLastMocapUpdate >= 5 && timeSinceLastUpdate < 5 )
     {
-      wandStatus = Partial;
+      trackableStatus = Partial;
       currentStatusColor = colorPartial;
     }
     else if( timeSinceLastMocapUpdate < 5 && timeSinceLastUpdate >= 5 )
     {
-      wandStatus = Partial;
+      trackableStatus = Partial;
       currentStatusColor = colorPartial;
+      
+      // Second ID not set, trackable has no controller component
+      // Set normal if mocap data is received
+      if( secondID == -1 )
+      {
+        trackableStatus = Normal;
+        currentStatusColor = colorNormal;
+      }
     }
     else if( timeSinceLastMocapUpdate >= 5 && timeSinceLastUpdate >= 5 )
     {
-      wandStatus = Offline;
+      trackableStatus = Offline;
       currentStatusColor = colorOffline;
     }
     else
     {
-      wandStatus = Normal;
+      trackableStatus = Normal;
       currentStatusColor = colorNormal;
     }
   
@@ -367,7 +378,7 @@ class Trackable
     }
     
     pushMatrix();
-    translate( displayX, displayY );
+    translate( displayX, displayY, displayZ );
     rotateX( -CAVE2_3Drotation.x );
     rotateY( CAVE2_3Drotation.y );
     
