@@ -197,26 +197,39 @@ class Trackable
   // 8192 = DPad Right
   void updateButton( int buttonFlag, boolean state )
   {
+    if( (buttonFlag & 0) == 0 )
+       clearAllButtons();
+    if( (buttonFlag & 1) == 1 )
+       button1 = state;
+    if( (buttonFlag & 2) == 2 )
+       button2 = state;
+    if( (buttonFlag & 4) == 4 )
+       button3 = state;
+    if( (buttonFlag & 8) == 8 )
+       specialButton1 = state;
+    if( (buttonFlag & 16) == 16 )
+       specialButton2 = state;
+    if( (buttonFlag & 32) ==32 )
+       specialButton3 = state;
+    if( (buttonFlag & 64) == 64 )
+       button4 = state;
+    if( (buttonFlag & 128) == 128 )
+       button5 = state;
+    if( (buttonFlag & 256) == 256 )
+       button6 = state;
+    if( (buttonFlag & 512) == 512 )
+       button7 = state;
+  
+    if( (buttonFlag & 1024) == 1024 )
+       buttonUp = state;
+    if( (buttonFlag & 2048) == 2048 )
+       buttonDown = state;
+    if( (buttonFlag & 4096) == 4096 )
+       buttonLeft = state;
+    if( (buttonFlag & 8192) == 8192 )
+       buttonRight = state;
+       
     updateTimer = programTimer;
-    switch( buttonFlag )
-    {
-      case(0): clearAllButtons(); break;
-      case(1): button1 = state; break;
-      case(2): button2 = state; break;
-      case(4): button3 = state; break;
-      case(8): specialButton1 = state; break;
-      case(16): specialButton2 = state; break;
-      case(32): specialButton3 = state; break;
-      case(64): button4 = state; break;
-      case(128): button5 = state; break;
-      case(256): button6 = state; break;
-      case(512): button7 = state; break;
-      
-      case(1024): buttonUp = state; break;
-      case(2048): buttonDown = state; break;
-      case(4096): buttonLeft = state; break;
-      case(8192): buttonRight = state; break;
-    }// switch
   }// updateButton
   
   void clearAllButtons()

@@ -89,11 +89,11 @@ void displayControllerWindow( Trackable t, int xPos, int yPos )
     fill(currentColor);
   }
   
-  text( "Analog 0: " + String.format("%.3f",t.analogStick1.x), 16, 16 * 15 );
-  text( "Analog 1: " + String.format("%.3f",t.analogStick1.y), 16, 16 * 16 );
-  text( "Analog 2: " + String.format("%.3f",t.analogStick2.x), 16, 16 * 17 );
-  text( "Analog 3: " + String.format("%.3f",t.analogStick2.y), 16, 16 * 18 );
-  text( "Analog 4: " + String.format("%.3f",t.analogStick3.x), 16, 16 * 19 );
+  text( "Analog 0: " + String.format("%.3f",t.analogStick1.x), 16, 16 * 16 );
+  text( "Analog 1: " + String.format("%.3f",t.analogStick1.y), 16, 16 * 17 );
+  text( "Analog 2: " + String.format("%.3f",t.analogStick2.x), 16, 16 * 18 );
+  text( "Analog 3: " + String.format("%.3f",t.analogStick2.y), 16, 16 * 19 );
+  text( "Analog 4: " + String.format("%.3f",t.analogStick3.x), 16, 16 * 20 );
   
   if( t.timeSinceLastMocapUpdate >= 5 && t.timeSinceLastUpdate < 5 )
   {
