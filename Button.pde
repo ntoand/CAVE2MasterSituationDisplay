@@ -40,7 +40,7 @@ class Button
       stroke(selectedFillColor);
     else
       stroke(strokeColor);
-    strokeWeight(3);
+    //strokeWeight(3);
     rect( position.x, position.y, buttonSize.x, buttonSize.y );
     
     if( hasText )

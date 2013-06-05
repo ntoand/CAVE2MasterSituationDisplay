@@ -87,27 +87,40 @@ class Trackable
     {
       switch( severity )
       {
-        case(Minor): fill( colorMinor );break;
-        case(Moderate): fill( colorModerate ); break;
-        case(Major): fill( colorMajor ); break;
+        case(Minor): tint( colorMinor ); fill( colorMinor ); break;
+        case(Moderate): tint( colorModerate ); fill( colorModerate ); break;
+        case(Major): tint( colorMajor ); fill( colorMajor ); break;
       }
       
       float displayX = position.x * displayScale;
       float displayY = position.z * displayScale;
       float displayZ = position.y * displayScale;
       
+      /*
       pushMatrix();
+      imageMode(CENTER);
+      translate( displayX, displayY );
+    
+      noStroke();
+      image( heatmapPoint, 0, 0 );
+        
+      popMatrix();
+      */
+      
+      pushMatrix();
+      imageMode(CENTER);
       translate( displayX, displayY, displayZ );
       rotateX( -CAVE2_3Drotation.x );
       rotateY( -CAVE2_3Drotation.y );
     
       noStroke();
-      //ellipse( 0, 0, 10, 10 );
       sphere( 5 );
       //if( selected )
       //  ellipse( 0, 0, 15, 15 );
         
       popMatrix();
+      
+      imageMode(CORNER);
       
       /*
       fill( 0,250,250 );
@@ -166,7 +179,17 @@ class Trackable
     
     mocapUpdateTimer = programTimer;
   }// setPosition
-    
+  
+  void loadErrorsFromFile()
+  {
+    String logPath = "logs/trackingDropLog-2013-5-9-17-39-0-trackable2.txt";
+    String[] lines = loadStrings(logPath);
+    for(int index = 0; index < lines.length; index++) {
+      String[] pieces = split(lines[index], '\t');
+      errorLog.add( new Error( int(pieces[0]), new PVector(float(pieces[1]),float(pieces[2]),float(pieces[3])), new PVector(float(pieces[4]),float(pieces[5]),float(pieces[6])), int(pieces[7]) ) );
+    }
+  }
+  
   void outputErrorsToFile()
   {
     String[] lines = new String[errorLog.size()];
@@ -178,7 +201,7 @@ class Trackable
     
     // Only create file if there is data (ignores initial drop data)
     if( errorLog.size() > 3 )
-      saveStrings("logs/trackingDropLog-"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+"-trackable"+ID+".txt", lines);
+      saveStrings("logs/trackingDropLog-"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+"-trackable"+ID+".tsv", lines);
   }
   
   // PS3 Sixaxis mapping:
@@ -296,7 +319,7 @@ class Trackable
     }
   }
   void draw()
-  {
+  {    
     timeSinceLastUpdate = programTimer - updateTimer;
     timeSinceLastMocapUpdate = programTimer - mocapUpdateTimer;
     
@@ -392,8 +415,8 @@ class Trackable
     
     pushMatrix();
     translate( displayX, displayY, displayZ );
-    rotateX( -CAVE2_3Drotation.x );
-    rotateY( CAVE2_3Drotation.y );
+    //rotateX( -CAVE2_3Drotation.x );
+    //rotateY( CAVE2_3Drotation.y );
     
     fill(currentMocapColor);
     
@@ -411,13 +434,23 @@ class Trackable
     
     float distanceFromCenter = PVector.dist( new PVector(0,0,0), new PVector(position.x,0,position.z) );
     float angleFromCenter = atan2( 0 - position.y, 0 - position.x );
-    text( name, 0 + 10, 0 - 5 );
+    //text( name, 0 + 10, 0 - 5 );
     //text( name, displayX + 10, displayZ - 24 );
     //text( "x: " + position.x + "\ny: " + position.y + "\nz: " + position.z, displayX + 10, displayZ - 10 );
     //text( "roll: " + rotation.x + "\npitch: " + rotation.y + "\nyaw: " + rotation.z, displayX + 100, displayZ - 10 );
     //text( "update delay: " + timeSincelastUpdate, displayX + 10, displayZ - 10 );
     //text( "origin 2D dist: " + distanceFromCenter, displayX + 10, displayZ - 10 );
     //text( "origin 2D angle: " + degrees(angleFromCenter), displayX + 10, displayZ + 4 );
+    popMatrix();
+    
+    pushMatrix();
+    translate( displayX, displayY, displayZ );
+    rotateZ( -CAVE2_3Drotation.y );
+    rotateX( -CAVE2_3Drotation.x ); 
+    
+    translate( 0, 0, zPos_3Dview + 500 );
+    
+    text( name, 0 + 10, 0 - 5 );
     popMatrix();
     
     // Show error log
@@ -452,4 +485,5 @@ class Trackable
     else
       return false;
   }// isPressed
+  
 }// class

@@ -1,10 +1,10 @@
 /**
  * ---------------------------------------------
- * CAVE2Locator.pde
- * Description: Omicron Processing Kinect example.
+ * CAVE2MasterSituationDisplay.pde
+ * Description: CAVE2 Master Situation Display (MSD)
  *
  * Class: 
- * System: Processing 2.0b6, SUSE 12.1, Windows 7 x64
+ * System: Processing 2.0a5, SUSE 12.1, Windows 7 x64
  * Author: Arthur Nishimoto
  * Version: 0.3 (alpha)
  *
@@ -22,7 +22,6 @@ import omicronAPI.*;
 OmicronAPI omicronManager;
 
 EventListener eventListener;
-Hashtable userSkeletons;
 
 PApplet applet;
 PFont font;
@@ -90,10 +89,16 @@ PVector CAVE2_3Drotation = new PVector();
 OscP5 oscP5;
 int recvPort = 8000;
 
-boolean demoMode = false; // No active contollers and trackables enables demo mode (rotates CAVE2 image)
+boolean demoMode = true; // No active contollers and trackables enables demo mode (rotates CAVE2 image)
 
 float lastInteractionTime;
 float timeSinceLastInteractionEvent;
+
+PImage heatmapPoint;
+
+float zPos_3Dview = -300;
+
+boolean scaleScreen = false;
 
 // Override of PApplet init() which is called before setup()
 public void init() {
@@ -103,7 +108,7 @@ public void init() {
   omicronManager = new OmicronAPI(this);
 
   // Removes the title bar for full screen mode (present mode will not work on Cyber-commons wall)
-  omicronManager.setFullscreen(false);
+  omicronManager.setFullscreen(true);
 }// init
 
 void exit()
@@ -126,11 +131,14 @@ void exit()
 // Program initializations
 void setup() {
   //size( 540, 960, P3D ); // Droid Razr
-  size( 640, 960, P3D ); // Droid Razr
+  size( screenWidth, screenHeight, P3D );
+
+  width = 2560;
+  height = 1600;
   
   applet = this;
   oscP5 = new OscP5(this,recvPort);
-  CAVE2_screenPos = new PVector( width/2, height * CAVE2_verticalScale, -100 );
+  CAVE2_screenPos = new PVector( width * 0.5, height * CAVE2_verticalScale, -100 );
    
   startTime = millis() / 1000.0;
 
@@ -143,9 +151,14 @@ void setup() {
   
   omicronManager.setEventListener( eventListener );
   
-  font = loadFont("ArialMT-48.vlw");
-  textFont( font, 16 );
+  // Screen scaling
+  omicronManager.enableScreenScale(scaleScreen);
+  omicronManager.calculateScreenTransformation(2560,1440); // Single display on CAVE2 column display
   
+  font = loadFont("TMP-Monitors-48.vlw");
+  textFont( font, 16 );
+
+  heatmapPoint = loadImage("heatmap/heatmapBrush.png");
   psNavigationOutline = loadImage("PS3Navigation.png");
   psNavigation_cross = loadImage("PS3Navigation_cross.png");
   psNavigation_circle = loadImage("PS3Navigation_circle.png");
@@ -157,8 +170,6 @@ void setup() {
   psNavigation_L2 = loadImage("PS3Navigation_L2.png");
   psNavigation_L3 = loadImage("PS3Navigation_L3.png");
   
-  userSkeletons = new Hashtable();
-  
   headTrackable = new Trackable( 0, "Head 1" );
   
   wandTrackable1 = new Trackable( 1, "Wand 1 Type A (Batman/Kirk)" );
@@ -166,6 +177,7 @@ void setup() {
   
   wandTrackable2 = new Trackable( 2, "Wand 2 Type B (Robin/Spock)" );
   wandTrackable2.secondID = 1; // Controller 1 is mapped to Wand 2
+  //wandTrackable2.loadErrorsFromFile();
   
   wandTrackable3 = new Trackable( 3, "Wand 3 Type A (Batman/Kirk)" );
   wandTrackable3.secondID = 2; // Controller 1 is mapped to Wand 2
@@ -173,13 +185,17 @@ void setup() {
   wandTrackable4 = new Trackable( 4, "Wand 4 Type B (Robin/Spock)" );
   wandTrackable4.secondID = 3; // Controller 1 is mapped to Wand 2
   
+  /*
   entranceTriangle = createShape();
   entranceTriangle.fill(24);
   entranceTriangle.noStroke();
   entranceTriangle.vertex(0,0);
   entranceTriangle.vertex(-0.8 * displayScale , 3.6 * displayScale);
   entranceTriangle.vertex(1.72 * displayScale , 3.27 * displayScale);
-  entranceTriangle.end(CLOSE);
+  entranceTriangle.end(); // 2.0a5
+  //entranceTriangle.close(CLOSE);
+  //entranceTriangle.endShape(); // 2.0b9
+  */
   
   headButton = new Button( 16 * 1, 16 * 6, 80, 30 );
   headButton.setText("Head 1", font, 16);
@@ -202,16 +218,25 @@ void setup() {
   wandButton4.setText("Wand 4", font, 16);
   wandButton4.fillColor = color( 10, 200, 125, 128 );
   
-  ortho();
+  ortho(0, width, 0, height, -1000, 1000);
 }// setup
 
 void draw() {
+  if( scaleScreen )
+  {
+    omicronManager.pushScreenScale();
+    translate( 0, -screenHeight * 0.87 );
+  }
+  
   programTimer = millis() / 1000.0;
   deltaTime = programTimer - lastFrameTime;
   timeSinceLastInteractionEvent = programTimer - lastInteractionTime;
   
   // Sets the background color
-  background(24);
+  background(0);
+  
+  pushMatrix();
+  translate( 50, 60 );
   
   fill(0,250,250);
   text("CAVE2(TM) System Master Situation Display (Version 0.3 - alpha)", 16, 16);
@@ -236,21 +261,24 @@ void draw() {
     
     if( timeSinceLastInteractionEvent >= 30 )
     {
-      CAVE2_3Drotation.x = constrain( CAVE2_3Drotation.x + deltaTime * 0.1, 0, radians(45) );
-      CAVE2_3Drotation.y += deltaTime * 0.1;
-      demoMode = true;
+      //CAVE2_3Drotation.x = constrain( CAVE2_3Drotation.x + deltaTime * 0.1, 0, radians(45) );
+      //CAVE2_3Drotation.y += deltaTime * 0.1;
+      //demoMode = true;
     }
   }
   else
   {
-    if( demoMode )
-    {
-      CAVE2_3Drotation.x = 0;
-      CAVE2_3Drotation.y = 0;
-    }
-    demoMode = false;
+    
+    //demoMode = false;
   }
   
+  popMatrix();
+  
+  if( demoMode )
+  {
+    CAVE2_3Drotation.x = constrain( CAVE2_3Drotation.x + deltaTime * 0.1, 0, radians(45) );
+    CAVE2_3Drotation.y += deltaTime * 0.1;
+  }
   
   /*
   if( timeSinceLastTrackerUpdate < 2 )
@@ -309,16 +337,16 @@ void draw() {
   
   // Draw CAVE2 ------------------------------------------------------------------
   pushMatrix();
-  translate( CAVE2_screenPos.x, CAVE2_screenPos.y );
+  translate( CAVE2_screenPos.x, CAVE2_screenPos.y, zPos_3Dview);
   rotateX( CAVE2_3Drotation.x ); 
   rotateZ( CAVE2_3Drotation.y );
-  
+  scale( 2, 2, 2 );
   translate( 0, 0, CAVE2_screenPos.z );
   
   // CAVE2 vertical supports
   noFill();
   stroke(20,200,200);
-  strokeWeight(2);
+  //strokeWeight(2);
   for( int i = 0; i < 9; i++ )
   {
     pushMatrix();
@@ -374,12 +402,21 @@ void draw() {
   wandButton3.fillColor = wandTrackable3.colorDisabled;
   wandButton4.fillColor = wandTrackable4.colorDisabled;
   
+  /*
   headButton.draw();
   wandButton1.draw();
   wandButton2.draw();
   wandButton3.draw();
   wandButton4.draw();
+  */
   
+  PVector trackableWindow = new PVector( width * 0.02, height - 400 );
+  float displayWindowSpacing = 800;
+  displayTrackableWindow( headTrackable, trackableWindow.x, trackableWindow.y );
+  displayControllerWindow( wandTrackable1, trackableWindow.x + displayWindowSpacing, trackableWindow.y );
+  displayControllerWindow( wandTrackable2, trackableWindow.x + displayWindowSpacing * 2, trackableWindow.y );
+  
+  /*
   if( headButton.selected )
   {
     headTrackable.selected = true;
@@ -388,7 +425,7 @@ void draw() {
     wandTrackable3.selected = false;
     wandTrackable4.selected = false;
     
-    displayTrackableWindow( headTrackable, 0, height - 328 );
+    displayTrackableWindow( headTrackable, trackableWindow.x, trackableWindow.y );
     wandButton1.selected = false;
     wandButton2.selected = false;
     wandButton3.selected = false;
@@ -396,7 +433,7 @@ void draw() {
   }
   else if( wandButton1.selected )
   {
-    displayControllerWindow( wandTrackable1, 0, height - 328 );
+    displayControllerWindow( wandTrackable1, trackableWindow.x, trackableWindow.y );
     headButton.selected = false;
     wandButton2.selected = false;
     wandButton3.selected = false;
@@ -410,7 +447,7 @@ void draw() {
   }
   else if( wandButton2.selected )
   {
-    displayControllerWindow( wandTrackable2, 0, height - 328 );
+    displayControllerWindow( wandTrackable2, trackableWindow.x, trackableWindow.y );
     headButton.selected = false;
     wandButton1.selected = false;
     wandButton3.selected = false;
@@ -424,7 +461,7 @@ void draw() {
   }
   else if( wandButton3.selected )
   {
-    displayControllerWindow( wandTrackable3, 0, height - 328 );
+    displayControllerWindow( wandTrackable3, trackableWindow.x, trackableWindow.y );
     headButton.selected = false;
     wandButton1.selected = false;
     wandButton2.selected = false;
@@ -439,7 +476,7 @@ void draw() {
   }
   else if( wandButton4.selected )
   {
-    displayControllerWindow( wandTrackable4, 0, height - 328 );
+    displayControllerWindow( wandTrackable4, trackableWindow.x, trackableWindow.y );
     headButton.selected = false;
     wandButton1.selected = false;
     wandButton2.selected = false;
@@ -452,10 +489,39 @@ void draw() {
     wandTrackable3.selected = false;
     wandTrackable4.selected = true;
   }
+  */
+    
+  // Border
+  float borderWidth = 20;
+  float borderDistFromEdge = 30;
+  String systemText = "TRACKING SYSTEM";
+  PVector textOffset = new PVector( width * 0.7, borderWidth );
+  
+  fill(50);
+  rect( borderDistFromEdge + borderWidth/2, borderDistFromEdge, width - borderDistFromEdge * 2 - borderWidth/2, borderWidth ); //Top
+  ellipse( borderDistFromEdge + borderWidth/2, borderDistFromEdge + borderWidth/2, borderWidth, borderWidth ); // Top-Left
+  ellipse( width - borderDistFromEdge, borderDistFromEdge + borderWidth/2, borderWidth, borderWidth ); // Top-Right
+  rect( borderDistFromEdge, borderDistFromEdge + borderWidth/2, borderWidth, height - borderDistFromEdge * 2 - borderWidth/2 ); //Left
+  rect( width - borderDistFromEdge - borderWidth/2, borderDistFromEdge + borderWidth/2, borderWidth, height - borderDistFromEdge * 2 - borderWidth/2 ); //Right
+  ellipse( borderDistFromEdge + borderWidth/2, height - borderDistFromEdge, borderWidth, borderWidth ); // Bottom-Left
+  ellipse( width - borderDistFromEdge, height - borderDistFromEdge, borderWidth, borderWidth ); // Bottom-Right
+  rect( borderDistFromEdge + borderWidth/2, height - borderDistFromEdge - borderWidth/2, width - borderDistFromEdge * 2 - borderWidth/2, borderWidth ); // Bottom
+  
+  textFont( font, 32 );
+  fill(10);
+  rect( borderDistFromEdge + textOffset.x, height - borderDistFromEdge - borderWidth/2, textWidth(systemText) + borderWidth * 2, borderWidth ); // Bottom
+  fill(255);
+  text(systemText, borderDistFromEdge + borderWidth + textOffset.x, height - borderDistFromEdge - borderWidth/2  + textOffset.y);
+  textFont( font, 16 );
   
   // For event and fullscreen processing, this must be called in draw()
   omicronManager.process();
   lastFrameTime = programTimer;
+  
+  if( scaleScreen )
+  {
+    omicronManager.popScreenScale();
+  }
 }// draw
 
 void mouseDragged()
