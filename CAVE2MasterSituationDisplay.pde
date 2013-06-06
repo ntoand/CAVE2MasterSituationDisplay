@@ -6,7 +6,7 @@
  * Class: 
  * System: Processing 2.0a5, SUSE 12.1, Windows 7 x64
  * Author: Arthur Nishimoto
- * Version: 0.3 (alpha)
+ * Version: 0.4 (alpha)
  *
  * Version Notes:
  * 11/6/12      - Initial version
@@ -30,7 +30,7 @@ float deltaTime;
 float lastFrameTime;
 float startTime;
 
-float displayScale =  65;
+float CAVE2_Scale =  65;
 
 float CAVE2_verticalScale = 0.33;
 
@@ -41,10 +41,11 @@ float CAVE2_legBaseWidth = 0.254;
 float CAVE2_legHeight = 2.159;
 float CAVE2_lowerRingHeight = 0.3048;
 float CAVE2_displayWidth = 1.02;
+float CAVE2_displayHeight = 0.579;
 float CAVE2_displayDepth = 0.08;
+float CAVE2_displayToFloor = 0.317;
 
 float CAVE2_rotation = 15; //degrees
-PShape entranceTriangle;
 
 Trackable headTrackable;
 Trackable wandTrackable1;
@@ -90,13 +91,12 @@ OscP5 oscP5;
 int recvPort = 8000;
 
 boolean demoMode = true; // No active contollers and trackables enables demo mode (rotates CAVE2 image)
+boolean logErrors = false;
 
 float lastInteractionTime;
 float timeSinceLastInteractionEvent;
 
-PImage heatmapPoint;
-
-float zPos_3Dview = -300;
+float CAVE2_worldZPos = -300;
 
 boolean scaleScreen = false;
 
@@ -158,7 +158,6 @@ void setup() {
   font = loadFont("TMP-Monitors-48.vlw");
   textFont( font, 16 );
 
-  heatmapPoint = loadImage("heatmap/heatmapBrush.png");
   psNavigationOutline = loadImage("PS3Navigation.png");
   psNavigation_cross = loadImage("PS3Navigation_cross.png");
   psNavigation_circle = loadImage("PS3Navigation_circle.png");
@@ -190,8 +189,8 @@ void setup() {
   entranceTriangle.fill(24);
   entranceTriangle.noStroke();
   entranceTriangle.vertex(0,0);
-  entranceTriangle.vertex(-0.8 * displayScale , 3.6 * displayScale);
-  entranceTriangle.vertex(1.72 * displayScale , 3.27 * displayScale);
+  entranceTriangle.vertex(-0.8 * CAVE2_Scale , 3.6 * CAVE2_Scale);
+  entranceTriangle.vertex(1.72 * CAVE2_Scale , 3.27 * CAVE2_Scale);
   entranceTriangle.end(); // 2.0a5
   //entranceTriangle.close(CLOSE);
   //entranceTriangle.endShape(); // 2.0b9
@@ -239,7 +238,7 @@ void draw() {
   translate( 50, 60 );
   
   fill(0,250,250);
-  text("CAVE2(TM) System Master Situation Display (Version 0.3 - alpha)", 16, 16);
+  text("CAVE2(TM) System Master Situation Display (Version 0.4 - alpha)", 16, 16);
   
   float timeSinceLastTrackerUpdate = programTimer - lastTrackerUpdateTime;
   
@@ -334,55 +333,17 @@ void draw() {
   }*/
   
   
-  
   // Draw CAVE2 ------------------------------------------------------------------
   pushMatrix();
-  translate( CAVE2_screenPos.x, CAVE2_screenPos.y, zPos_3Dview);
+  translate( CAVE2_screenPos.x, CAVE2_screenPos.y, CAVE2_worldZPos);
   rotateX( CAVE2_3Drotation.x ); 
   rotateZ( CAVE2_3Drotation.y );
   scale( 2, 2, 2 );
   translate( 0, 0, CAVE2_screenPos.z );
   
-  // CAVE2 vertical supports
-  noFill();
-  stroke(20,200,200);
-  //strokeWeight(2);
-  for( int i = 0; i < 9; i++ )
-  {
-    pushMatrix();
-    rotate( radians(CAVE2_rotation) );
-    rotate( radians(45) * i );
-    translate( CAVE2_diameter/2 * displayScale - CAVE2_legBaseWidth / 2 * displayScale, -CAVE2_legBaseWidth/2 * displayScale, CAVE2_legHeight/2 * displayScale );
-    
-    //rectMode(CENTER);
-    box( CAVE2_legBaseWidth * displayScale, CAVE2_legBaseWidth * displayScale, CAVE2_legHeight * displayScale );
-    popMatrix();
-  }
-  
-  // CAVE2 displays
-  for( int i = 0; i < 21; i++ )
-  {
-    pushMatrix();
-    rotate( radians(18) * i ); 
-    
-    translate( CAVE2_diameter/2 * displayScale - (CAVE2_legBaseWidth + CAVE2_displayDepth) * displayScale, 0, (CAVE2_legHeight/2 + CAVE2_lowerRingHeight)* displayScale );
-    //rectMode(CENTER);
-    stroke(0,50,200);
-    if( !(i == 4 || i == 5) )
-      box( CAVE2_displayDepth * displayScale, CAVE2_displayWidth * displayScale, (CAVE2_legHeight - CAVE2_lowerRingHeight) * displayScale );
-    popMatrix();
-  }
+  drawCAVE2();
   
   // CAVE2 diameter (inner-screen, outer ring) - upper ring
-  pushMatrix();
-  translate( 0, 0, CAVE2_legHeight * displayScale );
-  stroke(20,200,200);
-  ellipse( 0, 0, CAVE2_diameter * displayScale, CAVE2_diameter * displayScale );
-  stroke(0,50,200);
-  ellipse( 0, 0, CAVE2_innerDiameter * displayScale, CAVE2_innerDiameter * displayScale );
-  popMatrix();
-  
-  // Audio display
   drawSpeakers();
   drawSounds();
   
@@ -611,13 +572,13 @@ PVector screenToMeters( int xPos, int yPos )
 {
   float screenOffsetX = CAVE2_screenPos.x;
   float screenOffsetY = CAVE2_screenPos.y;
-  return new PVector( (xPos - screenOffsetX)/displayScale, 0, (yPos - screenOffsetY)/displayScale );
+  return new PVector( (xPos - screenOffsetX)/CAVE2_Scale, 0, (yPos - screenOffsetY)/CAVE2_Scale );
 }
 
 PVector metersToScreen( PVector position )
 {
-  float displayX = (position.x * displayScale) + CAVE2_screenPos.x;
-  float displayY = (position.z * displayScale) + CAVE2_screenPos.y;
+  float displayX = (position.x * CAVE2_Scale) + CAVE2_screenPos.x;
+  float displayY = (position.z * CAVE2_Scale) + CAVE2_screenPos.y;
   float displayZ = 0;
   
   return new PVector( displayX, displayY, displayZ );

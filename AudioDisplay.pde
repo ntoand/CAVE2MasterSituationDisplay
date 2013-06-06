@@ -31,7 +31,7 @@ class Sound
   void draw()
   {
     pushMatrix();
-    translate( position.x * displayScale, position.z * displayScale, 0 );
+    translate( position.x * CAVE2_Scale, position.z * CAVE2_Scale, 0 );
     
     lifetime -= deltaTime;
     
@@ -76,29 +76,6 @@ void oscEvent(OscMessage theOscMessage) {
       playingStereo = true;
       return;
     }
-  }
-}
-
-void drawSpeakers()
-{
-  stroke(0,100,25);
-  //fill(0,200,50);
-  for( int i = 0; i < 21; i++ )
-  {
-    
-    pushMatrix();
-    rotate( radians(18) * 5 + radians(18) * i ); 
-
-    translate( CAVE2_diameter/2 * displayScale - (CAVE2_legBaseWidth + CAVE2_displayDepth) * displayScale, 0, speakerHeight * displayScale );
-    
-    if( playingStereo && (i == 7 || i == 8 || i == 12 || i == 13) )
-      fill(0,200,50);
-    else
-      noFill();
-      
-    //rectMode(CENTER);
-    box( speakerWidth * displayScale, speakerWidth * displayScale, speakerWidth * displayScale );
-    popMatrix();
   }
 }
 

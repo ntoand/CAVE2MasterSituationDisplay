@@ -23,8 +23,8 @@ void displayTrackableWindow( Trackable t, float xPos, float yPos )
 
   }
   text( t.name+" Trackable Status", 16, 16 * -1 );
-  text( "x: " + t.position.x + "\ny: " + t.position.y + "\nz: " + t.position.z, 16 * 1, 16 );
-  text( "roll: " + t.rotation.x + "\npitch: " + t.rotation.y + "\nyaw: " + t.rotation.z, 16 + 200, 16 );
+  text( "x: " + String.format("%.2f", t.position.x) + "\ny: " + String.format("%.2f", t.position.y) + "\nz: " + String.format("%.2f", t.position.z), 16 * 1, 16 );
+  text( "roll: " + String.format("%.2f", t.rotation.x) + "\npitch: " + String.format("%.2f", t.rotation.y) + "\nyaw: " + String.format("%.2f", t.rotation.z), 16 + 200, 16 );
   
   fill( t.colorMinor );
   text( "Minor Tracking Drops: " + t.minorDrops, 16 * 1, 16 * 6 );
@@ -57,8 +57,8 @@ void displayControllerWindow( Trackable t, float xPos, float yPos )
     fill(250, 50, 50, 128);
   }
   
-  text( "x: " + t.position.x + "\ny: " + t.position.y + "\nz: " + t.position.z, 16 * 1, 16 );
-  text( "roll: " + t.rotation.x + "\npitch: " + t.rotation.y + "\nyaw: " + t.rotation.z, 16 + 200, 16 );
+  text( "x: " + String.format("%.2f", t.position.x) + "\ny: " + String.format("%.2f", t.position.y) + "\nz: " + String.format("%.2f", t.position.z), 16 * 1, 16 );
+  text( "roll: " + String.format("%.2f", t.rotation.x) + "\npitch: " + String.format("%.2f", t.rotation.y) + "\nyaw: " + String.format("%.2f", t.rotation.z), 16 + 200, 16 );
   
   text( "Button 1", 16, 16 * 6 );
   text( "Button 2", 16, 16 * 7 );

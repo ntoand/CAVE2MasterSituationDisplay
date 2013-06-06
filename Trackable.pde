@@ -92,9 +92,9 @@ class Trackable
         case(Major): tint( colorMajor ); fill( colorMajor ); break;
       }
       
-      float displayX = position.x * displayScale;
-      float displayY = position.z * displayScale;
-      float displayZ = position.y * displayScale;
+      float displayX = position.x * CAVE2_Scale;
+      float displayY = position.z * CAVE2_Scale;
+      float displayZ = position.y * CAVE2_Scale;
       
       /*
       pushMatrix();
@@ -352,9 +352,9 @@ class Trackable
       currentStatusColor = colorNormal;
     }
   
-    float displayX = position.x * displayScale;
-    float displayY = position.z * displayScale;
-    float displayZ = position.y * displayScale;
+    float displayX = position.x * CAVE2_Scale;
+    float displayY = position.z * CAVE2_Scale;
+    float displayZ = position.y * CAVE2_Scale;
     
     drawPriority = 0;
     if( timeSinceLastMocapUpdate < 1 )
@@ -368,7 +368,8 @@ class Trackable
       
       if( trackingError != Minor )
       {
-        errorLog.add( new Error( programTimer, position, rotation, Minor ) );
+        if( logErrors )
+          errorLog.add( new Error( programTimer, position, rotation, Minor ) );
         minorDrops++;
       }
       
@@ -380,7 +381,8 @@ class Trackable
       
       if( trackingError != Moderate )
       {
-        errorLog.add( new Error( programTimer, position, rotation, Moderate ) );
+        if( logErrors )
+          errorLog.add( new Error( programTimer, position, rotation, Moderate ) );
         minorDrops--;
         moderateDrops++;
       }
@@ -394,7 +396,8 @@ class Trackable
       
       if( trackingError != Major )
       {
-        errorLog.add( new Error( programTimer, position, rotation, Major ) );
+        if( logErrors )
+          errorLog.add( new Error( programTimer, position, rotation, Major ) );
         moderateDrops--;
         majorDrops++;
       }
@@ -413,6 +416,7 @@ class Trackable
       currentUpdateColor = color(250, 50, 50, 128);
     }
     
+    // Trackable position sphere
     pushMatrix();
     translate( displayX, displayY, displayZ );
     //rotateX( -CAVE2_3Drotation.x );
@@ -443,12 +447,19 @@ class Trackable
     //text( "origin 2D angle: " + degrees(angleFromCenter), displayX + 10, displayZ + 4 );
     popMatrix();
     
+    // Floor position;
+    stroke(currentMocapColor);
+    noFill();
+    ellipse( displayX, displayY, 10, 10 );
+    line( displayX, displayY, 0, displayX, displayY, displayZ );
+    
+    // Trackable name (billboarded)
     pushMatrix();
     translate( displayX, displayY, displayZ );
     rotateZ( -CAVE2_3Drotation.y );
     rotateX( -CAVE2_3Drotation.x ); 
     
-    translate( 0, 0, zPos_3Dview + 500 );
+    translate( 0, 0, CAVE2_screenPos.z + 500 );
     
     text( name, 0 + 10, 0 - 5 );
     popMatrix();
