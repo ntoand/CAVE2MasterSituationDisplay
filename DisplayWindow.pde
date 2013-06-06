@@ -1,4 +1,4 @@
-PVector controllerImagePos = new PVector( 400 , 0 );
+PVector controllerImagePos = new PVector( 480 , 0 );
 
 void displayTrackableWindow( Trackable t, float xPos, float yPos )
 {
@@ -23,8 +23,14 @@ void displayTrackableWindow( Trackable t, float xPos, float yPos )
 
   }
   text( t.name+" Trackable Status", 16, 16 * -1 );
-  text( "x: " + String.format("%.2f", t.position.x) + "\ny: " + String.format("%.2f", t.position.y) + "\nz: " + String.format("%.2f", t.position.z), 16 * 1, 16 );
-  text( "roll: " + String.format("%.2f", t.rotation.x) + "\npitch: " + String.format("%.2f", t.rotation.y) + "\nyaw: " + String.format("%.2f", t.rotation.z), 16 + 200, 16 );
+  
+  textAlign(RIGHT);
+  text( String.format("%.2f", t.position.x) + " meters \n" + String.format("%.2f", t.position.y) + " meters \n" + String.format("%.2f", t.position.z) + " meters ", 16 * 1 + 180, 16 );
+  text( String.format("%.2f", t.rotation.x) + " degrees \n" + String.format("%.2f", t.rotation.y) + " degrees \n" + String.format("%.2f", t.rotation.z) + " degrees ", 16 + 450, 16 );
+  
+  textAlign(LEFT);
+  text( "x: \ny: \nz: ", 16 * 1, 16 );
+  text( "roll: \npitch: \nyaw: ", 16 + 200, 16 );
   
   fill( t.colorMinor );
   text( "Minor Tracking Drops: " + t.minorDrops, 16 * 1, 16 * 6 );
@@ -57,8 +63,13 @@ void displayControllerWindow( Trackable t, float xPos, float yPos )
     fill(250, 50, 50, 128);
   }
   
-  text( "x: " + String.format("%.2f", t.position.x) + "\ny: " + String.format("%.2f", t.position.y) + "\nz: " + String.format("%.2f", t.position.z), 16 * 1, 16 );
-  text( "roll: " + String.format("%.2f", t.rotation.x) + "\npitch: " + String.format("%.2f", t.rotation.y) + "\nyaw: " + String.format("%.2f", t.rotation.z), 16 + 200, 16 );
+  textAlign(RIGHT);
+  text( String.format("%.2f", t.position.x) + " meters \n" + String.format("%.2f", t.position.y) + " meters \n" + String.format("%.2f", t.position.z) + " meters ", 16 * 1 + 180, 16 );
+  text( String.format("%.2f", t.rotation.x) + " degrees \n" + String.format("%.2f", t.rotation.y) + " degrees \n" + String.format("%.2f", t.rotation.z) + " degrees ", 16 + 450, 16 );
+  
+  textAlign(LEFT);
+  text( "x: \ny: \nz: ", 16 * 1, 16 );
+  text( "roll: \npitch: \nyaw: ", 16 + 200, 16 );
   
   text( "Button 1", 16, 16 * 6 );
   text( "Button 2", 16, 16 * 7 );
