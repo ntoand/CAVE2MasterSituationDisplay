@@ -1,8 +1,3 @@
-
-
-float speakerWidth = 0.2;
-float speakerHeight = CAVE2_legHeight * 1.2;
-
 ArrayList soundList = new ArrayList();
 boolean playingStereo = false;
 

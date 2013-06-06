@@ -45,6 +45,9 @@ float CAVE2_displayHeight = 0.579;
 float CAVE2_displayDepth = 0.08;
 float CAVE2_displayToFloor = 0.317;
 
+float speakerHeight = CAVE2_legHeight * 1.3;
+float speakerWidth = 0.2;
+
 float CAVE2_rotation = 15; //degrees
 
 Trackable headTrackable;
