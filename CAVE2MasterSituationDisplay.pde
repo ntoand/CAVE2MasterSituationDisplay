@@ -6,7 +6,7 @@
  * Class: 
  * System: Processing 2.0a5, SUSE 12.1, Windows 7 x64
  * Author: Arthur Nishimoto
- * Version: 0.4 (alpha)
+ * Version: 0.3 (alpha)
  *
  * Version Notes:
  * 11/6/12      - Initial version
@@ -24,15 +24,16 @@ OmicronAPI omicronManager;
 EventListener eventListener;
 
 PApplet applet;
-PFont font;
+
+PFont st_font;
+PFont space_font;
+
 float programTimer;
 float deltaTime;
 float lastFrameTime;
 float startTime;
 
-float CAVE2_Scale =  65;
-
-float CAVE2_verticalScale = 0.33;
+float CAVE2_Scale = 80; // Scaling from meters to pixels
 
 // In meters:
 float CAVE2_diameter = 3.429 * 2;
@@ -50,26 +51,7 @@ float speakerWidth = 0.2;
 
 float CAVE2_rotation = 15; //degrees
 
-Trackable headTrackable;
-Trackable wandTrackable1;
-Trackable wandTrackable2;
-Trackable wandTrackable3;
-Trackable wandTrackable4;
-
-PImage psNavigationOutline;
-
-PImage psNavigation_cross;
-PImage psNavigation_circle;
-PImage psNavigation_up;
-PImage psNavigation_down;
-PImage psNavigation_left;
-PImage psNavigation_right;
-
-PImage psNavigation_L1;
-PImage psNavigation_L2;
-PImage psNavigation_L3;
-
-boolean connectToTracker = true;
+boolean connectToTracker = false;
 String trackerIP = "cave2tracker.evl.uic.edu";
 int msgport = 28000;
 int dataport = 7734;
@@ -80,12 +62,6 @@ float reconnectTrackerDelay = 6.0f;
 float connectionTimer = 0;
 float connectionTime = 0;
 
-Button headButton;
-Button wandButton1;
-Button wandButton2;
-Button wandButton3;
-Button wandButton4;
-
 PVector CAVE2_screenPos;
 PVector CAVE2_3Drotation = new PVector();
 
@@ -93,15 +69,16 @@ PVector CAVE2_3Drotation = new PVector();
 OscP5 oscP5;
 int recvPort = 8000;
 
-boolean demoMode = true; // No active contollers and trackables enables demo mode (rotates CAVE2 image)
-boolean logErrors = false;
+boolean demoMode = false; // No active contollers and trackables enables demo mode (rotates CAVE2 image)
 
 float lastInteractionTime;
 float timeSinceLastInteractionEvent;
 
-float CAVE2_worldZPos = -300;
+float CAVE2_worldZPos = 0;
 
 boolean scaleScreen = false;
+
+NodeDisplay[] nodes = new NodeDisplay[37];
 
 // Override of PApplet init() which is called before setup()
 public void init() {
@@ -117,18 +94,6 @@ public void init() {
 void exit()
 {
   super.exit();
-  
-  // Output tracker drop data to text files
-  if( headTrackable!= null )
-    headTrackable.outputErrorsToFile();
-  if( wandTrackable1!= null )
-    wandTrackable1.outputErrorsToFile();
-  if( wandTrackable2!= null )
-    wandTrackable2.outputErrorsToFile();
-  if( wandTrackable3!= null )
-    wandTrackable1.outputErrorsToFile();
-  if( wandTrackable4!= null )
-    wandTrackable2.outputErrorsToFile();
 }// exit
 
 // Program initializations
@@ -141,7 +106,11 @@ void setup() {
   
   applet = this;
   oscP5 = new OscP5(this,recvPort);
-  CAVE2_screenPos = new PVector( width * 0.5, height * CAVE2_verticalScale, -100 );
+  
+  // CAVE2 model's origin is at the center, bottom of the CAVE.
+  // Here we offset the z position by -80 pixels to move the pivot
+  // point to approximatly the vertical center of the CAVE
+  CAVE2_screenPos = new PVector( width/2, height/2 - 20, -80 );
    
   startTime = millis() / 1000.0;
 
@@ -158,72 +127,21 @@ void setup() {
   omicronManager.enableScreenScale(scaleScreen);
   omicronManager.calculateScreenTransformation(2560,1440); // Single display on CAVE2 column display
   
-  font = loadFont("TMP-Monitors-48.vlw");
-  textFont( font, 16 );
-
-  psNavigationOutline = loadImage("PS3Navigation.png");
-  psNavigation_cross = loadImage("PS3Navigation_cross.png");
-  psNavigation_circle = loadImage("PS3Navigation_circle.png");
-  psNavigation_up = loadImage("PS3Navigation_up.png");
-  psNavigation_down = loadImage("PS3Navigation_down.png");
-  psNavigation_left = loadImage("PS3Navigation_left.png");
-  psNavigation_right = loadImage("PS3Navigation_right.png");
-  psNavigation_L1 = loadImage("PS3Navigation_L1.png");
-  psNavigation_L2 = loadImage("PS3Navigation_L2.png");
-  psNavigation_L3 = loadImage("PS3Navigation_L3.png");
-  
-  headTrackable = new Trackable( 0, "Head 1" );
-  
-  wandTrackable1 = new Trackable( 1, "Wand 1 Type A (Batman/Kirk)" );
-  wandTrackable1.secondID = 0; // Controller 0 is mapped to Wand 1
-  
-  wandTrackable2 = new Trackable( 2, "Wand 2 Type B (Robin/Spock)" );
-  wandTrackable2.secondID = 1; // Controller 1 is mapped to Wand 2
-  //wandTrackable2.loadErrorsFromFile();
-  
-  wandTrackable3 = new Trackable( 3, "Wand 3 Type A (Batman/Kirk)" );
-  wandTrackable3.secondID = 2; // Controller 1 is mapped to Wand 2
-  
-  wandTrackable4 = new Trackable( 4, "Wand 4 Type B (Robin/Spock)" );
-  wandTrackable4.secondID = 3; // Controller 1 is mapped to Wand 2
-  
-  /*
-  entranceTriangle = createShape();
-  entranceTriangle.fill(24);
-  entranceTriangle.noStroke();
-  entranceTriangle.vertex(0,0);
-  entranceTriangle.vertex(-0.8 * CAVE2_Scale , 3.6 * CAVE2_Scale);
-  entranceTriangle.vertex(1.72 * CAVE2_Scale , 3.27 * CAVE2_Scale);
-  entranceTriangle.end(); // 2.0a5
-  //entranceTriangle.close(CLOSE);
-  //entranceTriangle.endShape(); // 2.0b9
-  */
-  
-  headButton = new Button( 16 * 1, 16 * 6, 80, 30 );
-  headButton.setText("Head 1", font, 16);
-  headButton.fillColor = color( 10, 200, 125, 128 );
-  
-  wandButton1 = new Button( 16 * 1, 16 * 6 + 35, 80, 30 );
-  wandButton1.setText("Wand 1", font, 16);
-  wandButton1.fillColor = color( 10, 200, 125, 128 );
-  wandButton1.selected = true;
-  
-  wandButton2 = new Button( 16 * 1, 16 * 6 + 35 * 2, 80, 30 );
-  wandButton2.setText("Wand 2", font, 16);
-  wandButton2.fillColor = color( 10, 200, 125, 128 );
-  
-  wandButton3 = new Button( 16 * 1, 16 * 6 + 35 * 3, 80, 30 );
-  wandButton3.setText("Wand 3", font, 16);
-  wandButton3.fillColor = color( 10, 200, 125, 128 );
-  
-  wandButton4 = new Button( 16 * 1, 16 * 6 + 35 * 4, 80, 30 );
-  wandButton4.setText("Wand 4", font, 16);
-  wandButton4.fillColor = color( 10, 200, 125, 128 );
+  st_font = loadFont("TMP-Monitors-48.vlw");
+  space_font = loadFont("SpaceAge-48.vlw");
+  textFont( st_font, 16 );
   
   ortho(0, width, 0, height, -1000, 1000);
+  
+  for( int i = 0; i < 37; i++)
+  {
+    nodes[i] = new NodeDisplay(i);
+  }
 }// setup
 
 void draw() {
+  getData();
+  
   if( scaleScreen )
   {
     omicronManager.pushScreenScale();
@@ -237,11 +155,15 @@ void draw() {
   // Sets the background color
   background(0);
   
+  fill(200,0,0);
+  ellipse( width/2, height/2, 10, 10 );
+  
+  /*
   pushMatrix();
   translate( 50, 60 );
   
   fill(0,250,250);
-  text("CAVE2(TM) System Master Situation Display (Version 0.4 - alpha)", 16, 16);
+  text("CAVE2(TM) System Master Situation Display (Version 0.3 - alpha)", 16, 16);
   
   float timeSinceLastTrackerUpdate = programTimer - lastTrackerUpdateTime;
   
@@ -255,6 +177,7 @@ void draw() {
     text("Not connected to tracker", 16, 16 * 2);
     text("Running in demo mode", 16, 16 * 3);
   }
+  
   
   if( timeSinceLastTrackerUpdate >= 5 )
   {
@@ -275,190 +198,33 @@ void draw() {
   }
   
   popMatrix();
+  */
   
   if( demoMode )
   {
-    CAVE2_3Drotation.x = constrain( CAVE2_3Drotation.x + deltaTime * 0.1, 0, radians(45) );
+    CAVE2_3Drotation.x = constrain( CAVE2_3Drotation.x + deltaTime * 0.1, 0, radians(90) );
     CAVE2_3Drotation.y += deltaTime * 0.1;
   }
-  
-  /*
-  if( timeSinceLastTrackerUpdate < 2 )
-  {
-    text("Connected to '"+ trackerIP + "' on msgport: " + msgport, 16, 16 * 2);
-    text("Receiving data on dataport: " + dataport, 16, 16 * 3);
-    reconnectTrackerTimer = programTimer + reconnectTrackerDelay;
-  }
-  else
-  {
-    fill(250,50,50);
-    text("LOST CONNECTION TO '"+ trackerIP + "' on msgport: " + msgport, 16, 16 * 2);
-    text("TIME SINCE LAST UPDATE: " + timeSinceLastTrackerUpdate, 16, 16 * 3);
-    
-    float reconnectTimer = reconnectTrackerTimer - programTimer;
-    
-    
-    if( reconnectTimer > 1 )
-    {
-      text("CHECK OMEGALIB - OINPUTSERVER STATUS", 16, 16 * 4);
-      text("ATTEMPTING RECONNECT IN " + (int)reconnectTimer , 16, 16 * 5);
-      connectionTime = programTimer;
-    }
-    else
-    {
-      text("CHECK OMEGALIB - OINPUTSERVER STATUS", 16, 16 * 4);
-      //text("ATTEMPTING RECONNECT - MAY HANG FOR 70 SECONDS", 16, 16 * 4);
-      //text("OR UNTIL OINPUTSERVER CONNECTION IS ESTABLISHED", 16, 16 * 5);
-      connectionTimer = programTimer - connectionTime;
-      
-      if( reconnectTimer < 0 )
-      {
-        //this.unregisterDispose(omicronManager);
-        //omicronManager.ConnectToTracker(dataport, msgport, trackerIP);
-        //reconnectTrackerTimer = millis() / 1000.0 + reconnectTrackerDelay;
-      }
-    }
-    
-    if( connectionTimer < 5 )
-    {
-      background(24);
-      fill(0,250,250);
-      text("CAVE2(TM) System Locator (Version 0.2 - alpha)", 16, 16);
-      text("Connected to '"+ trackerIP + "' on msgport: " + msgport, 16, 16 * 2);
-      text("Receiving data on dataport: " + dataport, 16, 16 * 3);
-      //reconnectTrackerTimer = programTimer + reconnectTrackerDelay;
-      
-      fill(250,250,50);
-      text("No active controllers or trackables in CAVE2", 16, 16 * 4);
-    }
-    
-    
-  }*/
-  
   
   // Draw CAVE2 ------------------------------------------------------------------
   pushMatrix();
   translate( CAVE2_screenPos.x, CAVE2_screenPos.y, CAVE2_worldZPos);
-  rotateX( CAVE2_3Drotation.x ); 
-  rotateZ( CAVE2_3Drotation.y );
+  //rotateX( CAVE2_3Drotation.x ); 
+  //rotateZ( CAVE2_3Drotation.y );
   scale( 2, 2, 2 );
   translate( 0, 0, CAVE2_screenPos.z );
   
   drawCAVE2();
+  //drawSpeakers();
   
-  // CAVE2 diameter (inner-screen, outer ring) - upper ring
-  drawSpeakers();
-  drawSounds();
-  
-  // -----------------------------------------------------------------------------
-  wandTrackable4.update();
-  wandTrackable3.update();
-  wandTrackable2.draw();
-  wandTrackable1.draw();
-  headTrackable.draw();
-  
-  drawCoordinateSystem( 0, 0 );
+  //drawCoordinateSystem( 0, 0 );
   popMatrix();
-  
-  headButton.fillColor = headTrackable.currentStatusColor;
-  wandButton1.fillColor = wandTrackable1.currentStatusColor;
-  wandButton2.fillColor = wandTrackable2.currentStatusColor;
-  wandButton3.fillColor = wandTrackable3.colorDisabled;
-  wandButton4.fillColor = wandTrackable4.colorDisabled;
-  
-  /*
-  headButton.draw();
-  wandButton1.draw();
-  wandButton2.draw();
-  wandButton3.draw();
-  wandButton4.draw();
-  */
-  
-  PVector trackableWindow = new PVector( width * 0.02, height - 400 );
-  float displayWindowSpacing = 800;
-  displayTrackableWindow( headTrackable, trackableWindow.x, trackableWindow.y );
-  displayControllerWindow( wandTrackable1, trackableWindow.x + displayWindowSpacing, trackableWindow.y );
-  displayControllerWindow( wandTrackable2, trackableWindow.x + displayWindowSpacing * 2, trackableWindow.y );
-  
-  /*
-  if( headButton.selected )
-  {
-    headTrackable.selected = true;
-    wandTrackable1.selected = false;
-    wandTrackable2.selected = false;
-    wandTrackable3.selected = false;
-    wandTrackable4.selected = false;
-    
-    displayTrackableWindow( headTrackable, trackableWindow.x, trackableWindow.y );
-    wandButton1.selected = false;
-    wandButton2.selected = false;
-    wandButton3.selected = false;
-    wandButton4.selected = false;
-  }
-  else if( wandButton1.selected )
-  {
-    displayControllerWindow( wandTrackable1, trackableWindow.x, trackableWindow.y );
-    headButton.selected = false;
-    wandButton2.selected = false;
-    wandButton3.selected = false;
-    wandButton4.selected = false;
-    
-    headTrackable.selected = false;
-    wandTrackable1.selected = true;
-    wandTrackable2.selected = false;
-    wandTrackable3.selected = false;
-    wandTrackable4.selected = false;
-  }
-  else if( wandButton2.selected )
-  {
-    displayControllerWindow( wandTrackable2, trackableWindow.x, trackableWindow.y );
-    headButton.selected = false;
-    wandButton1.selected = false;
-    wandButton3.selected = false;
-    wandButton4.selected = false;
-    
-    headTrackable.selected = false;
-    wandTrackable1.selected = false;
-    wandTrackable2.selected = true;
-    wandTrackable3.selected = false;
-    wandTrackable4.selected = false;
-  }
-  else if( wandButton3.selected )
-  {
-    displayControllerWindow( wandTrackable3, trackableWindow.x, trackableWindow.y );
-    headButton.selected = false;
-    wandButton1.selected = false;
-    wandButton2.selected = false;
-    wandButton3.selected = true;
-    wandButton4.selected = false;
-    
-    headTrackable.selected = false;
-    wandTrackable1.selected = false;
-    wandTrackable2.selected = false;
-    wandTrackable3.selected = true;
-    wandTrackable4.selected = false;
-  }
-  else if( wandButton4.selected )
-  {
-    displayControllerWindow( wandTrackable4, trackableWindow.x, trackableWindow.y );
-    headButton.selected = false;
-    wandButton1.selected = false;
-    wandButton2.selected = false;
-    wandButton3.selected = false;
-    wandButton4.selected = true;
-    
-    headTrackable.selected = false;
-    wandTrackable1.selected = false;
-    wandTrackable2.selected = false;
-    wandTrackable3.selected = false;
-    wandTrackable4.selected = true;
-  }
-  */
     
   // Border
+  noStroke();
   float borderWidth = 20;
   float borderDistFromEdge = 30;
-  String systemText = "TRACKING SYSTEM";
+  String systemText = "PROCESSING UNIT STATUS";
   PVector textOffset = new PVector( width * 0.7, borderWidth );
   
   fill(50);
@@ -471,12 +237,12 @@ void draw() {
   ellipse( width - borderDistFromEdge, height - borderDistFromEdge, borderWidth, borderWidth ); // Bottom-Right
   rect( borderDistFromEdge + borderWidth/2, height - borderDistFromEdge - borderWidth/2, width - borderDistFromEdge * 2 - borderWidth/2, borderWidth ); // Bottom
   
-  textFont( font, 32 );
+  textFont( st_font, 32 );
   fill(10);
   rect( borderDistFromEdge + textOffset.x, height - borderDistFromEdge - borderWidth/2, textWidth(systemText) + borderWidth * 2, borderWidth ); // Bottom
   fill(255);
   text(systemText, borderDistFromEdge + borderWidth + textOffset.x, height - borderDistFromEdge - borderWidth/2  + textOffset.y);
-  textFont( font, 16 );
+  textFont( st_font, 16 );
   
   // For event and fullscreen processing, this must be called in draw()
   omicronManager.process();
@@ -486,6 +252,29 @@ void draw() {
   {
     omicronManager.popScreenScale();
   }
+  
+  
+  pushMatrix();
+  translate( width/2, height - 30 - borderDistFromEdge - 80 );
+  nodes[0].drawLeft();
+  popMatrix();
+  
+  for( int i = 1; i < 19; i++ )
+  {
+    pushMatrix();
+    translate( 80 + borderDistFromEdge, height - 30 - borderDistFromEdge + 80 * -i );
+    nodes[i].drawLeft();
+    popMatrix();
+  }
+  
+  for( int i = 19; i < 37; i++ )
+  {
+    pushMatrix();
+    translate( width - 80 - borderDistFromEdge - 500, 130 - borderDistFromEdge + 80 * (i-19) );
+    nodes[i].drawRight();
+    popMatrix();
+  }
+  
 }// draw
 
 void mouseDragged()
@@ -504,71 +293,6 @@ void mouseDragged()
 void mousePressed()
 {
   lastInteractionTime = programTimer;
-  
-  PVector meters = screenToMeters( mouseX, mouseY );
-  PVector displayPos = metersToScreen( meters );
-  //println( "ScreenPos "+ displayPos.x  + " " + displayPos.y );
-  //println( "MetersPos "+meters.x  + " " + meters.z );
-  //println( "-----" );
-  
-  //meters.x *= 1;
-  //meters.y = meters.y * CAVE2_verticalScale + (screenToMeters(width,height).y *CAVE2_verticalScale);
-  
-  if( headButton.isPressed( mouseX, mouseY ) )
-  {
-      wandButton1.selected = false;
-      wandButton2.selected = false;
-  }
-  
-  if( wandButton1.isPressed( mouseX, mouseY ) )
-  {
-      headButton.selected = false;
-      wandButton2.selected = false;
-  }
-  
-  if( wandButton2.isPressed( mouseX, mouseY ) )
-  {
-      headButton.selected = false;
-      wandButton1.selected = false;
-  }
-  
-  if( wandButton3.isPressed( mouseX, mouseY ) )
-  {
-      headButton.selected = false;
-      wandButton1.selected = false;
-      wandButton2.selected = false;
-      wandButton4.selected = false;
-  }
-  
-  if( wandButton4.isPressed( mouseX, mouseY ) )
-  {
-      headButton.selected = false;
-      wandButton1.selected = false;
-      wandButton2.selected = false;
-      wandButton3.selected = false;
-  }
-  
-  if( headTrackable.isPressed( meters.x, meters.y ) )
-  {
-      headButton.selected = true;
-      wandButton1.selected = false;
-      wandButton2.selected = false;
-  }
-  
-  if( wandTrackable1.isPressed( meters.x, meters.y ) )
-  {
-      headButton.selected = false;
-      wandButton1.selected = true;
-      wandButton2.selected = false;
-  }
-  
-  if( wandTrackable2.isPressed( meters.x, meters.y ) )
-  {
-      headButton.selected = false;
-      wandButton1.selected = false;
-      wandButton2.selected = true;
-  }
-  
 }
 
 PVector screenToMeters( int xPos, int yPos )

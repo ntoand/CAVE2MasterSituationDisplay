@@ -31,14 +31,7 @@ class EventListener implements OmicronListener{
     float yRot = e.orientation[1];
     float zRot = e.orientation[2];
     float wRot = e.orientation[3];
-    
-    if( objectID == headTrackable.ID )
-      headTrackable.updatePosition( xPos, yPos, zPos, xRot, yRot, zRot, wRot );
-    else if( objectID == wandTrackable1.ID )
-      wandTrackable1.updatePosition( xPos, yPos, zPos, xRot, yRot, zRot, wRot );
-    else if( objectID == wandTrackable2.ID )
-      wandTrackable2.updatePosition( xPos, yPos, zPos, xRot, yRot, zRot, wRot );
-      
+          
     popMatrix();
     
   }// onMocapEvent
@@ -60,55 +53,14 @@ class EventListener implements OmicronListener{
     
     if( e.getEventType() == OmicronAPI.Type.Down )
     {
-        if( objectID == wandTrackable1.secondID )
-          wandTrackable1.updateButton( flag, true );
-        else if( objectID == wandTrackable2.secondID )
-          wandTrackable2.updateButton( flag, true );
-        else if( objectID == wandTrackable3.secondID )
-          wandTrackable3.updateButton( flag, true );
-        else if( objectID == wandTrackable4.secondID )
-          wandTrackable4.updateButton( flag, true );
       //println("Wand ID " + objectID + " event: DOWN - Flag: " + flag);
     }
     else if( e.getEventType() == OmicronAPI.Type.Up )
     {
-      if( objectID == wandTrackable1.secondID )
-          wandTrackable1.updateButton( flag, false );
-      else if( objectID == wandTrackable2.secondID )
-          wandTrackable2.updateButton( flag, false );
-      else if( objectID == wandTrackable3.secondID )
-          wandTrackable3.updateButton( flag, false );
-      else if( objectID == wandTrackable4.secondID )
-          wandTrackable4.updateButton( flag, false );
       //println("Wand ID " + objectID + " event: UP - Flag: " + flag);
     }
     else if( e.getEventType() == OmicronAPI.Type.Update )
     {
-      if( objectID == wandTrackable1.secondID )
-      {
-          wandTrackable1.updateAnalog( 1, e.getFloatData(0), e.getFloatData(1) );
-          wandTrackable1.updateAnalog( 2, e.getFloatData(2), e.getFloatData(3) );
-          wandTrackable1.updateAnalog( 3, e.getFloatData(4), 0 );
-      }
-      else if( objectID == wandTrackable2.secondID )
-      {
-          wandTrackable2.updateAnalog( 1, e.getFloatData(0), e.getFloatData(1) );
-          wandTrackable2.updateAnalog( 2, e.getFloatData(2), e.getFloatData(3) );
-          wandTrackable2.updateAnalog( 3, e.getFloatData(4), 0 );
-      }
-      else if( objectID == wandTrackable3.secondID )
-      {
-          wandTrackable3.updateAnalog( 1, e.getFloatData(0), e.getFloatData(1) );
-          wandTrackable3.updateAnalog( 2, e.getFloatData(2), e.getFloatData(3) );
-          wandTrackable3.updateAnalog( 3, e.getFloatData(4), 0 );
-      }
-      else if( objectID == wandTrackable4.secondID )
-      {
-          wandTrackable4.updateAnalog( 1, e.getFloatData(0), e.getFloatData(1) );
-          wandTrackable4.updateAnalog( 2, e.getFloatData(2), e.getFloatData(3) );
-          wandTrackable4.updateAnalog( 3, e.getFloatData(4), 0 );
-      }
-      
       //println("Wand ID " + objectID + " event: UPDATE");
       //println("  Analog 0 " + e.getFloatData(0));
       //println("  Analog 1 " + e.getFloatData(1));

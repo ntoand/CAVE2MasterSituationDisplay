@@ -35,7 +35,7 @@ void drawCAVE2()
     }
     */
     
-    /*
+    
     // Display as individual computers
     for( int j = 0; j < 2; j++ )
     {
@@ -45,7 +45,7 @@ void drawCAVE2()
       translate( CAVE2_diameter/2 * CAVE2_Scale - (CAVE2_legBaseWidth + CAVE2_displayDepth) * CAVE2_Scale, 0, ( CAVE2_displayToFloor + CAVE2_displayHeight + 2 * CAVE2_displayHeight * j) * CAVE2_Scale );
       //rectMode(CENTER);
       stroke(0,50,200);
-      //fill(0,10,100);
+      fill(0,10,100);
       
       if( !(i == 4 || i == 5) )
         box( CAVE2_displayDepth * CAVE2_Scale, CAVE2_displayWidth * CAVE2_Scale, 2 * CAVE2_displayHeight * CAVE2_Scale );
@@ -53,9 +53,9 @@ void drawCAVE2()
       
       noFill();
     }
-    */
     
     
+    /*
     // Display as a single column
     pushMatrix();
     rotate( radians(18) * i ); 
@@ -66,7 +66,7 @@ void drawCAVE2()
     if( !(i == 4 || i == 5) )
       box( CAVE2_displayDepth * CAVE2_Scale, CAVE2_displayWidth * CAVE2_Scale, 4 * CAVE2_displayHeight * CAVE2_Scale );
     popMatrix();
-    
+    */
   }
   
   // CAVE2 top truss bottom
