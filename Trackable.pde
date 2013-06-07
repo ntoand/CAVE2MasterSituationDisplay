@@ -368,8 +368,7 @@ class Trackable
       
       if( trackingError != Minor )
       {
-        if( logErrors )
-          errorLog.add( new Error( programTimer, position, rotation, Minor ) );
+        errorLog.add( new Error( programTimer, position, rotation, Minor ) );
         minorDrops++;
       }
       
@@ -381,8 +380,7 @@ class Trackable
       
       if( trackingError != Moderate )
       {
-        if( logErrors )
-          errorLog.add( new Error( programTimer, position, rotation, Moderate ) );
+        errorLog.add( new Error( programTimer, position, rotation, Moderate ) );
         minorDrops--;
         moderateDrops++;
       }
@@ -396,8 +394,7 @@ class Trackable
       
       if( trackingError != Major )
       {
-        if( logErrors )
-          errorLog.add( new Error( programTimer, position, rotation, Major ) );
+        errorLog.add( new Error( programTimer, position, rotation, Major ) );
         moderateDrops--;
         majorDrops++;
       }
@@ -416,7 +413,6 @@ class Trackable
       currentUpdateColor = color(250, 50, 50, 128);
     }
     
-    // Trackable position sphere
     pushMatrix();
     translate( displayX, displayY, displayZ );
     //rotateX( -CAVE2_3Drotation.x );
@@ -447,13 +443,6 @@ class Trackable
     //text( "origin 2D angle: " + degrees(angleFromCenter), displayX + 10, displayZ + 4 );
     popMatrix();
     
-    // Floor position;
-    stroke(currentMocapColor);
-    noFill();
-    ellipse( displayX, displayY, 10, 10 );
-    line( displayX, displayY, 0, displayX, displayY, displayZ );
-    
-    // Trackable name (billboarded)
     pushMatrix();
     translate( displayX, displayY, displayZ );
     rotateZ( -CAVE2_3Drotation.y );

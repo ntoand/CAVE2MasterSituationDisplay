@@ -34,16 +34,22 @@ float lastFrameTime;
 float startTime;
 
 boolean demoMode = true; // No active contollers and trackables enables demo mode (rotates CAVE2 image)
-boolean scaleScreen = false;
+boolean scaleScreen = true;
 boolean logErrors = false;
 
 float lastInteractionTime;
 float timeSinceLastInteractionEvent;
 
 String systemText = "MASTER SITUATION DISPLAY";
+float borderWidth = 20;
+float borderDistFromEdge = 30;
+
+final int TRACKING = 0;
+final int CLUSTER = 1;
+int state = TRACKING;
 
 // CAVE2 model -----------------------------------
-float CAVE2_Scale =  65;
+float CAVE2_Scale = 65;
 
 float CAVE2_verticalScale = 0.33;
 
@@ -67,6 +73,11 @@ PVector CAVE2_screenPos;
 PVector CAVE2_3Drotation = new PVector();
 
 float CAVE2_worldZPos = -300;
+
+final int COLUMN = 0;
+final int NODE = 1;
+final int DISPLAY = 2;
+int CAVE2_displayMode = COLUMN;
 
 // Tracker ---------------------------------------
 boolean connectToTracker = true;
@@ -111,8 +122,10 @@ OscP5 oscP5;
 int recvPort = 8000;
 
 // Cluster ---------------------------------------
+boolean connectToClusterData = false;
 NodeDisplay[] nodes = new NodeDisplay[37];
 float[] columnPulse = new float[21];
+float pulseDecay = 0.1;
 
 // Override of PApplet init() which is called before setup()
 public void init() {
@@ -224,24 +237,24 @@ void setup() {
   */
   
   headButton = new Button( 16 * 1, 16 * 6, 80, 30 );
-  headButton.setText("Head 1", font, 16);
+  headButton.setText("Head 1", st_font, 16);
   headButton.fillColor = color( 10, 200, 125, 128 );
   
   wandButton1 = new Button( 16 * 1, 16 * 6 + 35, 80, 30 );
-  wandButton1.setText("Wand 1", font, 16);
+  wandButton1.setText("Wand 1", st_font, 16);
   wandButton1.fillColor = color( 10, 200, 125, 128 );
   wandButton1.selected = true;
   
   wandButton2 = new Button( 16 * 1, 16 * 6 + 35 * 2, 80, 30 );
-  wandButton2.setText("Wand 2", font, 16);
+  wandButton2.setText("Wand 2", st_font, 16);
   wandButton2.fillColor = color( 10, 200, 125, 128 );
   
   wandButton3 = new Button( 16 * 1, 16 * 6 + 35 * 3, 80, 30 );
-  wandButton3.setText("Wand 3", font, 16);
+  wandButton3.setText("Wand 3", st_font, 16);
   wandButton3.fillColor = color( 10, 200, 125, 128 );
   
   wandButton4 = new Button( 16 * 1, 16 * 6 + 35 * 4, 80, 30 );
-  wandButton4.setText("Wand 4", font, 16);
+  wandButton4.setText("Wand 4", st_font, 16);
   wandButton4.fillColor = color( 10, 200, 125, 128 );
   
   ortho(0, width, 0, height, -1000, 1000);
@@ -251,7 +264,6 @@ void draw() {
   if( scaleScreen )
   {
     omicronManager.pushScreenScale();
-    translate( 0, -screenHeight * 0.87 );
   }
   
   programTimer = millis() / 1000.0;
@@ -262,14 +274,20 @@ void draw() {
   background(0);
   
   pushMatrix();
-  translate( 50, 60 );
 
-  drawTrackerStatus();
-  drawClusterStatus();
+  switch( state )
+  {
+    case(TRACKING):
+      drawTrackerStatus();
+      break;
+    case(CLUSTER):
+      getData();
+      drawClusterStatus();
+      break;
+  }
   
   // Border
-  float borderWidth = 20;
-  float borderDistFromEdge = 30;
+  noStroke();
   PVector textOffset = new PVector( width * 0.7, borderWidth );
   
   fill(50);
@@ -282,12 +300,12 @@ void draw() {
   ellipse( width - borderDistFromEdge, height - borderDistFromEdge, borderWidth, borderWidth ); // Bottom-Right
   rect( borderDistFromEdge + borderWidth/2, height - borderDistFromEdge - borderWidth/2, width - borderDistFromEdge * 2 - borderWidth/2, borderWidth ); // Bottom
   
-  textFont( font, 32 );
+  textFont( st_font, 32 );
   fill(10);
   rect( borderDistFromEdge + textOffset.x, height - borderDistFromEdge - borderWidth/2, textWidth(systemText) + borderWidth * 2, borderWidth ); // Bottom
   fill(255);
   text(systemText, borderDistFromEdge + borderWidth + textOffset.x, height - borderDistFromEdge - borderWidth/2  + textOffset.y);
-  textFont( font, 16 );
+  textFont( st_font, 16 );
   
   // For event and fullscreen processing, this must be called in draw()
   omicronManager.process();
@@ -427,4 +445,17 @@ void drawCoordinateSystem( int x, float y )
   line( 30, 0, 0, 0 );
   
   popMatrix();
+}
+
+void keyPressed()
+{
+  println(key);
+  if( key == '1' )
+  {
+    state = TRACKING;
+  }
+  if( key == '2' )
+  {
+    state = CLUSTER;
+  }
 }

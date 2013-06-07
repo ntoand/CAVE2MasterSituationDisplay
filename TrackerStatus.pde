@@ -2,6 +2,11 @@ void drawTrackerStatus()
 {
   systemText = "TRACKING SYSTEM";
   
+  CAVE2_Scale = 65;
+  CAVE2_displayMode = DISPLAY;
+  
+  translate( 50, 60 );
+  
   fill(0,250,250);
   text("CAVE2(TM) System Master Situation Display (Version 0.4 - alpha)", 16, 16);
   
