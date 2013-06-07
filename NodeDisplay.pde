@@ -1,3 +1,18 @@
+class Pulse
+{
+  float curPos = 0;
+
+  public void setPosition(float val)
+  {
+    curPos = val;
+  }
+  
+  public float getPosition()
+  {
+    return curPos;
+  }
+}
+
 class NodeDisplay
 {
   int nodeID = 0;
@@ -6,9 +21,9 @@ class NodeDisplay
   
   int cpuBorder = 5;
   
-  color baseColor = color(10,250,10);
+  color baseColor = color(250,200,10);
   color nodeColor = color(10,50,10);
-  
+
   int[] CPU = new int[16];
   
   int[] conduitLength = new int[37];
@@ -16,6 +31,11 @@ class NodeDisplay
   int[] conduitAngle = new int[37];
   
   int gpuMem;
+  int nSegments;
+  int nAngledSegments;
+  int[] segments;
+  
+  ArrayList conduitPulses = new ArrayList();
   
   NodeDisplay( int id )
   {
@@ -23,15 +43,17 @@ class NodeDisplay
     
     for( int i = 0; i < 16; i++)
     {
-      CPU[i] = (int)random(0,100);
+      CPU[i] = (int)random(0,101);
     }
+      
+    gpuMem = (int)random(0,101);
     
-    gpuMem = (int)random(0,100);
+    conduitLength[0] = 400;
     
-    conduitLength[1] = 0;
-    conduitLength[2] = 0;
-    conduitLength[3] = 550;
-    conduitLength[4] = 520;
+    conduitLength[1] = 720;
+    conduitLength[2] = 670;
+    conduitLength[3] = 570;
+    conduitLength[4] = 540;
     conduitLength[5] = 460;
     conduitLength[6] = 460;
     conduitLength[7] = 440;
@@ -44,32 +66,32 @@ class NodeDisplay
     conduitLength[12] = 440;
     conduitLength[13] = 460;
     conduitLength[14] = 460;
-    conduitLength[15] = 520;
-    conduitLength[16] = 550;
-    conduitLength[17] = 0;
-    conduitLength[18] = 0;
+    conduitLength[15] = 540;
+    conduitLength[16] = 570;
+    conduitLength[17] = 670;
+    conduitLength[18] = 720;
 
-    conduitAngledLength[1] = 0;
-    conduitAngledLength[2] = 0;
-    conduitAngledLength[3] = 120;
-    conduitAngledLength[4] = 75;
-    conduitAngledLength[5] = 60;
-    conduitAngledLength[6] = 5;
+    conduitAngledLength[1] = 210;
+    conduitAngledLength[2] = 150;
+    conduitAngledLength[3] = 125;
+    conduitAngledLength[4] = 80;
+    conduitAngledLength[5] = 80;
+    conduitAngledLength[6] = 25;
     conduitAngledLength[7] = 0;
     conduitAngledLength[8] = 0;
     conduitAngledLength[9] = 0;
     conduitAngledLength[10] = 0;
     conduitAngledLength[11] = 0;
     conduitAngledLength[12] = 0;
-    conduitAngledLength[13] = 35;
+    conduitAngledLength[13] = 30;
     conduitAngledLength[14] = 80;
-    conduitAngledLength[15] = 95;
-    conduitAngledLength[16] = 140;
-    conduitAngledLength[17] = 0;
-    conduitAngledLength[18] = 0;
+    conduitAngledLength[15] = 80;
+    conduitAngledLength[16] = 125;
+    conduitAngledLength[17] = 150;
+    conduitAngledLength[18] = 210;
     
-    conduitAngle[1] = 0;
-    conduitAngle[2] = 0;
+    conduitAngle[1] = -72;
+    conduitAngle[2] = -72;
     conduitAngle[3] = -54;
     conduitAngle[4] = -54;
     conduitAngle[5] = -35;
@@ -84,8 +106,8 @@ class NodeDisplay
     conduitAngle[14] = 35;
     conduitAngle[15] = 54;
     conduitAngle[16] = 54;
-    conduitAngle[17] = 0;
-    conduitAngle[18] = 0;
+    conduitAngle[17] = 72;
+    conduitAngle[18] = 72;
 
     conduitLength[19] = 0;
     conduitLength[20] = 0;
@@ -105,92 +127,145 @@ class NodeDisplay
     conduitLength[34] = 0;
     conduitLength[35] = 0;
     conduitLength[36] = 0;
+    
+    nSegments =  conduitLength[nodeID] / (1000 / conduitSegments);
+    nAngledSegments = conduitAngledLength[nodeID] / (1000 / conduitSegments);
+    segments = new int[nSegments+nAngledSegments];
+    
+    conduitPulses.add( new Pulse() );
   }
   
   float conduitWidth = 40;
   int conduitSegments = 100;
-    
+  int decayRate = 10;
   float curSegment;
+  int segmentSizeRange = 1;
+
+  float pulseDelay = 0.5;
+  float pulseTimer = 0;
+  float pulseSpeed = 20;
+  
   void drawLeft()
   {  
-    CPU = allCPUs[nodeID];
+    /*   
+    pulseTimer += deltaTime;
+    if( pulseTimer > pulseDelay )
+    {
+      conduitPulses.add( new Pulse() );
+      pulseTimer = 0;
+    }
+    */
+    
+    if( connectToClusterData )
+      CPU = allCPUs[nodeID];
     
     float avgCPU = 0;
     for( int i = 0; i < 16; i++)
     {
-      //CPU[i] = (int)random(0,100);
+      //CPU[i] = (int)random(100,100);
       avgCPU += CPU[i];
     }
     
     avgCPU /= 16 * 100;
-
-    text( "Avg CPU: " + String.format("%.2f", avgCPU * 100), 20 + nodeWidth, -16 * 2 );
-    text( "GPU Memory: " + gpuMem, 20 + nodeWidth, -16 );
+    
+    fill(baseColor);
+    text( "Avg CPU: " + String.format("%.2f", avgCPU * 100), 20 + nodeWidth, -24 );
+    fill(10,200,200);
+    text( "GPU Memory: " + gpuMem, 200 + nodeWidth, -24 );
     
     // Bump up the CPU color effect
     avgCPU += 0.1;
     nodeColor = color( red(baseColor) * avgCPU, green(baseColor) * avgCPU, blue(baseColor) * avgCPU );
     
     // GPU conduit
-    gpuMem = allGPUs[nodeID];
-    curSegment += gpuMem / 20.0;
+    if( connectToClusterData )
+      gpuMem = allGPUs[nodeID];
+    curSegment += gpuMem / pulseSpeed;
     
     
+    rectMode(CENTER);
     
-    float segments =  conduitLength[nodeID] / (1000 / conduitSegments);
     
     // Angled background segments
-    float angledSegments = conduitAngledLength[nodeID] / (1000 / conduitSegments);
-    
+    float horzOffset = 0;
+    float vertOffset = 0;
+
     pushMatrix();
-    translate(20 + nodeWidth + segments * (1000 / conduitSegments), -conduitWidth/2);
+    translate(horzOffset + 20 + nodeWidth + nSegments * (1000 / conduitSegments), vertOffset);
+      
     rotate( radians(conduitAngle[nodeID]) );
     fill(10, 100, 110);
-    rect(0, 0, conduitAngledLength[nodeID], conduitWidth );
+    rect(conduitAngledLength[nodeID]/2, 0, conduitAngledLength[nodeID], conduitWidth );
+
+    if( conduitAngledLength[nodeID] > 0 )
+      ellipse( 0, 0, conduitWidth, conduitWidth );
     popMatrix();
-       
+    
+    
     // Straight background segment
     fill(10, 100, 110);
-    rect( 20 + nodeWidth, -conduitWidth/2, conduitLength[nodeID], conduitWidth );
+    rect( 20 + nodeWidth + conduitLength[nodeID]/2, 0, conduitLength[nodeID], conduitWidth );
     
-    // Angled animated segment
-    for( int i = 0; i < angledSegments; i++ )
+    /*
+    ArrayList nextPulseList = new ArrayList();
+    
+    for( int p = 0; p < conduitPulses.size(); p++ )
     {
-      float segmentValue = 100 * (i / (float)segments);
+      Pulse curPulse = (Pulse)conduitPulses.get(p);
+      curSegment = curPulse.getPosition();
+      */
       
-      if( segments + i == curSegment )
-        fill(10,220,110);
-      else if( segments + i < curSegment )
-        fill(10,220 * ((segments + i)/(float)curSegment), 110);
+    // Angled animated segment
+    for( int i = 0; i < nAngledSegments; i++ )
+    {
+      float segmentValue = 100 * (i / (float)nSegments);
+      
+      if( (nSegments + i) > curSegment - segmentSizeRange && (nSegments + i) < curSegment + segmentSizeRange )
+        segments[nSegments + i] = 100;
       else
-        fill(10, 0, 110);
-     
+        segments[nSegments + i] = segments[nSegments + i] - decayRate;
+      
+      fill(10,220 * segments[nSegments + i]/100.0, 110);
+      
       pushMatrix();
-      translate(20 + nodeWidth + segments * (1000 / conduitSegments), -conduitWidth/2);
+      translate(horzOffset + 20 + nodeWidth + nSegments * (1000 / conduitSegments), vertOffset);
       rotate( radians(conduitAngle[nodeID]) );
       rect( i * (1000 / conduitSegments), 0, 5, conduitWidth );
       popMatrix();
     }
 
     // Straight animated segment
-    for( int i = 0; i < segments; i++ )
+    for( int i = 0; i < nSegments; i++ )
     {
-      float segmentValue = 100 * (i / (float)segments);
+      float segmentValue = 100 * (i / (float)nSegments);
       
-      if( i == curSegment )
-        fill(10,220,110);
-      else if( i < curSegment )
-        fill(10,220 * (i/(float)curSegment), 110);
+      if( i > curSegment - segmentSizeRange && i < curSegment + segmentSizeRange )
+        segments[i] = 100;
       else
-        fill(10, 0, 110);
+        segments[i] = segments[i] - decayRate;
       
-      rect( 20 + nodeWidth + i * (1000 / conduitSegments), -conduitWidth/2, 5, conduitWidth );
+      fill(10,220 * segments[i]/100.0, 110);
+      
+      rect( 20 + nodeWidth + i * (1000 / conduitSegments), 0, 5, conduitWidth );
     }
-
-    
-    if( curSegment > 300 )
+    if( curSegment > nSegments + nAngledSegments )
+    {
       curSegment = 0;
+      if( nodeID > 0 )
+        columnPulse[(nodeID-1)/2] = 1;
+    }
     
+    /*
+      if( curSegment < 100 )
+      {
+        curPulse.setPosition( curSegment + gpuMem / 55.0 );
+        nextPulseList.add( curPulse );
+      }
+    }
+    conduitPulses = nextPulseList;
+    */
+    
+    rectMode(CORNER);
     
     // Node info
     fill(nodeColor);
@@ -206,11 +281,17 @@ class NodeDisplay
     fill(nodeColor);
     rect( 20, -nodeHeight/2, nodeWidth, nodeHeight );
     
-    fill(10,200,10);
+    if( avgCPU < 0.5 )
+      fill(baseColor);
+    else
+      fill(0);
     textAlign(RIGHT);
     textFont( st_font, 24 );
-    text( nodeID, -nodeHeight/2 + 42, 8 );
-    
+    if( nodeID != 0 )
+      text( nodeID, -nodeHeight/2 + 42, 8 );
+    else
+      text( "M", -nodeHeight/2 + 42, 8 );
+      
     textAlign(LEFT);
     textFont( st_font, 16 );
 
@@ -227,7 +308,8 @@ class NodeDisplay
   
   void drawRight()
   {
-    CPU = allCPUs[nodeID];
+    if( connectToClusterData )
+      CPU = allCPUs[nodeID];
     
     float avgCPU = 0;
     for( int i = 0; i < 16; i++)
@@ -246,7 +328,8 @@ class NodeDisplay
     nodeColor = color( red(baseColor) * avgCPU, green(baseColor) * avgCPU, blue(baseColor) * avgCPU );
     
     // GPU conduit
-    gpuMem = allGPUs[nodeID];
+    if( connectToClusterData )
+      gpuMem = allGPUs[nodeID];
     curSegment += gpuMem / 20.0;
     
     int conduitOffset = -425;
@@ -285,7 +368,10 @@ class NodeDisplay
     fill(nodeColor);
     rect( nodeWidth - 20, -nodeHeight/2, nodeWidth, nodeHeight );
     
-    fill(10,200,10);
+    if( avgCPU < 0.5 )
+      fill(10,200,10);
+    else
+      fill(10,20,10);
     textAlign(LEFT);
     textFont( st_font, 24 );
     text( nodeID, nodeWidth * 2 -nodeHeight/2 + 25, 8 );

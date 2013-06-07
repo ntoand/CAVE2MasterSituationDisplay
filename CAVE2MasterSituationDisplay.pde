@@ -51,6 +51,7 @@ float speakerWidth = 0.2;
 
 float CAVE2_rotation = 15; //degrees
 
+boolean connectToClusterData = true;
 boolean connectToTracker = false;
 String trackerIP = "cave2tracker.evl.uic.edu";
 int msgport = 28000;
@@ -76,9 +77,10 @@ float timeSinceLastInteractionEvent;
 
 float CAVE2_worldZPos = 0;
 
-boolean scaleScreen = false;
+boolean scaleScreen = true;
 
 NodeDisplay[] nodes = new NodeDisplay[37];
+float[] columnPulse = new float[21];
 
 // Override of PApplet init() which is called before setup()
 public void init() {
@@ -137,15 +139,29 @@ void setup() {
   {
     nodes[i] = new NodeDisplay(i);
   }
+  
+  for( int i = 0; i < 21; i++)
+  {
+    columnPulse[i] = random(0,0) / 100.0;
+  }
 }// setup
 
 void draw() {
-  getData();
+  for( int i = 0; i < 21; i++)
+  {
+    if( columnPulse[i] > 0 )
+      columnPulse[i] -= 0.05;
+    else
+      columnPulse[i] = 0;
+  }
+  
+  if( connectToClusterData )
+    getData();
   
   if( scaleScreen )
   {
     omicronManager.pushScreenScale();
-    translate( 0, -screenHeight * 0.87 );
+    translate( 0, -screenHeight * 0.6 );
   }
   
   programTimer = millis() / 1000.0;
@@ -243,6 +259,30 @@ void draw() {
   fill(255);
   text(systemText, borderDistFromEdge + borderWidth + textOffset.x, height - borderDistFromEdge - borderWidth/2  + textOffset.y);
   textFont( st_font, 16 );
+
+  // Master node
+  pushMatrix();
+  translate( width/2 - 100, height - 30 - borderDistFromEdge - 80 );
+  nodes[0].drawLeft();
+  popMatrix();
+  
+  // Left display nodes
+  for( int i = 1; i < 19; i++ )
+  {
+    pushMatrix();
+    translate( 80 + borderDistFromEdge, height - 30 - borderDistFromEdge + 80 * -i );
+    nodes[i].drawLeft();
+    popMatrix();
+  }
+  
+  // Right dsiplay nodes
+  for( int i = 19; i < 37; i++ )
+  {
+    pushMatrix();
+    translate( width - 80 - borderDistFromEdge - 500, 130 - borderDistFromEdge + 80 * (i-19) );
+    nodes[i].drawRight();
+    popMatrix();
+  }
   
   // For event and fullscreen processing, this must be called in draw()
   omicronManager.process();
@@ -252,29 +292,6 @@ void draw() {
   {
     omicronManager.popScreenScale();
   }
-  
-  
-  pushMatrix();
-  translate( width/2, height - 30 - borderDistFromEdge - 80 );
-  nodes[0].drawLeft();
-  popMatrix();
-  
-  for( int i = 1; i < 19; i++ )
-  {
-    pushMatrix();
-    translate( 80 + borderDistFromEdge, height - 30 - borderDistFromEdge + 80 * -i );
-    nodes[i].drawLeft();
-    popMatrix();
-  }
-  
-  for( int i = 19; i < 37; i++ )
-  {
-    pushMatrix();
-    translate( width - 80 - borderDistFromEdge - 500, 130 - borderDistFromEdge + 80 * (i-19) );
-    nodes[i].drawRight();
-    popMatrix();
-  }
-  
 }// draw
 
 void mouseDragged()
