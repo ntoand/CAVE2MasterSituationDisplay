@@ -17,56 +17,56 @@ void drawCAVE2()
   }
   
   // CAVE2 displays
-  for( int i = 0; i < 21; i++ )
+  for( int i = 0; i < 19; i++ )
   {
-    /*
+    
     // Display individual screens
     for( int j = 0; j < 4; j++ )
     {
       pushMatrix();
-      rotate( radians(18) * i ); 
+      rotate( radians(108) + radians(18) * i ); 
     
-      translate( CAVE2_diameter/2 * CAVE2_Scale - (CAVE2_legBaseWidth + CAVE2_displayDepth) * CAVE2_Scale, 0, (CAVE2_displayHeight * 0.5 + CAVE2_displayToFloor + CAVE2_displayHeight * j) * CAVE2_Scale );
+      translate( CAVE2_diameter/2 * CAVE2_Scale - (CAVE2_legBaseWidth + CAVE2_displayDepth) * CAVE2_Scale, 0, (CAVE2_displayHeight * 0.5 + CAVE2_displayToFloor + CAVE2_displayHeight * 3 - CAVE2_displayHeight * j) * CAVE2_Scale );
       //rectMode(CENTER);
       stroke(0,50,200);
-      if( !(i == 4 || i == 5) )
+      if( !(i == 18 || i == 19) )
         box( CAVE2_displayDepth * CAVE2_Scale, CAVE2_displayWidth * CAVE2_Scale, CAVE2_displayHeight * CAVE2_Scale );
       popMatrix();
     }
-    */
+    
     
     /*
     // Display as individual computers
     for( int j = 0; j < 2; j++ )
     {
       pushMatrix();
-      rotate( radians(18) * i ); 
+      rotate( radians(108) + radians(18) * i ); 
     
-      translate( CAVE2_diameter/2 * CAVE2_Scale - (CAVE2_legBaseWidth + CAVE2_displayDepth) * CAVE2_Scale, 0, ( CAVE2_displayToFloor + CAVE2_displayHeight + 2 * CAVE2_displayHeight * j) * CAVE2_Scale );
+      translate( CAVE2_diameter/2 * CAVE2_Scale - (CAVE2_legBaseWidth + CAVE2_displayDepth) * CAVE2_Scale, 0, ( CAVE2_displayToFloor + CAVE2_displayHeight * 3 - 2 * CAVE2_displayHeight * j) * CAVE2_Scale );
       //rectMode(CENTER);
       stroke(0,50,200);
-      //fill(0,10,100);
       
-      if( !(i == 4 || i == 5) )
+      if( !(i == 18 || i == 19) )
         box( CAVE2_displayDepth * CAVE2_Scale, CAVE2_displayWidth * CAVE2_Scale, 2 * CAVE2_displayHeight * CAVE2_Scale );
       popMatrix();
-      
-      noFill();
     }
     */
     
-    
+    /*
     // Display as a single column
     pushMatrix();
-    rotate( radians(18) * i ); 
+    rotate( radians(108) + radians(18) * i ); 
     
     translate( CAVE2_diameter/2 * CAVE2_Scale - (CAVE2_legBaseWidth + CAVE2_displayDepth) * CAVE2_Scale, 0, (CAVE2_displayToFloor + 2 * CAVE2_displayHeight) * CAVE2_Scale );
     //rectMode(CENTER);
     stroke(0,50,200);
-    if( !(i == 4 || i == 5) )
+    
+    if( !(i == 18 || i == 19) )
       box( CAVE2_displayDepth * CAVE2_Scale, CAVE2_displayWidth * CAVE2_Scale, 4 * CAVE2_displayHeight * CAVE2_Scale );
     popMatrix();
+    */
     
+    noFill();
   }
   
   // CAVE2 top truss bottom
@@ -111,3 +111,4 @@ void drawSpeakers()
     popMatrix();
   }
 }
+
