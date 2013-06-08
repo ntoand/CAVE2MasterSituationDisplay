@@ -5,6 +5,8 @@ void drawTrackerStatus()
   CAVE2_Scale = 65;
   CAVE2_displayMode = DISPLAY;
   
+  background(0);
+
   translate( 50, 60 );
   
   fill(0,250,250);

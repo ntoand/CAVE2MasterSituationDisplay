@@ -46,7 +46,7 @@ float borderDistFromEdge = 30;
 
 final int TRACKING = 0;
 final int CLUSTER = 1;
-int state = TRACKING;
+int state = CLUSTER;
 
 // CAVE2 model -----------------------------------
 float CAVE2_Scale = 65;
@@ -122,10 +122,22 @@ OscP5 oscP5;
 int recvPort = 8000;
 
 // Cluster ---------------------------------------
-boolean connectToClusterData = false;
+boolean connectToClusterData = true;
 NodeDisplay[] nodes = new NodeDisplay[37];
 float[] columnPulse = new float[21];
 float pulseDecay = 0.1;
+
+int[] conduitLength = new int[37];
+int[] conduitAngledLength = new int[37];
+int[] conduitAngle = new int[37];
+
+AppLabel app1 = new AppLabel("Mars", 6.18, 6.67, true);
+AppLabel app2 = new AppLabel("Vortex", 6.51, 5.50, false);
+AppLabel app3 = new AppLabel("Molecule", 25.3, 7.71, true);
+AppLabel app4 = new AppLabel("Connectome", 27.30, 7.11, false);
+AppLabel app5 = new AppLabel("Enterprise", 56.89, 8.44, false);
+
+ArrayList appList = new ArrayList();
 
 // Override of PApplet init() which is called before setup()
 public void init() {
@@ -141,17 +153,17 @@ public void init() {
 void exit()
 {
   super.exit();
-  
+
   // Output tracker drop data to text files
-  if( headTrackable!= null )
+  if ( headTrackable!= null )
     headTrackable.outputErrorsToFile();
-  if( wandTrackable1!= null )
+  if ( wandTrackable1!= null )
     wandTrackable1.outputErrorsToFile();
-  if( wandTrackable2!= null )
+  if ( wandTrackable2!= null )
     wandTrackable2.outputErrorsToFile();
-  if( wandTrackable3!= null )
+  if ( wandTrackable3!= null )
     wandTrackable1.outputErrorsToFile();
-  if( wandTrackable4!= null )
+  if ( wandTrackable4!= null )
     wandTrackable2.outputErrorsToFile();
 }// exit
 
@@ -162,40 +174,33 @@ void setup() {
 
   width = 2560;
   height = 1600;
-  
+
   applet = this;
-  oscP5 = new OscP5(this,recvPort);
+  oscP5 = new OscP5(this, recvPort);
   CAVE2_screenPos = new PVector( width * 0.5, height * CAVE2_verticalScale, -100 );
-   
+
   startTime = millis() / 1000.0;
 
   // Make the connection to the tracker machine
-  if( connectToTracker )
+  if ( connectToTracker )
     omicronManager.connectToTracker(dataport, msgport, trackerIP);
-  
+
   // Create a listener to get events
   eventListener = new EventListener();
-  
+
   omicronManager.setEventListener( eventListener );
-  
+
   // Screen scaling
+  omicronManager.calculateScreenTransformation(2560, 1600); // Single display on CAVE2 column display
   omicronManager.enableScreenScale(scaleScreen);
-  omicronManager.calculateScreenTransformation(2560,1440); // Single display on CAVE2 column display
   
   st_font = loadFont("TMP-Monitors-48.vlw");
   space_font = loadFont("SpaceAge-48.vlw");
   textFont( st_font, 16 );
-  
-  ortho(0, width, 0, height, -1000, 1000);
-  
-  for( int i = 0; i < 37; i++)
+
+  for ( int i = 0; i < 21; i++)
   {
-    nodes[i] = new NodeDisplay(i);
-  }
-  
-  for( int i = 0; i < 21; i++)
-  {
-    columnPulse[i] = random(0,0) / 100.0;
+    columnPulse[i] = random(0, 0) / 100.0;
   }
 
   psNavigationOutline = loadImage("PS3Navigation.png");
@@ -208,88 +213,242 @@ void setup() {
   psNavigation_L1 = loadImage("PS3Navigation_L1.png");
   psNavigation_L2 = loadImage("PS3Navigation_L2.png");
   psNavigation_L3 = loadImage("PS3Navigation_L3.png");
-  
+
   headTrackable = new Trackable( 0, "Head 1" );
-  
+
   wandTrackable1 = new Trackable( 1, "Wand 1 Type A (Batman/Kirk)" );
   wandTrackable1.secondID = 0; // Controller 0 is mapped to Wand 1
-  
+
   wandTrackable2 = new Trackable( 2, "Wand 2 Type B (Robin/Spock)" );
   wandTrackable2.secondID = 1; // Controller 1 is mapped to Wand 2
   //wandTrackable2.loadErrorsFromFile();
-  
+
   wandTrackable3 = new Trackable( 3, "Wand 3 Type A (Batman/Kirk)" );
   wandTrackable3.secondID = 2; // Controller 1 is mapped to Wand 2
-  
+
   wandTrackable4 = new Trackable( 4, "Wand 4 Type B (Robin/Spock)" );
   wandTrackable4.secondID = 3; // Controller 1 is mapped to Wand 2
-  
+
   /*
   entranceTriangle = createShape();
-  entranceTriangle.fill(24);
-  entranceTriangle.noStroke();
-  entranceTriangle.vertex(0,0);
-  entranceTriangle.vertex(-0.8 * CAVE2_Scale , 3.6 * CAVE2_Scale);
-  entranceTriangle.vertex(1.72 * CAVE2_Scale , 3.27 * CAVE2_Scale);
-  entranceTriangle.end(); // 2.0a5
-  //entranceTriangle.close(CLOSE);
-  //entranceTriangle.endShape(); // 2.0b9
-  */
-  
+   entranceTriangle.fill(24);
+   entranceTriangle.noStroke();
+   entranceTriangle.vertex(0,0);
+   entranceTriangle.vertex(-0.8 * CAVE2_Scale , 3.6 * CAVE2_Scale);
+   entranceTriangle.vertex(1.72 * CAVE2_Scale , 3.27 * CAVE2_Scale);
+   entranceTriangle.end(); // 2.0a5
+   //entranceTriangle.close(CLOSE);
+   //entranceTriangle.endShape(); // 2.0b9
+   */
+
   headButton = new Button( 16 * 1, 16 * 6, 80, 30 );
   headButton.setText("Head 1", st_font, 16);
   headButton.fillColor = color( 10, 200, 125, 128 );
-  
+
   wandButton1 = new Button( 16 * 1, 16 * 6 + 35, 80, 30 );
   wandButton1.setText("Wand 1", st_font, 16);
   wandButton1.fillColor = color( 10, 200, 125, 128 );
   wandButton1.selected = true;
-  
+
   wandButton2 = new Button( 16 * 1, 16 * 6 + 35 * 2, 80, 30 );
   wandButton2.setText("Wand 2", st_font, 16);
   wandButton2.fillColor = color( 10, 200, 125, 128 );
-  
+
   wandButton3 = new Button( 16 * 1, 16 * 6 + 35 * 3, 80, 30 );
   wandButton3.setText("Wand 3", st_font, 16);
   wandButton3.fillColor = color( 10, 200, 125, 128 );
-  
+
   wandButton4 = new Button( 16 * 1, 16 * 6 + 35 * 4, 80, 30 );
   wandButton4.setText("Wand 4", st_font, 16);
   wandButton4.fillColor = color( 10, 200, 125, 128 );
-  
-  ortho(0, width, 0, height, -1000, 1000);
-}// setup
 
-void draw() {
-  if( scaleScreen )
+  ortho(0, width, 0, height, -1000, 1000);
+
+  conduitLength[0] = 400;
+
+  conduitLength[1] = 760;
+  conduitLength[2] = 700;
+  conduitLength[3] = 620;
+  conduitLength[4] = 580;
+  conduitLength[5] = 535;
+  conduitLength[6] = 525;
+  conduitLength[7] = 480;
+  conduitLength[8] = 510;
+
+  conduitLength[9] = 520;
+  conduitLength[10] = 520;
+
+  conduitLength[11] = 510;
+  conduitLength[12] = 480;
+  conduitLength[13] = 525;
+  conduitLength[14] = 535;
+  conduitLength[15] = 580;
+  conduitLength[16] = 620;
+  conduitLength[17] = 700;
+  conduitLength[18] = 760;
+
+  conduitAngledLength[1] = 210;
+  conduitAngledLength[2] = 175;
+  conduitAngledLength[3] = 140;
+  conduitAngledLength[4] = 105;
+  conduitAngledLength[5] = 95;
+  conduitAngledLength[6] = 60;
+  conduitAngledLength[7] = 70;
+  conduitAngledLength[8] = 5;
+  
+  conduitAngledLength[9] = 0;
+  conduitAngledLength[10] = 0;
+  
+  conduitAngledLength[11] = 5;
+  conduitAngledLength[12] = 70;
+  conduitAngledLength[13] = 60;
+  conduitAngledLength[14] = 95;
+  conduitAngledLength[15] = 105;
+  conduitAngledLength[16] = 140;
+  conduitAngledLength[17] = 175;
+  conduitAngledLength[18] = 210;
+
+  conduitAngle[1] = -72;
+  conduitAngle[2] = -72;
+  conduitAngle[3] = -54;
+  conduitAngle[4] = -54;
+  conduitAngle[5] = -35;
+  conduitAngle[6] = -40;
+  conduitAngle[7] = -20;
+  conduitAngle[8] = -5;
+  
+  conduitAngle[9] = 0;
+  conduitAngle[10] = 0;
+  
+  conduitAngle[11] = 5;
+  conduitAngle[12] = 20;
+  conduitAngle[13] = 40;
+  conduitAngle[14] = 35;
+  conduitAngle[15] = 54;
+  conduitAngle[16] = 54;
+  conduitAngle[17] = 72;
+  conduitAngle[18] = 72;
+
+  conduitLength[19] = 720;
+  conduitLength[20] = 670;
+
+  conduitLength[9] = 520;
+  conduitLength[10] = 520;
+  
+  // Right ----------------------------
+  conduitLength[36] = 620;
+  conduitLength[35] = 580;
+  conduitLength[34] = 535;
+  conduitLength[33] = 525;
+  conduitLength[32] = 480;
+  conduitLength[31] = 510;
+  
+  conduitLength[30] = 520;
+  conduitLength[29] = 520;
+  
+  conduitLength[28] = 510;
+  conduitLength[27] = 480;
+  conduitLength[26] = 525;
+  conduitLength[25] = 535;
+  conduitLength[24] = 580;
+  conduitLength[23] = 620;
+  conduitLength[22] = 700;
+  conduitLength[21] = 760;
+  
+  conduitLength[20] = 880;
+  conduitLength[19] = 880;
+  
+  conduitAngledLength[36] = 140;
+  conduitAngledLength[35] = 105;
+  conduitAngledLength[34] = 95;
+  conduitAngledLength[33] = 60;
+  conduitAngledLength[32] = 70;
+  conduitAngledLength[31] = 5;
+  
+  conduitAngledLength[30] = 0;
+  conduitAngledLength[29] = 0;
+  
+  conduitAngledLength[28] = 5;
+  conduitAngledLength[27] = 70;
+  conduitAngledLength[26] = 60;
+  conduitAngledLength[25] = 95;
+  conduitAngledLength[24] = 105;
+  conduitAngledLength[23] = 140;
+  conduitAngledLength[22] = 175;
+  conduitAngledLength[21] = 210;
+  
+  conduitAngledLength[20] = 270;
+  conduitAngledLength[19] = 270;
+  
+  conduitAngle[36] = 54;
+  conduitAngle[35] = 54;
+  conduitAngle[34] = 35;
+  conduitAngle[33] = 40;
+  conduitAngle[32] = 20;
+  conduitAngle[31] = 5;
+  
+  conduitAngle[30] = 0;
+  conduitAngle[29] = 0;
+  
+  conduitAngle[28] = -5;
+  conduitAngle[27] = -20;
+  conduitAngle[26] = -40;
+  conduitAngle[25] = -35;
+  conduitAngle[24] = -54;
+  conduitAngle[23] = -54;
+  conduitAngle[22] = -72;
+  conduitAngle[21] = -72;
+  
+  conduitAngle[20] = -90;
+  conduitAngle[19] = 90;
+  
+  for ( int i = 0; i < 37; i++)
   {
-    omicronManager.pushScreenScale();
+    nodes[i] = new NodeDisplay(i);
   }
   
+  appList.add( app1 );
+  appList.add( app2 );
+  appList.add( app3 );
+  appList.add( app4 );
+  appList.add( app5 );
+  
+  background(0);
+}// setup
+
+float scaleScreenX, scaleScreenY;
+
+void draw() {
+  if ( scaleScreen )
+  {
+    omicronManager.pushScreenScale();
+    translate( 0, -(height - screenHeight) );
+  }
+
   programTimer = millis() / 1000.0;
   deltaTime = programTimer - lastFrameTime;
   timeSinceLastInteractionEvent = programTimer - lastInteractionTime;
-  
+
   // Sets the background color
-  background(0);
-  
+  //background(0);
+
   pushMatrix();
 
   switch( state )
   {
     case(TRACKING):
-      drawTrackerStatus();
-      break;
+    drawTrackerStatus();
+    break;
     case(CLUSTER):
-      getData();
-      drawClusterStatus();
-      break;
+    getData();
+    drawClusterStatus();
+    break;
   }
-  
+
   // Border
   noStroke();
   PVector textOffset = new PVector( width * 0.7, borderWidth );
-  
+
   fill(50);
   rect( borderDistFromEdge + borderWidth/2, borderDistFromEdge, width - borderDistFromEdge * 2 - borderWidth/2, borderWidth ); //Top
   ellipse( borderDistFromEdge + borderWidth/2, borderDistFromEdge + borderWidth/2, borderWidth, borderWidth ); // Top-Left
@@ -299,19 +458,19 @@ void draw() {
   ellipse( borderDistFromEdge + borderWidth/2, height - borderDistFromEdge, borderWidth, borderWidth ); // Bottom-Left
   ellipse( width - borderDistFromEdge, height - borderDistFromEdge, borderWidth, borderWidth ); // Bottom-Right
   rect( borderDistFromEdge + borderWidth/2, height - borderDistFromEdge - borderWidth/2, width - borderDistFromEdge * 2 - borderWidth/2, borderWidth ); // Bottom
-  
+
   textFont( st_font, 32 );
   fill(10);
   rect( borderDistFromEdge + textOffset.x, height - borderDistFromEdge - borderWidth/2, textWidth(systemText) + borderWidth * 2, borderWidth ); // Bottom
   fill(255);
   text(systemText, borderDistFromEdge + borderWidth + textOffset.x, height - borderDistFromEdge - borderWidth/2  + textOffset.y);
   textFont( st_font, 16 );
-  
+
   // For event and fullscreen processing, this must be called in draw()
   omicronManager.process();
   lastFrameTime = programTimer;
-  
-  if( scaleScreen )
+
+  if ( scaleScreen )
   {
     omicronManager.popScreenScale();
   }
@@ -322,82 +481,81 @@ void mouseDragged()
   lastInteractionTime = programTimer;
   float dy = pmouseY - mouseY;
   float dx = pmouseX - mouseX;
-  
-  
+
+
   CAVE2_3Drotation.x = constrain( CAVE2_3Drotation.x + dy / 500.0, 0, radians(90) );
   CAVE2_3Drotation.y += dx / 500.0;
-  
+
   //println("Dragged: "+CAVE2_3Drotation);
 }// mouseDragged
 
 void mousePressed()
 {
   lastInteractionTime = programTimer;
-  
+
   PVector meters = screenToMeters( mouseX, mouseY );
   PVector displayPos = metersToScreen( meters );
   //println( "ScreenPos "+ displayPos.x  + " " + displayPos.y );
   //println( "MetersPos "+meters.x  + " " + meters.z );
   //println( "-----" );
-  
+
   //meters.x *= 1;
   //meters.y = meters.y * CAVE2_verticalScale + (screenToMeters(width,height).y *CAVE2_verticalScale);
-  
-  if( headButton.isPressed( mouseX, mouseY ) )
+
+  if ( headButton.isPressed( mouseX, mouseY ) )
   {
-      wandButton1.selected = false;
-      wandButton2.selected = false;
+    wandButton1.selected = false;
+    wandButton2.selected = false;
   }
-  
-  if( wandButton1.isPressed( mouseX, mouseY ) )
+
+  if ( wandButton1.isPressed( mouseX, mouseY ) )
   {
-      headButton.selected = false;
-      wandButton2.selected = false;
+    headButton.selected = false;
+    wandButton2.selected = false;
   }
-  
-  if( wandButton2.isPressed( mouseX, mouseY ) )
+
+  if ( wandButton2.isPressed( mouseX, mouseY ) )
   {
-      headButton.selected = false;
-      wandButton1.selected = false;
+    headButton.selected = false;
+    wandButton1.selected = false;
   }
-  
-  if( wandButton3.isPressed( mouseX, mouseY ) )
+
+  if ( wandButton3.isPressed( mouseX, mouseY ) )
   {
-      headButton.selected = false;
-      wandButton1.selected = false;
-      wandButton2.selected = false;
-      wandButton4.selected = false;
+    headButton.selected = false;
+    wandButton1.selected = false;
+    wandButton2.selected = false;
+    wandButton4.selected = false;
   }
-  
-  if( wandButton4.isPressed( mouseX, mouseY ) )
+
+  if ( wandButton4.isPressed( mouseX, mouseY ) )
   {
-      headButton.selected = false;
-      wandButton1.selected = false;
-      wandButton2.selected = false;
-      wandButton3.selected = false;
+    headButton.selected = false;
+    wandButton1.selected = false;
+    wandButton2.selected = false;
+    wandButton3.selected = false;
   }
-  
-  if( headTrackable.isPressed( meters.x, meters.y ) )
+
+  if ( headTrackable.isPressed( meters.x, meters.y ) )
   {
-      headButton.selected = true;
-      wandButton1.selected = false;
-      wandButton2.selected = false;
+    headButton.selected = true;
+    wandButton1.selected = false;
+    wandButton2.selected = false;
   }
-  
-  if( wandTrackable1.isPressed( meters.x, meters.y ) )
+
+  if ( wandTrackable1.isPressed( meters.x, meters.y ) )
   {
-      headButton.selected = false;
-      wandButton1.selected = true;
-      wandButton2.selected = false;
+    headButton.selected = false;
+    wandButton1.selected = true;
+    wandButton2.selected = false;
   }
-  
-  if( wandTrackable2.isPressed( meters.x, meters.y ) )
+
+  if ( wandTrackable2.isPressed( meters.x, meters.y ) )
   {
-      headButton.selected = false;
-      wandButton1.selected = false;
-      wandButton2.selected = true;
+    headButton.selected = false;
+    wandButton1.selected = false;
+    wandButton2.selected = true;
   }
-  
 }
 
 PVector screenToMeters( int xPos, int yPos )
@@ -412,7 +570,7 @@ PVector metersToScreen( PVector position )
   float displayX = (position.x * CAVE2_Scale) + CAVE2_screenPos.x;
   float displayY = (position.z * CAVE2_Scale) + CAVE2_screenPos.y;
   float displayZ = 0;
-  
+
   return new PVector( displayX, displayY, displayZ );
 }
 
@@ -421,41 +579,42 @@ void drawCoordinateSystem( int x, float y )
   // Coordinate System
   pushMatrix();
   translate( x, y );
-  
-  fill(0,0,200,128); // Z
-  stroke(0,0,200,128);
+
+  fill(0, 0, 200, 128); // Z
+  stroke(0, 0, 200, 128);
   line( 0, 0, 0, 30 ); 
   text("z", 5, 32 );
-  
-  fill(200,0,0,128); // X
-  stroke(200,0,0,128);
+
+  fill(200, 0, 0, 128); // X
+  stroke(200, 0, 0, 128);
   line( 30, 0, 0, 0 );
   text("x", 35, 0 );
 
-  fill(0,100,0,128); // y
+  fill(0, 100, 0, 128); // y
   noStroke();
   ellipse( 0, 0, 5, 5);
   text("y", 5, -5 );
   noFill();
-  stroke(0,100,0,128);
+  stroke(0, 100, 0, 128);
   strokeWeight(1);
   ellipse( 0, 0, 10, 10);
-  
+
   rotateY( radians(270) );
   line( 30, 0, 0, 0 );
-  
+
   popMatrix();
 }
 
 void keyPressed()
 {
-  println(key);
-  if( key == '1' )
+  //println(key);
+  if ( key == '1' )
   {
     state = TRACKING;
   }
-  if( key == '2' )
+  if ( key == '2' )
   {
     state = CLUSTER;
   }
 }
+
