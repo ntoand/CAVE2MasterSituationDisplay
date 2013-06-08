@@ -1,3 +1,7 @@
+PVector demoPos = new PVector(0,1.2,0);
+float trackerPulseDelay = 0.1;
+float trackerPulseTimer;
+
 void drawTrackerStatus()
 {
   systemText = "TRACKING SYSTEM";
@@ -23,6 +27,25 @@ void drawTrackerStatus()
   {
     text("Not connected to tracker", 16, 16 * 2);
     text("Running in demo mode", 16, 16 * 3);
+    
+    
+    headTrackable.updatePosition( -0.34 , 1.76, 0.91, -0.1, 0.15, 0.8, 1 );
+    
+    trackerPulseTimer += deltaTime;
+    if( trackerPulseTimer > trackerPulseDelay && !connectToClusterData )
+    {
+      trackerPulseTimer = 0;
+      
+      demoPos = new PVector( demoPos.x + random(-0.01,0.01), demoPos.y + random(-0.01,0.01), demoPos.z + random(-0.01,0.01) );
+      
+      wandTrackable1.updatePosition( demoPos.x, demoPos.y, demoPos.z, demoPos.x/5, demoPos.y/5, demoPos.z/5, demoPos.y/5 );
+      if( random(0,3) >= 0 )
+        wandTrackable1.updateButton( (int)random(0,8193), true );
+      else
+        wandTrackable1.updateButton( (int)random(0,8193), false );
+        
+      wandTrackable1.updateAnalog( (int)random(1,4), demoPos.x, demoPos.z );
+    }
   }
   
   if( timeSinceLastTrackerUpdate >= 5 )

@@ -47,7 +47,7 @@ float targetGPU = 1;
 
 void drawClusterStatus()
 {
-  systemText = "PROCESSING UNIT STATUS";
+  systemText = "CLUSTER PROCESSING STATUS";
   
   CAVE2_Scale = 64;
   CAVE2_3Drotation.x = 0;
@@ -186,6 +186,12 @@ void drawClusterStatus()
   stroke(10,20,210);
   fill(20);
   rect( horzBarPosX, horzBarPosY, barLength, barWidth );
+  
+  fill( red(gpuBaseColor)/4, green(gpuBaseColor)/4, blue(gpuBaseColor)/4 );
+  rect( horzBarPosX, horzBarPosY, barLength * (peakGPU / 100.0), barWidth/2 );
+  
+  fill( red(cpuBaseColor)/4, green(cpuBaseColor)/4, blue(cpuBaseColor)/4 );
+  rect( horzBarPosX, horzBarPosY + barWidth/2, barLength * (peakCPU / 100.0), barWidth/2 );
   
   fill(gpuBaseColor);
   rect( horzBarPosX, horzBarPosY, barLength * (targetGPU / 100.0), barWidth/2 );

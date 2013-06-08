@@ -60,10 +60,10 @@ class NodeDisplay
   float curSegment;
   int segmentSizeRange = 1;
 
-  float pulseDelay = 2.5;
+  float pulseDelay = 2.0;
   float pulseTimer = 0;
   float pulseSpeed = 20;
-  
+
   void drawLeft()
   {  
     pulseTimer += deltaTime;

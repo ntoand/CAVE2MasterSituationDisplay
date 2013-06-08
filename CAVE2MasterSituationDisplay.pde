@@ -47,7 +47,8 @@ float borderDistFromEdge = 30;
 
 final int TRACKING = 0;
 final int CLUSTER = 1;
-int state = CLUSTER;
+final int AUDIO = 2;
+int state = TRACKING;
 
 // CAVE2 model -----------------------------------
 float CAVE2_Scale = 65;
@@ -75,13 +76,14 @@ PVector CAVE2_3Drotation = new PVector();
 
 float CAVE2_worldZPos = -300;
 
+// How the display columns are represented in the CAVE2 model
 final int COLUMN = 0;
 final int NODE = 1;
 final int DISPLAY = 2;
 int CAVE2_displayMode = COLUMN;
 
 // Tracker ---------------------------------------
-boolean connectToTracker = true;
+boolean connectToTracker = false;
 boolean logErrors = false;
 String trackerIP = "localhost";
 int msgport = 28000;
@@ -458,12 +460,15 @@ void draw() {
         text("DEMO MODE - NOT CONNECTED TO CLUSTER", 216, 16);
       }
       drawClusterStatus();
-    break;
+      break;
+    case(AUDIO):
+      drawAudioStatus();
+      break;
   }
 
   // Border
   noStroke();
-  PVector textOffset = new PVector( width * 0.7, borderWidth );
+  PVector textOffset = new PVector( width * 0.9, borderWidth );
 
   fill(50);
   rect( borderDistFromEdge + borderWidth/2, borderDistFromEdge, width - borderDistFromEdge * 2 - borderWidth/2, borderWidth ); //Top
@@ -474,14 +479,15 @@ void draw() {
   ellipse( borderDistFromEdge + borderWidth/2, height - borderDistFromEdge, borderWidth, borderWidth ); // Bottom-Left
   ellipse( width - borderDistFromEdge, height - borderDistFromEdge, borderWidth, borderWidth ); // Bottom-Right
   rect( borderDistFromEdge + borderWidth/2, height - borderDistFromEdge - borderWidth/2, width - borderDistFromEdge * 2 - borderWidth/2, borderWidth ); // Bottom
-
+  
+  textAlign(RIGHT);
   textFont( st_font, 32 );
   fill(10);
-  rect( borderDistFromEdge + textOffset.x, height - borderDistFromEdge - borderWidth/2, textWidth(systemText) + borderWidth * 2, borderWidth ); // Bottom
+  rect( borderDistFromEdge + textOffset.x, height - borderDistFromEdge - borderWidth/2, -(textWidth(systemText) + borderWidth * 2), borderWidth ); // Bottom
   fill(255);
-  text(systemText, borderDistFromEdge + borderWidth + textOffset.x, height - borderDistFromEdge - borderWidth/2  + textOffset.y);
+  text(systemText, textOffset.x + borderWidth/2, height - borderDistFromEdge - borderWidth/2  + textOffset.y);
   textFont( st_font, 16 );
-  
+  textAlign(LEFT);
   //text("FPS: "+ (int)frameRate, 16, 16);
     
   // For event and fullscreen processing, this must be called in draw()
@@ -634,5 +640,16 @@ void keyPressed()
   {
     state = CLUSTER;
   }
+  if ( key == '3' )
+  {
+    state = AUDIO;
+  }
+  
+  if ( key == ' ' )
+  {
+    peakCPU = 0;
+    peakGPU = 0;
+  }
+  
 }
 

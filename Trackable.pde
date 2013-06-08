@@ -417,6 +417,14 @@ class Trackable
     }
     
     pushMatrix();
+    translate( displayX, displayY, 0 );
+    noFill();
+    stroke(currentMocapColor);
+    ellipse( 0, 0, 10, 10 );
+    line( 0, 0, 0, 0, 0, displayZ );
+    popMatrix();
+    
+    pushMatrix();
     translate( displayX, displayY, displayZ );
     //rotateX( -CAVE2_3Drotation.x );
     //rotateY( CAVE2_3Drotation.y );
