@@ -200,7 +200,7 @@ class Trackable
     }
     
     // Only create file if there is data (ignores initial drop data)
-    if( errorLog.size() > 3 )
+    if( logErrors && errorLog.size() > 3 )
       saveStrings("logs/trackingDropLog-"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+"-trackable"+ID+".tsv", lines);
   }
   
@@ -368,7 +368,8 @@ class Trackable
       
       if( trackingError != Minor )
       {
-        errorLog.add( new Error( programTimer, position, rotation, Minor ) );
+        if( logErrors )
+          errorLog.add( new Error( programTimer, position, rotation, Minor ) );
         minorDrops++;
       }
       
@@ -380,7 +381,8 @@ class Trackable
       
       if( trackingError != Moderate )
       {
-        errorLog.add( new Error( programTimer, position, rotation, Moderate ) );
+        if( logErrors )
+          errorLog.add( new Error( programTimer, position, rotation, Moderate ) );
         minorDrops--;
         moderateDrops++;
       }
@@ -394,7 +396,8 @@ class Trackable
       
       if( trackingError != Major )
       {
-        errorLog.add( new Error( programTimer, position, rotation, Major ) );
+        if( logErrors )
+          errorLog.add( new Error( programTimer, position, rotation, Major ) );
         moderateDrops--;
         majorDrops++;
       }

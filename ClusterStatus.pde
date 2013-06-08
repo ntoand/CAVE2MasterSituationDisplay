@@ -41,6 +41,10 @@ class AppLabel
 float peakCPU;
 float peakGPU;
 
+float updateTransitionTime = 0.1;
+float targetCPU = 1;
+float targetGPU = 1;
+
 void drawClusterStatus()
 {
   systemText = "PROCESSING UNIT STATUS";
@@ -53,16 +57,17 @@ void drawClusterStatus()
   float averageCPU = 0;
   float averageGPU = 0;
   
+  float verticalOffset = 125;
+  
   // Master node
   pushMatrix();
-  translate( width/2 - 10, height + 15 - borderDistFromEdge - 70 * 3 );
-  nodes[0].drawLeft();
+  translate( width - 70 - borderDistFromEdge - 500, height - verticalOffset - borderDistFromEdge - 70 * 19 + 70 * (38 - 20) );
+  nodes[0].drawRight();
   averageCPU += nodes[0].avgCPU;
   averageGPU += nodes[0].gpuMem;
   popMatrix();
   
   // Left display nodes
-  float verticalOffset = 125;
   for( int i = 1; i < 20; i++ )
   {
     pushMatrix();
@@ -75,6 +80,7 @@ void drawClusterStatus()
   }
   
   // Right display nodes
+  
   for( int i = 20; i < 37; i++ )
   {
     pushMatrix();
@@ -85,7 +91,7 @@ void drawClusterStatus()
     averageCPU += nodes[i].avgCPU;
     averageGPU += nodes[i].gpuMem;
   }
-
+  
   // Draw CAVE2 ------------------------------------------------------------------
   pushMatrix();
   translate( width/2, height/2 - 20, 0);
@@ -105,14 +111,25 @@ void drawClusterStatus()
       columnPulse[i] = 0;
   }
   // CPU/GPU bar ----------------------------------------------------------------
-    
+  fill(0);
+  noStroke();
+  rect( 0, height - 200, width, 180 );
+  
   averageCPU = averageCPU / 37 * 100 - 10;
   averageGPU = (averageGPU - 10) / 37; // Remember the 10% padding done for vis?
   
-
-
+  if( targetCPU > averageCPU )
+    targetCPU -= updateTransitionTime;
+  if( targetCPU < averageCPU )
+    targetCPU += updateTransitionTime;
+  
+  if( targetGPU > averageGPU )
+    targetGPU -= updateTransitionTime;
+  if( targetGPU < averageGPU )
+    targetGPU += updateTransitionTime;
+  
   float horzBarPosX = borderDistFromEdge + borderWidth + 16;
-  float horzBarPosY = height - borderDistFromEdge - 120 + 16 * 2;
+  float horzBarPosY = height - borderDistFromEdge - 120 + 16 * 1.5;
   float barLength = width - horzBarPosX * 2;
   float barWidth = 20;
   
@@ -121,20 +138,21 @@ void drawClusterStatus()
   
   textAlign(LEFT);
   fill(cpuBaseColor);
-  text("CAVE2 CPU: " + String.format("%.2f", averageCPU) + " ("+String.format("%.2f", peakCPU)+" peak)", horzBarPosX + barLength * (averageCPU / 100.0) + 8, horzBarPosY + cpuMarkerHeight + 36);
+  text("CAVE2 CPU: " + String.format("%.2f", averageCPU) + " ("+String.format("%.2f", peakCPU)+" peak)", horzBarPosX + barLength * (targetCPU / 100.0) + 8, horzBarPosY + cpuMarkerHeight + 36);
   fill(gpuBaseColor);
-  text("CAVE2 GPU: " + String.format("%.2f", averageGPU) + " ("+String.format("%.2f", peakGPU)+" peak)", horzBarPosX + barLength * (averageGPU / 100.0) + 8, horzBarPosY - gpuMarkerHeight - 8);
+  text("CAVE2 GPU: " + String.format("%.2f", averageGPU) + " ("+String.format("%.2f", peakGPU)+" peak)", horzBarPosX + barLength * (targetGPU / 100.0) + 8, horzBarPosY - gpuMarkerHeight - 8);
   
   if( averageCPU > peakCPU )
     peakCPU = averageCPU;
   if( averageGPU > peakGPU )
     peakGPU = averageGPU;
-    
+  
   for( int i = 0; i < 101; i += 10 )
   {
     stroke(255);
     line( horzBarPosX + barLength * (i / 100.0), horzBarPosY + barWidth + 10, horzBarPosX + barLength * (i / 100.0), horzBarPosY - 10 );
   }
+  
   noStroke();
   
   float triangleSize = 25;
@@ -142,7 +160,7 @@ void drawClusterStatus()
   // CPU Triangle marker
   pushMatrix();
   fill(100);
-  translate( horzBarPosX + barLength * (averageCPU / 100.0), horzBarPosY + barWidth + cpuMarkerHeight );
+  translate( horzBarPosX + barLength * (targetCPU / 100.0), horzBarPosY + barWidth + cpuMarkerHeight );
   triangle( -triangleSize, triangleSize, 0, 0, 0, triangleSize );
   
   // Line to bar
@@ -154,7 +172,7 @@ void drawClusterStatus()
   pushMatrix();
   noStroke();
   fill(100);
-  translate( horzBarPosX + barLength * (averageGPU / 100.0), horzBarPosY - gpuMarkerHeight );
+  translate( horzBarPosX + barLength * (targetGPU / 100.0), horzBarPosY - gpuMarkerHeight );
   triangle( -triangleSize, -triangleSize, 0, 0, 0, -triangleSize );
   
   // Line to bar
@@ -170,10 +188,10 @@ void drawClusterStatus()
   rect( horzBarPosX, horzBarPosY, barLength, barWidth );
   
   fill(gpuBaseColor);
-  rect( horzBarPosX, horzBarPosY, barLength * (averageGPU / 100.0), barWidth/2 );
+  rect( horzBarPosX, horzBarPosY, barLength * (targetGPU / 100.0), barWidth/2 );
   
   fill(cpuBaseColor);
-  rect( horzBarPosX, horzBarPosY + barWidth/2, barLength * (averageCPU / 100.0), barWidth/2 );
+  rect( horzBarPosX, horzBarPosY + barWidth/2, barLength * (targetCPU / 100.0), barWidth/2 );
   
   popMatrix();
   
@@ -208,11 +226,12 @@ void drawClusterStatus()
   float k = 0.1;
   float t = 2;
 
-  
+  t = millis() / 1000.0 * targetCPU;
+  nPoints = (int)targetGPU;
   
   fill(0,0,0,20);
   rect(0, 0, width, height);
-  /*
+  
   fill(200);
   noStroke();
   //ellipse( mouseX, mouseY, 50, 50 );
@@ -220,7 +239,7 @@ void drawClusterStatus()
   // Linear spiral
   pushMatrix();
   translate(width/2, height/2 - 20 );
-  rotate( millis() / t );
+  rotate( t );
   for( int th = 0; th < 3600; th += (3600 / nPoints) )
   {
     float R = k * th;
@@ -228,19 +247,25 @@ void drawClusterStatus()
     float Y = R * cos(th);
     float Z = R;
     
-    fill(200);
-    ellipse( X, Y, 5, 5 );
+    pushMatrix();
+    translate( X, Y );
+    scale( 0.05 );
+    tint(0, 250 * (100.0/R), 250 * (200.0/R) );
+    
+    image( circleImg, 0, 0 );
+    popMatrix();
   }
   
   popMatrix();
   
-  nPoints = mouseX; //96 straight line spiral
+  //nPoints = mouseX; //96 straight line spiral
   //k = mouseY / 1000.0;
-  t = mouseY;
+  
+  
   if( nPoints <= 0 )
     nPoints = 1;
     
   if( t <= 0 )
     t = 1;
-  */
+  
 }

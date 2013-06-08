@@ -28,6 +28,8 @@ PApplet applet;
 PFont st_font;
 PFont space_font;
 
+PImage circleImg;
+
 float programTimer;
 float deltaTime;
 float lastFrameTime;
@@ -35,7 +37,6 @@ float startTime;
 
 boolean demoMode = true; // No active contollers and trackables enables demo mode (rotates CAVE2 image)
 boolean scaleScreen = true;
-boolean logErrors = false;
 
 float lastInteractionTime;
 float timeSinceLastInteractionEvent;
@@ -81,7 +82,8 @@ int CAVE2_displayMode = COLUMN;
 
 // Tracker ---------------------------------------
 boolean connectToTracker = true;
-String trackerIP = "cave2tracker.evl.uic.edu";
+boolean logErrors = false;
+String trackerIP = "localhost";
 int msgport = 28000;
 int dataport = 7734;
 
@@ -122,7 +124,7 @@ OscP5 oscP5;
 int recvPort = 8000;
 
 // Cluster ---------------------------------------
-boolean connectToClusterData = true;
+boolean connectToClusterData = false;
 NodeDisplay[] nodes = new NodeDisplay[37];
 float[] columnPulse = new float[21];
 float pulseDecay = 0.1;
@@ -196,6 +198,9 @@ void setup() {
   
   st_font = loadFont("TMP-Monitors-48.vlw");
   space_font = loadFont("SpaceAge-48.vlw");
+  
+  circleImg = loadImage("circle.png");
+   
   textFont( st_font, 16 );
 
   for ( int i = 0; i < 21; i++)
@@ -437,11 +442,22 @@ void draw() {
   switch( state )
   {
     case(TRACKING):
-    drawTrackerStatus();
-    break;
+      drawTrackerStatus();
+      if( !connectToTracker )
+      {
+        fill(250,250,0);
+        text("DEMO MODE - NOT CONNECTED TO TRACKER", 216, 16);
+      }
+      break;
     case(CLUSTER):
-    getData();
-    drawClusterStatus();
+      if( connectToClusterData )
+        getData();
+      else
+      {
+        fill(250,250,0);
+        text("DEMO MODE - NOT CONNECTED TO CLUSTER", 216, 16);
+      }
+      drawClusterStatus();
     break;
   }
 
@@ -465,7 +481,9 @@ void draw() {
   fill(255);
   text(systemText, borderDistFromEdge + borderWidth + textOffset.x, height - borderDistFromEdge - borderWidth/2  + textOffset.y);
   textFont( st_font, 16 );
-
+  
+  //text("FPS: "+ (int)frameRate, 16, 16);
+    
   // For event and fullscreen processing, this must be called in draw()
   omicronManager.process();
   lastFrameTime = programTimer;

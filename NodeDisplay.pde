@@ -30,8 +30,8 @@ class NodeDisplay
   int nSegments;
   int nAngledSegments;
   int[] segments;
-  
-      
+
+  boolean nodeDown = false;
   float avgCPU = 0;
     
   ArrayList conduitPulses = new ArrayList();
@@ -60,21 +60,37 @@ class NodeDisplay
   float curSegment;
   int segmentSizeRange = 1;
 
-  float pulseDelay = 0.5;
+  float pulseDelay = 2.5;
   float pulseTimer = 0;
   float pulseSpeed = 20;
   
   void drawLeft()
   {  
-    /*   
     pulseTimer += deltaTime;
-    if( pulseTimer > pulseDelay )
+    if( pulseTimer > pulseDelay && !connectToClusterData )
     {
-      conduitPulses.add( new Pulse() );
       pulseTimer = 0;
+      
+      if( !connectToClusterData )
+      {
+        for( int i = 0; i < 16; i++)
+        {
+          if( nodeID == 15 )
+            CPU[i] = 0;
+          else
+            CPU[i] = (int)random(0,15);
+        }
+        
+        gpuMem = (int)random(25,70);
+        
+        
+        if( nodeID == 15 )
+        {
+          gpuMem = 0;
+        }
+      }
     }
-    */
-    
+
     if( connectToClusterData )
       CPU = allCPUs[nodeID];
     
@@ -86,6 +102,8 @@ class NodeDisplay
     }
     
     avgCPU /= 16 * 100;
+    
+    
     
     textAlign(RIGHT);
     fill(cpuBaseColor);
@@ -99,19 +117,24 @@ class NodeDisplay
     fill(gpuBaseColor);
     text("GPU Mem.: ", 210 + nodeWidth, -24 );
   
-    // Bump up the CPU color effect
-    avgCPU += 0.1;
-    nodeColor = color( red(baseColor) * avgCPU, green(baseColor) * avgCPU, blue(baseColor) * avgCPU );
+    
     
     // GPU conduit
     if( connectToClusterData )
       gpuMem = allGPUs[nodeID];
     curSegment += gpuMem / pulseSpeed;
     
+    if( gpuMem == 0 && avgCPU == 0 )
+      nodeDown = true;
+    else
+      nodeDown = false;
+    
+    // Bump up the CPU color effect
+    avgCPU += 0.1;
+    nodeColor = color( red(baseColor) * avgCPU, green(baseColor) * avgCPU, blue(baseColor) * avgCPU );
     
     rectMode(CENTER);
-    
-    
+
     // Angled background segments
     float horzOffset = 0;
     float vertOffset = 0;
@@ -142,7 +165,10 @@ class NodeDisplay
       */
     
     // Angled animated segment
-    stroke(200 * (gpuMem / 100.0), 50, 250 * ( 1 - (gpuMem / 100.0)) );
+    if( nodeDown )
+      stroke(0,0,20);
+    else
+      stroke(200 * (gpuMem / 100.0), 50, 250 * ( 1 - (gpuMem / 100.0)) );
     for( int i = 0; i < nAngledSegments; i++ )
     {
       float segmentValue = 100 * (i / (float)nSegments);
@@ -197,17 +223,26 @@ class NodeDisplay
     // Node info
     pushMatrix();
     translate(0,0,10);
-    fill(nodeColor);
     noStroke();
+    
+    if( nodeDown )
+      fill(250 * (1 - (pulseTimer / pulseDelay)),0,0);
+    else
+      fill(nodeColor);
+      
     ellipse( 0, 0, nodeHeight, nodeHeight );
     
     fill(0);
     rect( 0, -nodeHeight/2, nodeHeight/2, nodeHeight );
     
     fill(nodeColor);
-    rect( 0, -nodeHeight/2, 10, nodeHeight );
     
-    fill(nodeColor);
+    if( nodeDown )
+      fill(250 * (1 - (pulseTimer / pulseDelay)),0,0);
+    else
+      fill(nodeColor);
+
+    rect( 0, -nodeHeight/2, 10, nodeHeight );
     rect( 20, -nodeHeight/2, nodeWidth, nodeHeight );
     
     if( avgCPU < 0.5 )
@@ -238,6 +273,18 @@ class NodeDisplay
   
   void drawRight()
   {
+    pulseTimer += deltaTime;
+    if( pulseTimer > pulseDelay && !connectToClusterData )
+    {
+      for( int i = 0; i < 16; i++)
+      {
+        CPU[i] = (int)random(0,54);
+      }
+      
+      gpuMem = (int)random(0,15);
+      pulseTimer = 0;
+    }
+    
     if( connectToClusterData )
       CPU = allCPUs[nodeID];
     
@@ -265,16 +312,20 @@ class NodeDisplay
     fill(gpuBaseColor);
     text("GPU Mem.: ", 210 - nodeWidth, -24 );
     popMatrix();
-    
-    // Bump up the CPU color effect
-    avgCPU += 0.1;
-    nodeColor = color( red(baseColor) * avgCPU, green(baseColor) * avgCPU, blue(baseColor) * avgCPU );
-    
+
     // GPU conduit
     if( connectToClusterData )
       gpuMem = allGPUs[nodeID];
     curSegment += gpuMem / pulseSpeed;
     
+    if( gpuMem == 0 && avgCPU == 0 )
+      nodeDown = true;
+    else
+      nodeDown = false;
+      
+    // Bump up the CPU color effect
+    avgCPU += 0.1;
+    nodeColor = color( red(baseColor) * avgCPU, green(baseColor) * avgCPU, blue(baseColor) * avgCPU );
     
     rectMode(CENTER);
     pushMatrix();
@@ -311,7 +362,10 @@ class NodeDisplay
       */
     
     // Angled animated segment
-    stroke(200 * (gpuMem / 100.0), 50, 250 * ( 1 - (gpuMem / 100.0)) );
+    if( nodeDown )
+      stroke(0,0,20);
+    else
+      stroke(200 * (gpuMem / 100.0), 50, 250 * ( 1 - (gpuMem / 100.0)) );
     for( int i = 0; i < nAngledSegments; i++ )
     {
       float segmentValue = 100 * (i / (float)nSegments);
@@ -354,21 +408,30 @@ class NodeDisplay
     popMatrix();
     
     rectMode(CORNER);
-    pushMatrix();
-    translate( 0, 0, 1 );
     
     // Node info
-    fill(nodeColor);
+    pushMatrix();
+    translate( 0, 0, 1 );
     noStroke();
+    
+    if( nodeDown )
+      fill(250 * (1 - (pulseTimer / pulseDelay)),0,0);
+    else
+      fill(nodeColor);
+      
     ellipse( nodeWidth * 2, 0, nodeHeight, nodeHeight );
     
     fill(0);
     rect( nodeWidth * 2 - nodeHeight/2, -nodeHeight/2, nodeHeight/2, nodeHeight );
     
     fill(nodeColor);
-    rect( nodeWidth * 2 - 10, -nodeHeight/2, 10, nodeHeight );
     
-    fill(nodeColor);
+    if( nodeDown )
+      fill(250 * (1 - (pulseTimer / pulseDelay)),0,0);
+    else
+      fill(nodeColor);
+
+    rect( nodeWidth * 2 - 10, -nodeHeight/2, 10, nodeHeight );
     rect( nodeWidth - 20, -nodeHeight/2, nodeWidth, nodeHeight );
     
     if( avgCPU < 0.5 )
@@ -377,7 +440,10 @@ class NodeDisplay
       fill(0);
     textAlign(LEFT);
     textFont( st_font, 20 );
-    text( nodeID, nodeWidth * 2 -nodeHeight/2 + 20, 8 );
+    if( nodeID != 0 )
+      text( nodeID, nodeWidth * 2 -nodeHeight/2 + 20, 8 );
+    else
+      text( "M", nodeWidth * 2 -nodeHeight/2 + 20, 8 );
     
     textAlign(LEFT);
     textFont( st_font, 16 );
