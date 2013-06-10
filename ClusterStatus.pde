@@ -47,7 +47,7 @@ float targetGPU = 1;
 
 void drawClusterStatus()
 {
-  systemText = "CLUSTER PROCESSING STATUS";
+  systemText = "CLUSTER PROCESSING UNIT STATUS";
   
   CAVE2_Scale = 64;
   CAVE2_3Drotation.x = 0;
@@ -233,7 +233,7 @@ void drawClusterStatus()
   float t = 2;
 
   t = millis() / 1000.0 * targetCPU;
-  nPoints = (int)targetGPU;
+  nPoints = (int)targetGPU + 1;
   
   fill(0,0,0,20);
   rect(0, 0, width, height);

@@ -11,6 +11,13 @@ void getData()
 {
   String lines[] = loadStrings(website);
   
+  allElements = new String[37][25];
+  allCPUs = new int[37][16];
+  allGPUs = new int[37];
+  netIn = new int[37];
+  netOut = new int[37];
+  memUsed = new int[37];
+
   if (lines != null){
   for (int node = 0 ; node < lines.length; node++) {
     String[] elements = splitTokens(lines[node]);

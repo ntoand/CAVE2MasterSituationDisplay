@@ -6,7 +6,7 @@ void drawTrackerStatus()
 {
   systemText = "TRACKING SYSTEM";
   
-  CAVE2_Scale = 65;
+  CAVE2_Scale = 64;
   CAVE2_displayMode = DISPLAY;
   
   background(0);
