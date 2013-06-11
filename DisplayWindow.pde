@@ -106,7 +106,7 @@ void displayControllerWindow( Trackable t, float xPos, float yPos )
   }
   
   // Center and diameter of analog region
-  //ellipse( width - 282 + 67, 51, 68, 68 );
+  //ellipse( targetWidth - 282 + 67, 51, 68, 68 );
   PVector analogStick = t.analogStick1;
   PVector analogCenter = new PVector( controllerImagePos.x + 67, controllerImagePos.y + 51 );
   

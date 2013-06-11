@@ -7,12 +7,15 @@ class AppLabel
   float cpu;
   float gpu;
   boolean flipLabel = false;
-  AppLabel( String appName, float gpuValue, float cpuValue, boolean flipLabel )
+  int displayFlag = 0;
+  
+  AppLabel( String appName, float gpuValue, float cpuValue, boolean flipLabel, int displayFlag )
   {
     name = appName;
     cpu = cpuValue;
     gpu = gpuValue;
     this.flipLabel = flipLabel;
+    this.displayFlag = displayFlag;
   }
   
   public String getName()
@@ -33,6 +36,11 @@ class AppLabel
   public boolean isFlipped()
   {
     return flipLabel;
+  }
+  
+  public int getDisplayFlag()
+  {
+    return displayFlag;
   }
 }
 
@@ -61,7 +69,7 @@ void drawClusterStatus()
   
   // Master node
   pushMatrix();
-  translate( width - 70 - borderDistFromEdge - 500, height - verticalOffset - borderDistFromEdge - 70 * 19 + 70 * (38 - 20) );
+  translate( targetWidth - 70 - borderDistFromEdge - 500, targetHeight - verticalOffset - borderDistFromEdge - 70 * 19 + 70 * (38 - 20) );
   nodes[0].drawRight();
   averageCPU += nodes[0].avgCPU;
   averageGPU += nodes[0].gpuMem;
@@ -71,7 +79,7 @@ void drawClusterStatus()
   for( int i = 1; i < 20; i++ )
   {
     pushMatrix();
-    translate( 70 + borderDistFromEdge, height - verticalOffset - borderDistFromEdge + 70 * -i );
+    translate( 70 + borderDistFromEdge, targetHeight - verticalOffset - borderDistFromEdge + 70 * -i );
     nodes[i].drawLeft();
     popMatrix();
     
@@ -84,7 +92,7 @@ void drawClusterStatus()
   for( int i = 20; i < 37; i++ )
   {
     pushMatrix();
-    translate( width - 70 - borderDistFromEdge - 500, height - verticalOffset - borderDistFromEdge - 70 * 19 + 70 * (i - 20) );
+    translate( targetWidth - 70 - borderDistFromEdge - 500, targetHeight - verticalOffset - borderDistFromEdge - 70 * 19 + 70 * (i - 20) );
     nodes[i].drawRight();
     popMatrix();
     
@@ -94,7 +102,7 @@ void drawClusterStatus()
   
   // Draw CAVE2 ------------------------------------------------------------------
   pushMatrix();
-  translate( width/2, height/2 - 20, 0);
+  translate( targetWidth/2, targetHeight/2 - 20, 0);
   rotateX( CAVE2_3Drotation.x ); 
   rotateZ( CAVE2_3Drotation.y );
   scale( 2, 2, 2 );
@@ -113,7 +121,7 @@ void drawClusterStatus()
   // CPU/GPU bar ----------------------------------------------------------------
   fill(0);
   noStroke();
-  rect( 0, height - 200, width, 180 );
+  rect( 0, targetHeight - 200, targetWidth, 180 );
   
   averageCPU = averageCPU / 37 * 100 - 10;
   averageGPU = (averageGPU - 10) / 37; // Remember the 10% padding done for vis?
@@ -129,8 +137,8 @@ void drawClusterStatus()
     targetGPU += updateTransitionTime;
   
   float horzBarPosX = borderDistFromEdge + borderWidth + 16;
-  float horzBarPosY = height - borderDistFromEdge - 120 + 16 * 1.5;
-  float barLength = width - horzBarPosX * 2;
+  float horzBarPosY = targetHeight - borderDistFromEdge - 120 + 16 * 1.5;
+  float barLength = targetWidth - horzBarPosX * 2;
   float barWidth = 20;
   
   float cpuMarkerHeight = 32;
@@ -205,23 +213,40 @@ void drawClusterStatus()
   {
     AppLabel app = (AppLabel)appList.get(i);
     float gpuAppLabelHeight = gpuMarkerHeight/2;
+    float cpuAppLabelHeight = cpuMarkerHeight;
     String appName = app.getName();
     float gpuValue = app.getGPU();
+    float cpuValue = app.getCPU();
     boolean flipped = app.isFlipped();
+    int displayFlag = app.getDisplayFlag();
     
     if( flipped )
       textAlign(RIGHT);
     else
       textAlign(LEFT);
-      
-    fill(10,120,210);
-    stroke(10,120,210);
-    pushMatrix();
-    translate( horzBarPosX + barLength * (gpuValue / 100.0), horzBarPosY - gpuAppLabelHeight, 1 );
-    text( appName + " " + gpuValue + "   ", 8, 0 );
     
-    line( 0, -8, 0, gpuAppLabelHeight );
-    popMatrix();
+    if( displayFlag == 0 || displayFlag == 1 )
+    {
+      fill(10,120,210);
+      stroke(10,120,210);
+      pushMatrix();
+      translate( horzBarPosX + barLength * (gpuValue / 100.0), horzBarPosY - gpuAppLabelHeight, 1 );
+      text( appName + " " + gpuValue + "   ", 8, 0 );
+      line( 0, -8, 0, gpuAppLabelHeight );
+      popMatrix();
+    }
+    
+    if( displayFlag == 0 || displayFlag == 2 )
+    {
+      fill(150,100,10);
+      stroke(150,100,10);
+      pushMatrix();
+      translate( horzBarPosX + barLength * (cpuValue / 100.0), horzBarPosY + barWidth + cpuAppLabelHeight, 1 );
+      text( appName + " " + cpuValue + "   ", 8, 0 );
+      line( 0, -cpuAppLabelHeight, 0, 0 );
+      popMatrix();
+    }
+    
     textAlign(LEFT);
   }
   noStroke();
@@ -232,11 +257,11 @@ void drawClusterStatus()
   float k = 0.1;
   float t = 2;
 
-  t = millis() / 1000.0 * targetCPU;
+  t = targetCPU;
   nPoints = (int)targetGPU + 1;
   
   fill(0,0,0,20);
-  rect(0, 0, width, height);
+  rect(0, 0, targetWidth, targetHeight);
   
   fill(200);
   noStroke();
@@ -244,8 +269,8 @@ void drawClusterStatus()
   
   // Linear spiral
   pushMatrix();
-  translate(width/2, height/2 - 20 );
-  rotate( t );
+  translate(targetWidth/2, targetHeight/2 - 20 );
+  rotate( millis() / t );
   for( int th = 0; th < 3600; th += (3600 / nPoints) )
   {
     float R = k * th;

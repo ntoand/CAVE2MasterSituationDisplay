@@ -32,7 +32,7 @@ void drawTrackerStatus()
     headTrackable.updatePosition( -0.34 , 1.76, 0.91, -0.1, 0.15, 0.8, 1 );
     
     trackerPulseTimer += deltaTime;
-    if( trackerPulseTimer > trackerPulseDelay && !connectToClusterData )
+    if( trackerPulseTimer > trackerPulseDelay )
     {
       trackerPulseTimer = 0;
       
@@ -166,7 +166,7 @@ void drawTrackerStatus()
   wandButton4.draw();
   */
   
-  PVector trackableWindow = new PVector( width * 0.02, height - 400 );
+  PVector trackableWindow = new PVector( targetWidth * 0.02, targetHeight - 400 );
   float displayWindowSpacing = 800;
   displayTrackableWindow( headTrackable, trackableWindow.x, trackableWindow.y );
   displayControllerWindow( wandTrackable1, trackableWindow.x + displayWindowSpacing, trackableWindow.y );

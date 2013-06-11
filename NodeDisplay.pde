@@ -67,7 +67,7 @@ class NodeDisplay
   void drawLeft()
   {  
     pulseTimer += deltaTime;
-    if( pulseTimer > pulseDelay && !connectToClusterData )
+    if( pulseTimer > pulseDelay )
     {
       pulseTimer = 0;
       
@@ -262,7 +262,7 @@ class NodeDisplay
     // CPU Display
     for( int i = 0; i < 16; i++ )
     {
-      fill(10,200,10);
+      fill(210,100,10);
       rect( 10 + 3 * cpuBorder + ( 2 + nodeWidth / 18) * i, cpuBorder - nodeHeight/2, (nodeWidth / 18), nodeHeight - cpuBorder * 2 );
       
       fill(0);
@@ -274,14 +274,17 @@ class NodeDisplay
   void drawRight()
   {
     pulseTimer += deltaTime;
-    if( pulseTimer > pulseDelay && !connectToClusterData )
+    if( pulseTimer > pulseDelay )
     {
-      for( int i = 0; i < 16; i++)
+      if( !connectToClusterData )
       {
-        CPU[i] = (int)random(0,54);
+        for( int i = 0; i < 16; i++)
+        {
+          CPU[i] = (int)random(0,54);
+        }
+        
+        gpuMem = (int)random(0,15);
       }
-      
-      gpuMem = (int)random(0,15);
       pulseTimer = 0;
     }
     
@@ -451,7 +454,7 @@ class NodeDisplay
     // CPU Display
     for( int i = 0; i < 16; i++ )
     {
-      fill(10,200,10);
+      fill(200,100,10);
       rect( nodeWidth - 3 * cpuBorder + ( 2 + nodeWidth / 18) * i, cpuBorder - nodeHeight/2, (nodeWidth / 18), nodeHeight - cpuBorder * 2 );
       
       fill(0);

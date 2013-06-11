@@ -35,6 +35,9 @@ float deltaTime;
 float lastFrameTime;
 float startTime;
 
+float targetWidth;
+float targetHeight;
+
 boolean demoMode = true; // No active contollers and trackables enables demo mode (rotates CAVE2 image)
 boolean scaleScreen = true;
 
@@ -87,7 +90,7 @@ boolean connectToTracker = false;
 boolean logErrors = false;
 String trackerIP = "localhost";
 int msgport = 28000;
-int dataport = 7734;
+int dataport = 7738;
 
 Trackable headTrackable;
 Trackable wandTrackable1;
@@ -126,20 +129,16 @@ OscP5 oscP5;
 int recvPort = 8000;
 
 // Cluster ---------------------------------------
-boolean connectToClusterData = false;
+boolean connectToClusterData = true;
+
 NodeDisplay[] nodes = new NodeDisplay[37];
 float[] columnPulse = new float[21];
 float pulseDecay = 0.1;
+boolean connectedToClusterData = false;
 
 int[] conduitLength = new int[37];
 int[] conduitAngledLength = new int[37];
 int[] conduitAngle = new int[37];
-
-AppLabel app1 = new AppLabel("Mars", 6.18, 6.67, true);
-AppLabel app2 = new AppLabel("Vortex", 6.51, 5.50, false);
-AppLabel app3 = new AppLabel("Molecule", 25.3, 7.71, true);
-AppLabel app4 = new AppLabel("Connectome", 27.30, 7.11, false);
-AppLabel app5 = new AppLabel("Enterprise", 56.89, 8.44, false);
 
 ArrayList appList = new ArrayList();
 
@@ -151,7 +150,7 @@ public void init() {
   omicronManager = new OmicronAPI(this);
 
   // Removes the title bar for full screen mode (present mode will not work on Cyber-commons wall)
-  omicronManager.setFullscreen(true);
+  omicronManager.setFullscreen(false);
 }// init
 
 void exit()
@@ -174,14 +173,17 @@ void exit()
 // Program initializations
 void setup() {
   //size( 540, 960, P3D ); // Droid Razr
-  size( screenWidth, screenHeight, P3D );
-
-  width = 2560;
-  height = 1600;
-
+  size( 1280, 1024, P3D );
+  //size( screenWidth, screenHeight, P3D );
+  
+  readConfigFile("config.cfg");
+  
+  targetWidth = 2560;
+  targetHeight = 1600;
+  
   applet = this;
   oscP5 = new OscP5(this, recvPort);
-  CAVE2_screenPos = new PVector( width * 0.5, height * CAVE2_verticalScale, -100 );
+  CAVE2_screenPos = new PVector( targetWidth * 0.5, targetHeight * CAVE2_verticalScale, -100 );
 
   startTime = millis() / 1000.0;
 
@@ -195,7 +197,7 @@ void setup() {
   omicronManager.setEventListener( eventListener );
 
   // Screen scaling
-  omicronManager.calculateScreenTransformation(2560, 1600); // Single display on CAVE2 column display
+  omicronManager.calculateScreenTransformation(targetWidth, targetHeight);
   omicronManager.enableScreenScale(scaleScreen);
   
   st_font = loadFont("TMP-Monitors-48.vlw");
@@ -414,12 +416,6 @@ void setup() {
     nodes[i] = new NodeDisplay(i);
   }
   
-  appList.add( app1 );
-  appList.add( app2 );
-  appList.add( app3 );
-  appList.add( app4 );
-  appList.add( app5 );
-  
   background(0);
 }// setup
 
@@ -428,8 +424,12 @@ float scaleScreenX, scaleScreenY;
 void draw() {
   if ( scaleScreen )
   {
-    omicronManager.pushScreenScale();
-    translate( 0, -(height - screenHeight) );
+    //omicronManager.pushScreenScale();
+    // Overriding pushScreenScale()
+    float screenScale = width / targetWidth;
+    pushMatrix();
+    translate( 0, (height - targetHeight * screenScale) / 2 );
+    scale( screenScale );
   }
 
   programTimer = millis() / 1000.0;
@@ -459,6 +459,15 @@ void draw() {
         fill(250,250,0);
         text("DEMO MODE - NOT CONNECTED TO CLUSTER", 216, 16);
       }
+      
+      if( connectToClusterData && !connectedToClusterData )
+      {
+        fill(0);
+        rect(0,0,width,borderWidth);
+        
+        fill(250,250,0);
+        text("NO DATA RECEIVED - NOT CONNECTED TO CLUSTER - ATTEMPTING RECONNECT IN " + (int)clusterReconnectTimer, 216, 16);
+      }
       drawClusterStatus();
       break;
     case(AUDIO):
@@ -468,24 +477,24 @@ void draw() {
 
   // Border
   noStroke();
-  PVector textOffset = new PVector( width * 0.9, borderWidth );
+  PVector textOffset = new PVector( targetWidth * 0.9, borderWidth );
 
   fill(50);
-  rect( borderDistFromEdge + borderWidth/2, borderDistFromEdge, width - borderDistFromEdge * 2 - borderWidth/2, borderWidth ); //Top
+  rect( borderDistFromEdge + borderWidth/2, borderDistFromEdge, targetWidth - borderDistFromEdge * 2 - borderWidth/2, borderWidth ); //Top
   ellipse( borderDistFromEdge + borderWidth/2, borderDistFromEdge + borderWidth/2, borderWidth, borderWidth ); // Top-Left
-  ellipse( width - borderDistFromEdge, borderDistFromEdge + borderWidth/2, borderWidth, borderWidth ); // Top-Right
-  rect( borderDistFromEdge, borderDistFromEdge + borderWidth/2, borderWidth, height - borderDistFromEdge * 2 - borderWidth/2 ); //Left
-  rect( width - borderDistFromEdge - borderWidth/2, borderDistFromEdge + borderWidth/2, borderWidth, height - borderDistFromEdge * 2 - borderWidth/2 ); //Right
-  ellipse( borderDistFromEdge + borderWidth/2, height - borderDistFromEdge, borderWidth, borderWidth ); // Bottom-Left
-  ellipse( width - borderDistFromEdge, height - borderDistFromEdge, borderWidth, borderWidth ); // Bottom-Right
-  rect( borderDistFromEdge + borderWidth/2, height - borderDistFromEdge - borderWidth/2, width - borderDistFromEdge * 2 - borderWidth/2, borderWidth ); // Bottom
+  ellipse( targetWidth - borderDistFromEdge, borderDistFromEdge + borderWidth/2, borderWidth, borderWidth ); // Top-Right
+  rect( borderDistFromEdge, borderDistFromEdge + borderWidth/2, borderWidth, targetHeight - borderDistFromEdge * 2 - borderWidth/2 ); //Left
+  rect( targetWidth - borderDistFromEdge - borderWidth/2, borderDistFromEdge + borderWidth/2, borderWidth, targetHeight - borderDistFromEdge * 2 - borderWidth/2 ); //Right
+  ellipse( borderDistFromEdge + borderWidth/2, targetHeight - borderDistFromEdge, borderWidth, borderWidth ); // Bottom-Left
+  ellipse( targetWidth - borderDistFromEdge, targetHeight - borderDistFromEdge, borderWidth, borderWidth ); // Bottom-Right
+  rect( borderDistFromEdge + borderWidth/2, targetHeight - borderDistFromEdge - borderWidth/2, targetWidth - borderDistFromEdge * 2 - borderWidth/2, borderWidth ); // Bottom
   
   textAlign(RIGHT);
   textFont( st_font, 32 );
   fill(10);
-  rect( borderDistFromEdge + textOffset.x, height - borderDistFromEdge - borderWidth/2, -(textWidth(systemText) + borderWidth * 2), borderWidth ); // Bottom
+  rect( borderDistFromEdge + textOffset.x, targetHeight - borderDistFromEdge - borderWidth/2, -(textWidth(systemText) + borderWidth * 2), borderWidth ); // Bottom
   fill(255);
-  text(systemText, textOffset.x + borderWidth/2, height - borderDistFromEdge - borderWidth/2  + textOffset.y);
+  text(systemText, textOffset.x + borderWidth/2, targetHeight - borderDistFromEdge - borderWidth/2  + textOffset.y);
   textFont( st_font, 16 );
   textAlign(LEFT);
   //text("FPS: "+ (int)frameRate, 16, 16);

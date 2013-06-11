@@ -6,11 +6,28 @@ int[]netOut = new int[37];
 int[]memUsed = new int[37];
 
 String website = "http://lyra.evl.uic.edu:9000/html/cluster.txt";
+//String website = "S:/EVL/CAVE2/cluster2.txt";
+
+float clusterReconnectDelay = 10;
+float clusterReconnectTimer;
 
 void getData()
 {
+  if( clusterReconnectTimer > 0 )
+  {
+    clusterReconnectTimer -= deltaTime;
+    return;
+  } 
   String lines[] = loadStrings(website);
-  
+  if( lines == null)
+  {
+    clusterReconnectTimer = clusterReconnectDelay;
+    connectedToClusterData = false;
+  }
+  else
+  {
+    connectedToClusterData = true;
+  }
   /*
   allElements = new String[37][25];
   allCPUs = new int[37][16];
