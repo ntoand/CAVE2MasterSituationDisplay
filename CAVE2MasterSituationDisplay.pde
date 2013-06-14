@@ -51,7 +51,7 @@ float borderDistFromEdge = 30;
 final int TRACKING = 0;
 final int CLUSTER = 1;
 final int AUDIO = 2;
-int state = TRACKING;
+int state = CLUSTER;
 
 // CAVE2 model -----------------------------------
 float CAVE2_Scale = 65;
@@ -129,7 +129,7 @@ OscP5 oscP5;
 int recvPort = 8000;
 
 // Cluster ---------------------------------------
-boolean connectToClusterData = true;
+boolean connectToClusterData = false;
 
 NodeDisplay[] nodes = new NodeDisplay[37];
 float[] columnPulse = new float[21];
@@ -173,8 +173,8 @@ void exit()
 // Program initializations
 void setup() {
   //size( 540, 960, P3D ); // Droid Razr
-  size( 1280, 1024, P3D );
-  //size( screenWidth, screenHeight, P3D );
+  //size( 1280, 1024, P3D );
+  size( 1500, 960, P3D );
   
   readConfigFile("config.cfg");
   

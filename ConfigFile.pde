@@ -36,17 +36,21 @@ void readConfigFile(String config_file) {
       if ( currentBlockName.contains("applicationLog") && inBlock ) // Get block name
       {
         String[] applicationData = rawConfig[i].split(" ");
-        for(int j = 0; j < applicationData.length; j++ )
+        
+        if( applicationData.length == 5 )
         {
-          //println(j+"] '" + applicationData[j] + "'");
-          String appName = applicationData[0];
-          float gpu = Float.valueOf(applicationData[1]);
-          float cpu = Float.valueOf(applicationData[2]);
-          boolean flip = Boolean.valueOf(applicationData[3]);
-          int displayFlag = Integer.valueOf(applicationData[4]);
-          
-          AppLabel app = new AppLabel(appName, gpu, cpu, flip, displayFlag);
-          appList.add( app );
+          for(int j = 0; j < applicationData.length; j++ )
+          {
+            //println(j+"] '" + applicationData[j] + "'");
+            String appName = applicationData[0];
+            float gpu = Float.valueOf(applicationData[1]);
+            float cpu = Float.valueOf(applicationData[2]);
+            boolean flip = Boolean.valueOf(applicationData[3]);
+            int displayFlag = Integer.valueOf(applicationData[4]);
+            
+            AppLabel app = new AppLabel(appName, gpu, cpu, flip, displayFlag);
+            appList.add( app );
+          }
         }
       }
       
