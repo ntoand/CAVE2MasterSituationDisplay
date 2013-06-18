@@ -86,9 +86,9 @@ final int DISPLAY = 2;
 int CAVE2_displayMode = COLUMN;
 
 // Tracker ---------------------------------------
-boolean connectToTracker = false;
+boolean connectToTracker = true;
 boolean logErrors = false;
-String trackerIP = "localhost";
+String trackerIP = "cave2tracker.evl.uic.edu";
 int msgport = 28000;
 int dataport = 7738;
 
@@ -129,12 +129,14 @@ OscP5 oscP5;
 int recvPort = 8000;
 
 // Cluster ---------------------------------------
-boolean connectToClusterData = false;
+boolean connectToClusterData = true;
+float clusterUpdateInterval = 0.5; // seconds
 
 NodeDisplay[] nodes = new NodeDisplay[37];
 float[] columnPulse = new float[21];
 float pulseDecay = 0.1;
 boolean connectedToClusterData = false;
+float clusterUpdateTimer;
 
 int[] conduitLength = new int[37];
 int[] conduitAngledLength = new int[37];
@@ -150,7 +152,7 @@ public void init() {
   omicronManager = new OmicronAPI(this);
 
   // Removes the title bar for full screen mode (present mode will not work on Cyber-commons wall)
-  omicronManager.setFullscreen(false);
+  omicronManager.setFullscreen(true);
 }// init
 
 void exit()
@@ -173,8 +175,8 @@ void exit()
 // Program initializations
 void setup() {
   //size( 540, 960, P3D ); // Droid Razr
-  //size( 1280, 1024, P3D );
-  size( 1500, 960, P3D );
+  size( screenWidth, screenHeight, P3D );
+  //size( 1500, 960, P3D );
   
   readConfigFile("config.cfg");
   
@@ -453,7 +455,18 @@ void draw() {
       break;
     case(CLUSTER):
       if( connectToClusterData )
-        getData();
+      {
+        if( clusterUpdateTimer >= clusterUpdateInterval )
+        {
+          getData();
+          clusterUpdateTimer = 0;
+          
+        }
+        else
+        {
+          clusterUpdateTimer += deltaTime;
+        }
+      }
       else
       {
         fill(250,250,0);
