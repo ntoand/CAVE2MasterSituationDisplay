@@ -51,7 +51,7 @@ float borderDistFromEdge = 30;
 final int TRACKING = 0;
 final int CLUSTER = 1;
 final int AUDIO = 2;
-int state = CLUSTER;
+int state = TRACKING;
 
 // CAVE2 model -----------------------------------
 float CAVE2_Scale = 65;
@@ -86,7 +86,7 @@ final int DISPLAY = 2;
 int CAVE2_displayMode = COLUMN;
 
 // Tracker ---------------------------------------
-boolean connectToTracker = true;
+boolean connectToTracker = false;
 boolean logErrors = false;
 String trackerIP = "cave2tracker.evl.uic.edu";
 int msgport = 28000;
@@ -129,7 +129,9 @@ OscP5 oscP5;
 int recvPort = 8000;
 
 // Cluster ---------------------------------------
-boolean connectToClusterData = true;
+String clusterData = "http://lyra.evl.uic.edu:9000/html/cluster.txt";
+//String website = "S:/EVL/CAVE2/cluster2.txt";
+boolean connectToClusterData = false;
 float clusterUpdateInterval = 0.5; // seconds
 
 NodeDisplay[] nodes = new NodeDisplay[37];
@@ -191,8 +193,10 @@ void setup() {
 
   // Make the connection to the tracker machine
   if ( connectToTracker )
+  {
+    println("Connecting to tracker '"+trackerIP+"' on port " + msgport ); 
     omicronManager.connectToTracker(dataport, msgport, trackerIP);
-
+  }
   // Create a listener to get events
   eventListener = new EventListener();
 
@@ -428,7 +432,7 @@ void draw() {
   {
     //omicronManager.pushScreenScale();
     // Overriding pushScreenScale()
-    float screenScale = width / targetWidth;
+    float screenScale = height / targetHeight;
     pushMatrix();
     translate( 0, (height - targetHeight * screenScale) / 2 );
     scale( screenScale );
@@ -456,11 +460,10 @@ void draw() {
     case(CLUSTER):
       if( connectToClusterData )
       {
+        getData();
         if( clusterUpdateTimer >= clusterUpdateInterval )
         {
-          getData();
           clusterUpdateTimer = 0;
-          
         }
         else
         {

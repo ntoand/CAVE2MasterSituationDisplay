@@ -5,8 +5,7 @@ int[]netIn = new int[37];
 int[]netOut = new int[37];
 int[]memUsed = new int[37];
 
-String website = "http://lyra.evl.uic.edu:9000/html/cluster.txt";
-//String website = "S:/EVL/CAVE2/cluster2.txt";
+
 
 float clusterReconnectDelay = 10;
 float clusterReconnectTimer;
@@ -18,11 +17,17 @@ void getData()
     clusterReconnectTimer -= deltaTime;
     return;
   } 
-  String lines[] = loadStrings(website);
+  String lines[] = loadStrings(clusterData);
   if( lines == null)
   {
     clusterReconnectTimer = clusterReconnectDelay;
     connectedToClusterData = false;
+    allElements = new String[37][25];
+    allCPUs = new int[37][16];
+    allGPUs = new int[37];
+    netIn = new int[37];
+    netOut = new int[37];
+    memUsed = new int[37];
   }
   else
   {

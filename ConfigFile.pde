@@ -7,7 +7,6 @@
 void readConfigFile(String config_file) {
   String[] rawConfig = loadStrings(config_file);
 
-  trackerIP = "localhost";
   if ( rawConfig == null ) {
     println("No config.cfg file found. Using defaults.");
   } else {
@@ -18,14 +17,54 @@ void readConfigFile(String config_file) {
     for ( int i = 0; i < rawConfig.length; i++ ) {
       rawConfig[i].trim(); // Removes leading and trailing white space
 
-      if ( rawConfig[i].contains("//") ) // Removes comments
+      if ( rawConfig[i].contains("//") && !rawConfig[i].contains("://") ) // Removes comments
       {
           rawConfig[i] = rawConfig[i].substring( 0, rawConfig[i].indexOf("//") );
       }
       
       if ( rawConfig[i].length() == 0 ) // Ignore blank lines
         continue;
-        
+      
+      if ( rawConfig[i].contains("trackerServerIP") ) {
+        trackerIP = rawConfig[i].substring( rawConfig[i].indexOf("\"")+1, rawConfig[i].lastIndexOf("\"") );
+        connectToTracker = true;
+        continue;
+      }
+      
+      if ( rawConfig[i].contains("trackerDataPort") ) {
+        tempStr = rawConfig[i].substring( rawConfig[i].indexOf("=")+1, rawConfig[i].lastIndexOf(";") );
+        dataport = Integer.valueOf( tempStr.trim() );
+        continue;
+      }
+      if ( rawConfig[i].contains("trackerMsgPort") ) {
+        tempStr = rawConfig[i].substring( rawConfig[i].indexOf("=")+1, rawConfig[i].lastIndexOf(";") );
+        msgport = Integer.valueOf( tempStr.trim() );
+        continue;
+      }
+
+      if ( rawConfig[i].contains("clusterDataWebsite") ) {
+        println(rawConfig[i]);
+        clusterData = rawConfig[i].substring( rawConfig[i].indexOf("\"")+1, rawConfig[i].lastIndexOf("\"") );
+        connectToClusterData = true;
+        continue;
+      }
+      if ( rawConfig[i].contains("clusterUpdateInterval") ) {
+        tempStr = rawConfig[i].substring( rawConfig[i].indexOf("=")+1, rawConfig[i].lastIndexOf(";") );
+        clusterUpdateInterval = Float.valueOf( tempStr.trim() );
+        continue;
+      }
+      
+      if( rawConfig[i].contains("defaultScreen") && rawConfig[i].contains("TRACKER") ){
+        state = TRACKING;
+        println("Default screen set to TRACKER");
+        continue;
+      }
+      if( rawConfig[i].contains("defaultScreen") && rawConfig[i].contains("CLUSTER") ){
+        state = CLUSTER;
+        println("Default screen set to CLUSTER");
+        continue;
+      }
+      
       if ( rawConfig[i].indexOf("}") != -1 ) // check block contents after this this
       {
         currentBlockName = "";
