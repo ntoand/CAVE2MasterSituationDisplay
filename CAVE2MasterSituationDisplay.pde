@@ -130,6 +130,8 @@ int recvPort = 8000;
 
 // Cluster ---------------------------------------
 String clusterData = "http://lyra.evl.uic.edu:9000/html/cluster.txt";
+String clusterPing1 = "http://lyra.evl.uic.edu:9000/html/ping.txt";
+String clusterPing2 = "http://lyra.evl.uic.edu:9000/html/pingcavewave.txt";
 //String website = "S:/EVL/CAVE2/cluster2.txt";
 boolean connectToClusterData = false;
 float clusterUpdateInterval = 0.5; // seconds
@@ -143,6 +145,7 @@ float clusterUpdateTimer;
 int[] conduitLength = new int[37];
 int[] conduitAngledLength = new int[37];
 int[] conduitAngle = new int[37];
+boolean[] nodeUp = new boolean[37];
 
 ArrayList appList = new ArrayList();
 

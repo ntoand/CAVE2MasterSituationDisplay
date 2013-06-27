@@ -117,17 +117,26 @@ class NodeDisplay
     fill(gpuBaseColor);
     text("GPU Mem.: ", 210 + nodeWidth, -24 );
   
-    
-    
-    // GPU conduit
+    // GPU conduit 
     if( connectToClusterData )
       gpuMem = allGPUs[nodeID];
-    curSegment += gpuMem / pulseSpeed;
-    
+ 
     if( gpuMem == 0 && avgCPU == 0 )
       nodeDown = true;
     else
       nodeDown = false;
+    
+    if( nodeUp[nodeID] == false )
+    {
+      nodeDown = true;
+      gpuMem = 0;
+      avgCPU = 0;
+    }
+    else
+      nodeDown = false;
+    
+    
+    curSegment += gpuMem / pulseSpeed;
     
     // Bump up the CPU color effect
     avgCPU += 0.1;
