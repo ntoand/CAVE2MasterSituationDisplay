@@ -92,6 +92,7 @@ String trackerIP = "cave2tracker.evl.uic.edu";
 int msgport = 28000;
 int dataport = 7738;
 
+boolean connectedToTracker = false;
 Trackable headTrackable;
 Trackable wandTrackable1;
 Trackable wandTrackable2;
@@ -113,8 +114,8 @@ PImage psNavigation_L3;
 
 float lastTrackerUpdateTime;
 
-float reconnectTrackerTimer = 10;
-float reconnectTrackerDelay = 6.0f;
+float trackerReconnectTimer = 10;
+float trackerReconnectDelay = 10;
 float connectionTimer = 0;
 float connectionTime = 0;
 
@@ -197,8 +198,8 @@ void setup() {
   // Make the connection to the tracker machine
   if ( connectToTracker )
   {
-    println("Connecting to tracker '"+trackerIP+"' on port " + msgport ); 
-    omicronManager.connectToTracker(dataport, msgport, trackerIP);
+    println("Connecting to tracker '"+trackerIP+"' on port " + msgport );
+    connectedToTracker = omicronManager.connectToTracker(dataport, msgport, trackerIP);
   }
   // Create a listener to get events
   eventListener = new EventListener();
@@ -458,6 +459,14 @@ void draw() {
       {
         fill(250,250,0);
         text("DEMO MODE - NOT CONNECTED TO TRACKER", 216, 16);
+      }
+      else if( connectToTracker && !connectedToTracker )
+      {
+        fill(0);
+        rect(0,0,width,borderWidth);
+        
+        fill(250,250,0);
+        text("FAILED TO CONNECT TO TRACKER - ATTEMPTING RECONNECT IN " + (int)trackerReconnectTimer, 216, 16);
       }
       break;
     case(CLUSTER):

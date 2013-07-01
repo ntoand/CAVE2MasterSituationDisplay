@@ -20,8 +20,25 @@ void drawTrackerStatus()
   
   if( connectToTracker )
   {
-    text("Connected to '"+ trackerIP + "' on msgport: " + msgport, 16, 16 * 2);
-    text("Receiving data on dataport: " + dataport, 16, 16 * 3);
+    if( connectedToTracker )
+    {
+      text("Connected to '"+ trackerIP + "' on msgport: " + msgport, 16, 16 * 2);
+      text("Receiving data on dataport: " + dataport, 16, 16 * 3);
+    }
+    else
+    {
+      fill(250,10,10);
+      text("FAILED to connect to '"+ trackerIP + "' on msgport: " + msgport, 16, 16 * 2);
+      text("Attempting reconnect in: " + (int)trackerReconnectTimer, 16, 16 * 3);
+      trackerReconnectTimer -= deltaTime;
+      
+      if( trackerReconnectTimer <= 0 )
+      {
+        connectedToTracker = omicronManager.connectToTracker(dataport, msgport, trackerIP);
+        if( !connectedToTracker )
+          trackerReconnectTimer = trackerReconnectDelay;
+      }
+    }
   }
   else
   {
@@ -52,6 +69,10 @@ void drawTrackerStatus()
   {
     fill(250,250,50);
     text("No active controllers or trackables in CAVE2", 16, 16 * 4);
+    text("timeSinceLastTrackerUpdate " + timeSinceLastTrackerUpdate, 16, 16 * 5);
+    
+    if( timeSinceLastTrackerUpdate > 5 )
+      connectedToTracker = omicronManager.isConnectedToServer();
     
     if( timeSinceLastInteractionEvent >= 30 )
     {
