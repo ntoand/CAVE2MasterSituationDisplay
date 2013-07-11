@@ -41,6 +41,10 @@ float targetHeight;
 boolean demoMode = true; // No active contollers and trackables enables demo mode (rotates CAVE2 image)
 boolean scaleScreen = true;
 
+boolean showFullscreen = true;
+int windowWidth = 1600;
+int windowHeight = 1200;
+
 float lastInteractionTime;
 float timeSinceLastInteractionEvent;
 
@@ -157,9 +161,11 @@ public void init() {
 
   // Creates the OmicronAPI object. This is placed in init() since we want to use fullscreen
   omicronManager = new OmicronAPI(this);
-
+  
+  readConfigFile("config.cfg");
+  
   // Removes the title bar for full screen mode (present mode will not work on Cyber-commons wall)
-  omicronManager.setFullscreen(true);
+  omicronManager.setFullscreen(showFullscreen);
 }// init
 
 void exit()
@@ -181,11 +187,16 @@ void exit()
 
 // Program initializations
 void setup() {
-  //size( 540, 960, P3D ); // Droid Razr
-  size( screenWidth, screenHeight, P3D );
-  //size( 1500, 960, P3D );
-  
   readConfigFile("config.cfg");
+  //size( 540, 960, P3D ); // Droid Razr
+  if( showFullscreen )
+    size( screenWidth, screenHeight, P3D );
+  else
+    size( windowWidth, windowHeight, P3D );
+  //size( 1920, 1080, P3D );
+  //size( 1600, 1200, P3D );
+  
+  //readConfigFile("config.cfg");
   
   targetWidth = 2560;
   targetHeight = 1600;
@@ -435,12 +446,7 @@ float scaleScreenX, scaleScreenY;
 void draw() {
   if ( scaleScreen )
   {
-    //omicronManager.pushScreenScale();
-    // Overriding pushScreenScale()
-    float screenScale = height / targetHeight;
-    pushMatrix();
-    translate( 0, (height - targetHeight * screenScale) / 2 );
-    scale( screenScale );
+    omicronManager.pushScreenScale();
   }
 
   programTimer = millis() / 1000.0;

@@ -25,12 +25,32 @@ void readConfigFile(String config_file) {
       if ( rawConfig[i].length() == 0 ) // Ignore blank lines
         continue;
       
+            
+      if ( rawConfig[i].contains("fullscreen") && rawConfig[i].contains("true") ) {
+        showFullscreen = true;
+        continue;
+      }
+      else if ( rawConfig[i].contains("fullscreen") && rawConfig[i].contains("false") ) {
+        showFullscreen = false;
+        continue;
+      }
+      
+      if ( rawConfig[i].contains("windowWidth") ) {
+        tempStr = rawConfig[i].substring( rawConfig[i].indexOf("=")+1, rawConfig[i].lastIndexOf(";") );
+        windowWidth = Integer.valueOf( tempStr.trim() );
+        continue;
+      }
+      if ( rawConfig[i].contains("windowHeight") ) {
+        tempStr = rawConfig[i].substring( rawConfig[i].indexOf("=")+1, rawConfig[i].lastIndexOf(";") );
+        windowHeight = Integer.valueOf( tempStr.trim() );
+        continue;
+      }
+      
       if ( rawConfig[i].contains("trackerServerIP") ) {
         trackerIP = rawConfig[i].substring( rawConfig[i].indexOf("\"")+1, rawConfig[i].lastIndexOf("\"") );
         connectToTracker = true;
         continue;
       }
-      
       if ( rawConfig[i].contains("trackerDataPort") ) {
         tempStr = rawConfig[i].substring( rawConfig[i].indexOf("=")+1, rawConfig[i].lastIndexOf(";") );
         dataport = Integer.valueOf( tempStr.trim() );
