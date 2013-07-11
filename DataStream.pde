@@ -120,12 +120,12 @@ void ping()
     if(elements[1].equals("DOWN") == true )
     {
       badNode = elements[0];
-      nodeUp[node-1] = false;
+      nodePing[node-1] = false;
     }
     else if( elements[1].equals("UP") == true )
     {
       if( node > 0 )
-        nodeUp[node-1] = true;
+        nodePing[node-1] = true;
     }
   }
   
@@ -138,12 +138,12 @@ void ping()
     if(elements[1].equals("DOWN") == true )
     {
       badNode = elements[0];
-      nodeUp[node-1] = false;
+      nodeCavewavePing[node-1] = false;
     }
     else if( elements[1].equals("UP") == true )
     {
       if( node > 0 )
-        nodeUp[node-1] = true;
+        nodeCavewavePing[node-1] = true;
     }
   }
   

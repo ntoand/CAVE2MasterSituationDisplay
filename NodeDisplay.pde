@@ -126,7 +126,7 @@ class NodeDisplay
     else
       nodeDown = false;
     
-    if( nodeUp[nodeID] == false )
+    if( nodePing[nodeID] == false || nodeCavewavePing[nodeID] == false )
     {
       nodeDown = true;
       gpuMem = 0;

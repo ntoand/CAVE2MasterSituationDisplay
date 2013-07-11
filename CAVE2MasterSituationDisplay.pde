@@ -146,7 +146,8 @@ float clusterUpdateTimer;
 int[] conduitLength = new int[37];
 int[] conduitAngledLength = new int[37];
 int[] conduitAngle = new int[37];
-boolean[] nodeUp = new boolean[37];
+boolean[] nodePing = new boolean[37];
+boolean[] nodeCavewavePing = new boolean[37];
 
 ArrayList appList = new ArrayList();
 
