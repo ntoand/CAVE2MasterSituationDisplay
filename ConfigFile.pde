@@ -68,6 +68,7 @@ void readConfigFile(String config_file) {
         connectToClusterData = true;
         continue;
       }
+
       if ( rawConfig[i].contains("clusterUpdateInterval") ) {
         tempStr = rawConfig[i].substring( rawConfig[i].indexOf("=")+1, rawConfig[i].lastIndexOf(";") );
         clusterUpdateInterval = Float.valueOf( tempStr.trim() );

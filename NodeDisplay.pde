@@ -63,9 +63,9 @@ class NodeDisplay
   float pulseDelay = 2.0;
   float pulseTimer = 0;
   float pulseSpeed = 20;
-
-  void drawLeft()
-  {  
+  
+  void update()
+  {
     pulseTimer += deltaTime;
     if( pulseTimer > pulseDelay )
     {
@@ -103,20 +103,6 @@ class NodeDisplay
     
     avgCPU /= 16 * 100;
     
-    
-    
-    textAlign(RIGHT);
-    fill(cpuBaseColor);
-    text(String.format("%.2f", avgCPU * 100), 20 + nodeWidth + 180, -24 );
-    fill(gpuBaseColor);
-    text(gpuMem, 365 + nodeWidth, -24 );
-    
-    textAlign(LEFT);
-    fill(cpuBaseColor);
-    text("Avg. CPU: ", 20 + nodeWidth, -24 );
-    fill(gpuBaseColor);
-    text("GPU Mem.: ", 210 + nodeWidth, -24 );
-  
     // GPU conduit 
     if( connectToClusterData )
       gpuMem = allGPUs[nodeID];
@@ -141,6 +127,25 @@ class NodeDisplay
     // Bump up the CPU color effect
     avgCPU += 0.1;
     nodeColor = color( red(baseColor) * avgCPU, green(baseColor) * avgCPU, blue(baseColor) * avgCPU );
+  }
+  
+  void drawLeft()
+  {  
+    update();
+    
+    textAlign(RIGHT);
+    fill(cpuBaseColor);
+    text(String.format("%.2f", avgCPU * 100), 20 + nodeWidth + 180, -24 );
+    fill(gpuBaseColor);
+    text(gpuMem, 365 + nodeWidth, -24 );
+    
+    textAlign(LEFT);
+    fill(cpuBaseColor);
+    text("Avg. CPU: ", 20 + nodeWidth, -24 );
+    fill(gpuBaseColor);
+    text("GPU Mem.: ", 210 + nodeWidth, -24 );
+  
+    
     
     rectMode(CENTER);
 
@@ -282,32 +287,7 @@ class NodeDisplay
   
   void drawRight()
   {
-    pulseTimer += deltaTime;
-    if( pulseTimer > pulseDelay )
-    {
-      if( !connectToClusterData )
-      {
-        for( int i = 0; i < 16; i++)
-        {
-          CPU[i] = (int)random(0,54);
-        }
-        
-        gpuMem = (int)random(0,15);
-      }
-      pulseTimer = 0;
-    }
-    
-    if( connectToClusterData )
-      CPU = allCPUs[nodeID];
-    
-    avgCPU = 0;
-    for( int i = 0; i < 16; i++)
-    {
-      //CPU[i] = (int)random(100,100);
-      avgCPU += CPU[i];
-    }
-    
-    avgCPU /= 16 * 100;
+    update();
     
     pushMatrix();
     translate( 108, 0 );
@@ -324,20 +304,6 @@ class NodeDisplay
     fill(gpuBaseColor);
     text("GPU Mem.: ", 210 - nodeWidth, -24 );
     popMatrix();
-
-    // GPU conduit
-    if( connectToClusterData )
-      gpuMem = allGPUs[nodeID];
-    curSegment += gpuMem / pulseSpeed;
-    
-    if( gpuMem == 0 && avgCPU == 0 )
-      nodeDown = true;
-    else
-      nodeDown = false;
-      
-    // Bump up the CPU color effect
-    avgCPU += 0.1;
-    nodeColor = color( red(baseColor) * avgCPU, green(baseColor) * avgCPU, blue(baseColor) * avgCPU );
     
     rectMode(CENTER);
     pushMatrix();
