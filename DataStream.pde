@@ -98,7 +98,7 @@ void getData()
         }
     }
   }
-  catch( NullPointerException e )
+  catch( Exception e )
   {
     e.printStackTrace();
   }
