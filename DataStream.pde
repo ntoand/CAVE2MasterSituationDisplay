@@ -14,6 +14,9 @@ float clusterReconnectTimer;
 float clusterPingDelay = 1;
 float clusterPingTimer;
 
+boolean networkUp = false;
+boolean cavewaveUp = false;
+
 void getData()
 {
   if( clusterReconnectTimer > 0 )
@@ -113,38 +116,54 @@ void ping()
   
   pings = loadStrings(clusterPing1);
   
-  for (int node = 0 ; node < pings.length; node++)
-  {
-    String[] elements = splitTokens(pings[node]);
+  try{
     
-    if(elements[1].equals("DOWN") == true )
+    for (int node = 0 ; node < pings.length; node++)
     {
-      badNode = elements[0];
-      nodePing[node-1] = false;
+      String[] elements = splitTokens(pings[node]);
+      
+      if(elements[1].equals("DOWN") == true )
+      {
+        badNode = elements[0];
+        nodePing[node-1] = false;
+      }
+      else if( elements[1].equals("UP") == true )
+      {
+        if( node > 0 )
+          nodePing[node-1] = true;
+      }
     }
-    else if( elements[1].equals("UP") == true )
-    {
-      if( node > 0 )
-        nodePing[node-1] = true;
-    }
+    networkUp = true;
+  }
+  catch( Exception e )
+  {
+    networkUp = false;
   }
   
   pings = loadStrings(clusterPing2);
   
-  for (int node = 0 ; node < pings.length; node++)
+  try
   {
-    String[] elements = splitTokens(pings[node]);
     
-    if(elements[1].equals("DOWN") == true )
+    for (int node = 0 ; node < pings.length; node++)
     {
-      badNode = elements[0];
-      nodeCavewavePing[node-1] = false;
+      String[] elements = splitTokens(pings[node]);
+      
+      if(elements[1].equals("DOWN") == true )
+      {
+        badNode = elements[0];
+        nodeCavewavePing[node-1] = false;
+      }
+      else if( elements[1].equals("UP") == true )
+      {
+        if( node > 0 )
+          nodeCavewavePing[node-1] = true;
+      }
     }
-    else if( elements[1].equals("UP") == true )
-    {
-      if( node > 0 )
-        nodeCavewavePing[node-1] = true;
-    }
+    cavewaveUp = true;
   }
-  
+  catch( Exception e )
+  {
+    cavewaveUp = false;
+  }
 }

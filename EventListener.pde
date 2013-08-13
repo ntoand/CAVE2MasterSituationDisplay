@@ -1,7 +1,7 @@
 class EventListener implements OmicronListener{
  
   // This is called on every Omicron event
-  public void onEvent( Event e ){
+  void onEvent( Event e ){
     lastTrackerUpdateTime = programTimer;
     
     if( e.getServiceType() == OmicronAPI.ServiceType.Mocap )
