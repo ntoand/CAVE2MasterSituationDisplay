@@ -14,9 +14,6 @@ float clusterReconnectTimer;
 float clusterPingDelay = 1;
 float clusterPingTimer;
 
-boolean networkUp = false;
-boolean cavewaveUp = false;
-
 void getData()
 {
   if( clusterReconnectTimer > 0 )
@@ -28,11 +25,12 @@ void getData()
   if( clusterPingTimer > 0 )
   {
     clusterPingTimer -= deltaTime;
+    return;
   }
   else
   {
     ping();
-    clusterPingTimer = clusterPingDelay;
+    clusterPingTimer = clusterUpdateInterval;
   }
   
   String lines[] = loadStrings(clusterData);
@@ -51,6 +49,7 @@ void getData()
   {
     connectedToClusterData = true;
   }
+
   /*
   allElements = new String[37][25];
   allCPUs = new int[37][16];
@@ -116,54 +115,38 @@ void ping()
   
   pings = loadStrings(clusterPing1);
   
-  try{
-    
-    for (int node = 0 ; node < pings.length; node++)
-    {
-      String[] elements = splitTokens(pings[node]);
-      
-      if(elements[1].equals("DOWN") == true )
-      {
-        badNode = elements[0];
-        nodePing[node-1] = false;
-      }
-      else if( elements[1].equals("UP") == true )
-      {
-        if( node > 0 )
-          nodePing[node-1] = true;
-      }
-    }
-    networkUp = true;
-  }
-  catch( Exception e )
+  for (int node = 0 ; node < pings.length; node++)
   {
-    networkUp = false;
+    String[] elements = splitTokens(pings[node]);
+    
+    if(elements[1].equals("DOWN") == true )
+    {
+      badNode = elements[0];
+      nodePing[node-1] = false;
+    }
+    else if( elements[1].equals("UP") == true )
+    {
+      if( node > 0 )
+        nodePing[node-1] = true;
+    }
   }
   
   pings = loadStrings(clusterPing2);
   
-  try
+  for (int node = 0 ; node < pings.length; node++)
   {
+    String[] elements = splitTokens(pings[node]);
     
-    for (int node = 0 ; node < pings.length; node++)
+    if(elements[1].equals("DOWN") == true )
     {
-      String[] elements = splitTokens(pings[node]);
-      
-      if(elements[1].equals("DOWN") == true )
-      {
-        badNode = elements[0];
-        nodeCavewavePing[node-1] = false;
-      }
-      else if( elements[1].equals("UP") == true )
-      {
-        if( node > 0 )
-          nodeCavewavePing[node-1] = true;
-      }
+      badNode = elements[0];
+      nodeCavewavePing[node-1] = false;
     }
-    cavewaveUp = true;
+    else if( elements[1].equals("UP") == true )
+    {
+      if( node > 0 )
+        nodeCavewavePing[node-1] = true;
+    }
   }
-  catch( Exception e )
-  {
-    cavewaveUp = false;
-  }
+  
 }

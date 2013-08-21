@@ -72,7 +72,7 @@ void drawTrackerStatus()
     text("timeSinceLastTrackerUpdate " + timeSinceLastTrackerUpdate, 16, 16 * 5);
     
     if( timeSinceLastTrackerUpdate > 5 )
-      connectedToTracker = omicronManager.isConnectedToServer();
+     connectedToTracker = omicronManager.isConnectedToServer();
     
     if( timeSinceLastInteractionEvent >= 30 )
     {
