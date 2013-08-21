@@ -16,13 +16,13 @@ float clusterPingTimer;
 
 void getData()
 {
-  if( clusterReconnectTimer > 0 )
+  if ( clusterReconnectTimer > 0 )
   {
     clusterReconnectTimer -= deltaTime;
     return;
   }
-  
-  if( clusterPingTimer > 0 )
+
+  if ( clusterPingTimer > 0 )
   {
     clusterPingTimer -= deltaTime;
     return;
@@ -30,11 +30,12 @@ void getData()
   else
   {
     ping();
+    println("ping " + millis() );
     clusterPingTimer = clusterUpdateInterval;
   }
-  
+
   String lines[] = loadStrings(clusterData);
-  if( lines == null)
+  if ( lines == null)
   {
     clusterReconnectTimer = clusterReconnectDelay;
     connectedToClusterData = false;
@@ -52,52 +53,52 @@ void getData()
 
   /*
   allElements = new String[37][25];
-  allCPUs = new int[37][16];
-  allGPUs = new int[37];
-  netIn = new int[37];
-  netOut = new int[37];
-  memUsed = new int[37];
-  */
+   allCPUs = new int[37][16];
+   allGPUs = new int[37];
+   netIn = new int[37];
+   netOut = new int[37];
+   memUsed = new int[37];
+   */
   try
   {
-    if (lines != null){
+    if (lines != null) {
       for (int node = 0 ; node < lines.length; node++) {
         String[] elements = splitTokens(lines[node]);
-      
+
         // grab the node name
-      
+
         allElements[node][0] = elements[0];
         allElements[node][1] = elements[1];
-      
+
         // uptime may be missing the Days field so we need to handle the special case
-        
-         if (elements.length == 25){
-           for (int j = 2 ; j < 25; j++) {
-              allElements[node][j] = elements[j];
-           }
-         }
-         
-         if (elements.length < 25){
-            for (int j = 4 ; j < 25; j++) {
-              allElements[node][j] = elements[j-2]; 
-            }
+
+        if (elements.length == 25) {
+          for (int j = 2 ; j < 25; j++) {
+            allElements[node][j] = elements[j];
+          }
+        }
+
+        if (elements.length < 25) {
+          for (int j = 4 ; j < 25; j++) {
+            allElements[node][j] = elements[j-2];
+          }
           allElements[node][2] = "0";
           allElements[node][3] = "days";
         }   
-      
+
         // grab the GPU and Network data
-      
+
         allGPUs[node] = int(allElements[node][21]);
         netIn[node]   = int(allElements[node][22]);
         netOut[node]  = int(allElements[node][23]);
         memUsed[node]  = int(allElements[node][24]) * 100 / 64;
-        
+
         // grab the CPU core data
-        
+
         for (int core = 0 ; core < 16; core++) {
           allCPUs[node][core] = int(allElements[node][core+5]);
-          }
         }
+      }
     }
   }
   catch( Exception e )
@@ -106,47 +107,53 @@ void getData()
   }
 }
 
-void ping()
+public void ping()
 {
-    
-  badNode = "";
+  try
+  {
+    badNode = "";
 
-  // check all the nodes from the first network interface
-  
-  pings = loadStrings(clusterPing1);
-  
-  for (int node = 0 ; node < pings.length; node++)
-  {
-    String[] elements = splitTokens(pings[node]);
-    
-    if(elements[1].equals("DOWN") == true )
+    // check all the nodes from the first network interface
+
+    pings = loadStrings(clusterPing1);
+
+    for (int node = 0 ; node < pings.length; node++)
     {
-      badNode = elements[0];
-      nodePing[node-1] = false;
+      String[] elements = splitTokens(pings[node]);
+
+      if (elements[1].equals("DOWN") == true )
+      {
+        badNode = elements[0];
+        nodePing[node-1] = false;
+      }
+      else if ( elements[1].equals("UP") == true )
+      {
+        if ( node > 0 )
+          nodePing[node-1] = true;
+      }
     }
-    else if( elements[1].equals("UP") == true )
+
+    pings = loadStrings(clusterPing2);
+
+    for (int node = 0 ; node < pings.length; node++)
     {
-      if( node > 0 )
-        nodePing[node-1] = true;
+      String[] elements = splitTokens(pings[node]);
+
+      if (elements[1].equals("DOWN") == true )
+      {
+        badNode = elements[0];
+        nodeCavewavePing[node-1] = false;
+      }
+      else if ( elements[1].equals("UP") == true )
+      {
+        if ( node > 0 )
+          nodeCavewavePing[node-1] = true;
+      }
     }
   }
-  
-  pings = loadStrings(clusterPing2);
-  
-  for (int node = 0 ; node < pings.length; node++)
+  catch( Exception e )
   {
-    String[] elements = splitTokens(pings[node]);
-    
-    if(elements[1].equals("DOWN") == true )
-    {
-      badNode = elements[0];
-      nodeCavewavePing[node-1] = false;
-    }
-    else if( elements[1].equals("UP") == true )
-    {
-      if( node > 0 )
-        nodeCavewavePing[node-1] = true;
-    }
+    e.printStackTrace();
   }
-  
 }
+
