@@ -212,42 +212,45 @@ void drawClusterStatus()
   for( int i = 0; i < appList.size(); i++ )
   {
     AppLabel app = (AppLabel)appList.get(i);
-    float gpuAppLabelHeight = gpuMarkerHeight/2;
-    float cpuAppLabelHeight = cpuMarkerHeight;
-    String appName = app.getName();
-    float gpuValue = app.getGPU();
-    float cpuValue = app.getCPU();
-    boolean flipped = app.isFlipped();
-    int displayFlag = app.getDisplayFlag();
-    
-    if( flipped )
-      textAlign(RIGHT);
-    else
+    if( app != null )
+    {
+      float gpuAppLabelHeight = gpuMarkerHeight/2;
+      float cpuAppLabelHeight = cpuMarkerHeight;
+      String appName = app.getName();
+      float gpuValue = app.getGPU();
+      float cpuValue = app.getCPU();
+      boolean flipped = app.isFlipped();
+      int displayFlag = app.getDisplayFlag();
+      
+      if( flipped )
+        textAlign(RIGHT);
+      else
+        textAlign(LEFT);
+      
+      if( displayFlag == 0 || displayFlag == 1 )
+      {
+        fill(10,120,210);
+        stroke(10,120,210);
+        pushMatrix();
+        translate( horzBarPosX + barLength * (gpuValue / 100.0), horzBarPosY - gpuAppLabelHeight, 1 );
+        text( appName + " " + gpuValue + "   ", 8, 0 );
+        line( 0, -8, 0, gpuAppLabelHeight );
+        popMatrix();
+      }
+      
+      if( displayFlag == 0 || displayFlag == 2 )
+      {
+        fill(150,100,10);
+        stroke(150,100,10);
+        pushMatrix();
+        translate( horzBarPosX + barLength * (cpuValue / 100.0), horzBarPosY + barWidth + cpuAppLabelHeight, 1 );
+        text( appName + " " + cpuValue + "   ", 8, 0 );
+        line( 0, -cpuAppLabelHeight, 0, 0 );
+        popMatrix();
+      }
+      
       textAlign(LEFT);
-    
-    if( displayFlag == 0 || displayFlag == 1 )
-    {
-      fill(10,120,210);
-      stroke(10,120,210);
-      pushMatrix();
-      translate( horzBarPosX + barLength * (gpuValue / 100.0), horzBarPosY - gpuAppLabelHeight, 1 );
-      text( appName + " " + gpuValue + "   ", 8, 0 );
-      line( 0, -8, 0, gpuAppLabelHeight );
-      popMatrix();
     }
-    
-    if( displayFlag == 0 || displayFlag == 2 )
-    {
-      fill(150,100,10);
-      stroke(150,100,10);
-      pushMatrix();
-      translate( horzBarPosX + barLength * (cpuValue / 100.0), horzBarPosY + barWidth + cpuAppLabelHeight, 1 );
-      text( appName + " " + cpuValue + "   ", 8, 0 );
-      line( 0, -cpuAppLabelHeight, 0, 0 );
-      popMatrix();
-    }
-    
-    textAlign(LEFT);
   }
   noStroke();
   
