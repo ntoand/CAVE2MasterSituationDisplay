@@ -248,17 +248,17 @@ void setup() {
   headTrackable = new Trackable( 0, "Head 1" );
 
   wandTrackable1 = new Trackable( 1, "Wand 1 Type A (Batman/Kirk)" );
-  wandTrackable1.secondID = 0; // Controller 0 is mapped to Wand 1
+  wandTrackable1.secondID = 1; // Controller 0 is mapped to Wand 1
 
   wandTrackable2 = new Trackable( 2, "Wand 2 Type B (Robin/Spock)" );
-  wandTrackable2.secondID = 1; // Controller 1 is mapped to Wand 2
+  wandTrackable2.secondID = 2; // Controller 1 is mapped to Wand 2
   //wandTrackable2.loadErrorsFromFile();
 
   wandTrackable3 = new Trackable( 3, "Wand 3 Type A (Batman/Kirk)" );
-  wandTrackable3.secondID = 2; // Controller 1 is mapped to Wand 2
+  wandTrackable3.secondID = 3; // Controller 1 is mapped to Wand 2
 
   wandTrackable4 = new Trackable( 4, "Wand 4 Type B (Robin/Spock)" );
-  wandTrackable4.secondID = 3; // Controller 1 is mapped to Wand 2
+  wandTrackable4.secondID = 4; // Controller 1 is mapped to Wand 2
 
   /*
   entranceTriangle = createShape();
