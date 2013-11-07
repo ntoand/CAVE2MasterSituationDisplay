@@ -289,7 +289,7 @@ class NodeDisplay
   {
     update();
     
-    pushMatrix();
+    //pushMatrix();
     translate( 108, 0 );
     
     textAlign(RIGHT);
@@ -303,7 +303,7 @@ class NodeDisplay
     text("Avg. CPU: ", 20 - nodeWidth, -24 );
     fill(gpuBaseColor);
     text("GPU Mem.: ", 210 - nodeWidth, -24 );
-    popMatrix();
+    //popMatrix();
     
     rectMode(CENTER);
     pushMatrix();
@@ -314,7 +314,7 @@ class NodeDisplay
     float horzOffset = 0;
     float vertOffset = 0;
 
-    pushMatrix();
+    //pushMatrix();
     translate(horzOffset + 20 + nodeWidth + nSegments * (1000 / conduitSegments), vertOffset);
       
     rotate( radians(conduitAngle[nodeID]) );
@@ -323,7 +323,7 @@ class NodeDisplay
 
     if( conduitAngledLength[nodeID] > 0 )
       ellipse( 0, 0, conduitWidth, conduitWidth );
-    popMatrix();
+    //popMatrix();
     
     
     // Straight background segment
@@ -355,11 +355,11 @@ class NodeDisplay
       
       fill(10,220 * segments[nSegments + i]/100.0, 110);
       
-      pushMatrix();
+      //pushMatrix();
       translate(horzOffset + 20 + nodeWidth + nSegments * (1000 / conduitSegments), vertOffset);
       rotate( radians(conduitAngle[nodeID]) );
       rect( i * (1000 / conduitSegments), 0, 5, conduitWidth );
-      popMatrix();
+      //popMatrix();
     }
 
     // Straight animated segment

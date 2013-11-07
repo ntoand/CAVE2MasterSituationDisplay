@@ -9,7 +9,7 @@ void drawCAVE2()
     pushMatrix();
     rotate( radians(CAVE2_rotation) );
     rotate( radians(45) * i );
-    translate( CAVE2_diameter/2 * CAVE2_Scale - CAVE2_legBaseWidth / 2 * CAVE2_Scale, -CAVE2_legBaseWidth/2 * CAVE2_Scale, CAVE2_legHeight/2 * CAVE2_Scale );
+    translate( (CAVE2_diameter - (CAVE2_diameter - CAVE2_innerDiameter)/2) /2 * CAVE2_Scale, 0, CAVE2_legHeight/2 * CAVE2_Scale );
     
     //rectMode(CENTER);
     box( CAVE2_legBaseWidth * CAVE2_Scale, CAVE2_legBaseWidth * CAVE2_Scale, CAVE2_legHeight * CAVE2_Scale );
@@ -25,9 +25,9 @@ void drawCAVE2()
       for( int j = 0; j < 4; j++ )
       {
         pushMatrix();
-        rotate( radians(108) + radians(18) * i ); 
+        rotate( radians(108) + radians(360 / nColumns) * i ); 
       
-        translate( CAVE2_diameter/2 * CAVE2_Scale - (CAVE2_legBaseWidth + CAVE2_displayDepth) * CAVE2_Scale, 0, (CAVE2_displayHeight * 0.5 + CAVE2_displayToFloor + CAVE2_displayHeight * 3 - CAVE2_displayHeight * j) * CAVE2_Scale );
+        translate( CAVE2_screenDiameter/2 * CAVE2_Scale, 0, (CAVE2_displayHeight * 0.5 + CAVE2_displayToFloor + CAVE2_displayHeight * 3 - CAVE2_displayHeight * j) * CAVE2_Scale );
         //rectMode(CENTER);
         stroke(0,50,200);
         if( !(i == 18 || i == 19) )
@@ -44,7 +44,7 @@ void drawCAVE2()
         pushMatrix();
         rotate( radians(108) + radians(18) * i ); 
       
-        translate( CAVE2_diameter/2 * CAVE2_Scale - (CAVE2_legBaseWidth + CAVE2_displayDepth) * CAVE2_Scale, 0, ( CAVE2_displayToFloor + CAVE2_displayHeight * 3 - 2 * CAVE2_displayHeight * j) * CAVE2_Scale );
+        translate( CAVE2_screenDiameter/2 * CAVE2_Scale - (CAVE2_legBaseWidth + CAVE2_displayDepth) * CAVE2_Scale, 0, ( CAVE2_displayToFloor + CAVE2_displayHeight * 3 - 2 * CAVE2_displayHeight * j) * CAVE2_Scale );
         //rectMode(CENTER);
         stroke(0,50,200);
         
@@ -60,7 +60,7 @@ void drawCAVE2()
       pushMatrix();
       rotate( radians(108) + radians(18) * i ); 
       
-      translate( CAVE2_diameter/2 * CAVE2_Scale - (CAVE2_legBaseWidth + CAVE2_displayDepth) * CAVE2_Scale, 0, (CAVE2_displayToFloor + 2 * CAVE2_displayHeight) * CAVE2_Scale );
+      translate( CAVE2_screenDiameter/2 * CAVE2_Scale - (CAVE2_legBaseWidth + CAVE2_displayDepth) * CAVE2_Scale, 0, (CAVE2_displayToFloor + 2 * CAVE2_displayHeight) * CAVE2_Scale );
       //rectMode(CENTER);
       stroke(0,50,200);
       fill( 0, 250 * columnPulse[i], 100 );
@@ -94,7 +94,7 @@ void drawCAVE2()
 
 void drawSpeakers()
 {
-  stroke(0,100,25);
+  stroke(100,100,25);
 
   for( int i = 0; i < 21; i++ )
   {
@@ -102,7 +102,7 @@ void drawSpeakers()
     pushMatrix();
     rotate( radians(18) * 5 + radians(18) * i ); 
 
-    translate( CAVE2_diameter/2 * CAVE2_Scale - (CAVE2_legBaseWidth + CAVE2_displayDepth) * CAVE2_Scale, 0, speakerHeight * CAVE2_Scale );
+    translate( CAVE2_screenDiameter/2 * CAVE2_Scale, 0, speakerHeight * CAVE2_Scale );
     
     if( playingStereo && (i == 7 || i == 8 || i == 12 || i == 13) )
       fill(0,200,50);
@@ -110,7 +110,30 @@ void drawSpeakers()
       noFill();
       
     //rectMode(CENTER);
-    box( speakerWidth * CAVE2_Scale, speakerWidth * CAVE2_Scale, speakerWidth * CAVE2_Scale );
+    box( speakerWidth * CAVE2_Scale, speakerWidth * CAVE2_Scale, speakerWidth * 1.5 * CAVE2_Scale );
+    popMatrix();
+  }
+}
+
+void drawCameras()
+{
+  stroke(0,100,25);
+
+  for( int i = 1; i < 22; i++ )
+  {
+    
+    pushMatrix();
+    rotate( radians(18) * 2 + radians(18) * i + radians(45) ); 
+
+    translate( CAVE2_screenDiameter/2 * CAVE2_Scale, 0, speakerHeight * CAVE2_Scale );
+    
+    //noFill();
+    fill(0,200,50);
+    
+    //rectMode(CENTER);
+    if( !(i == 4 || i == 6|| i == 10 || i == 14 || i == 16 || i == 20) )
+      box( speakerWidth * 1.2 * CAVE2_Scale, speakerWidth * CAVE2_Scale, speakerWidth * CAVE2_Scale );
+      
     popMatrix();
   }
 }

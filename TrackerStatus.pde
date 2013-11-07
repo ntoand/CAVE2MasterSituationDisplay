@@ -34,7 +34,7 @@ void drawTrackerStatus()
       
       if( trackerReconnectTimer <= 0 )
       {
-        connectedToTracker = omicronManager.connectToTracker(dataport, msgport, trackerIP);
+        //connectedToTracker = omicronManager.connectToTracker(dataport, msgport, trackerIP);
         if( !connectedToTracker )
           trackerReconnectTimer = trackerReconnectDelay;
       }
@@ -71,15 +71,12 @@ void drawTrackerStatus()
     text("No active controllers or trackables in CAVE2", 16, 16 * 4);
     text("timeSinceLastTrackerUpdate " + timeSinceLastTrackerUpdate, 16, 16 * 5);
     
-    if( timeSinceLastTrackerUpdate > 5 )
-     connectedToTracker = omicronManager.isConnectedToServer();
-    
-    if( timeSinceLastInteractionEvent >= 30 )
-    {
-      //CAVE2_3Drotation.x = constrain( CAVE2_3Drotation.x + deltaTime * 0.1, 0, radians(45) );
-      //CAVE2_3Drotation.y += deltaTime * 0.1;
+    //if( timeSinceLastInteractionEvent >= 30 )
+    //{
+      CAVE2_3Drotation.x = constrain( CAVE2_3Drotation.x + deltaTime * 0.1, 0, radians(45) );
+      CAVE2_3Drotation.y += deltaTime * 0.1;
       //demoMode = true;
-    }
+    //}
   }
   else
   {
@@ -91,8 +88,8 @@ void drawTrackerStatus()
   
   if( demoMode )
   {
-    CAVE2_3Drotation.x = constrain( CAVE2_3Drotation.x + deltaTime * 0.1, 0, radians(45) );
-    CAVE2_3Drotation.y += deltaTime * 0.1;
+    //CAVE2_3Drotation.x = constrain( CAVE2_3Drotation.x + deltaTime * 0.1, 0, radians(45) );
+    //CAVE2_3Drotation.y += deltaTime * 0.1;
   }
   
   /*
@@ -158,6 +155,8 @@ void drawTrackerStatus()
   translate( 0, 0, CAVE2_screenPos.z );
   
   drawCAVE2();
+  
+  drawCameras();
   
   // CAVE2 diameter (inner-screen, outer ring) - upper ring
   drawSpeakers();

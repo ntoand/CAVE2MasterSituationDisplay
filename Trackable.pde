@@ -224,75 +224,53 @@ class Trackable
     //   clearAllButtons()
     
     if( (buttonFlag & 1) == 1 )
-       button1 = true;
-    else if( (buttonFlag & 1) == 0 )
-       button1 = false;
-       
+       button1 = state;
+
     if( (buttonFlag & 2) == 2 )
-       button2 = true;
-    else if( (buttonFlag & 2) == 0 )
-       button2 = false;
-       
+       button2 = state;
+
     if( (buttonFlag & 4) == 4 )
-       button3 = true;
-    else if( (buttonFlag & 4) == 0 )
-       button3 = false;
+       button3 = state;
+
        
     if( (buttonFlag & 8) == 8 )
-       specialButton1 = true;
-    else if( (buttonFlag & 8) == 0 )
-       specialButton1 = false;
+       specialButton1 = state;
+
        
     if( (buttonFlag & 16) == 16 )
-       specialButton2 = true;
-    else if( (buttonFlag & 16) == 0 )
-       specialButton2 = false;
+       specialButton2 = state;
+
        
-    if( (buttonFlag & 32) == 32 )
-       specialButton3 = true;
-    else if( (buttonFlag & 32) == 0 )
-       specialButton3 = false;
+    if( (buttonFlag & 32)== 32 )
+       specialButton3 = state;
+
        
     if( (buttonFlag & 64) == 64 )
-       button4 = true;
-    else if( (buttonFlag & 64) == 0 )
-       button4 = false;  
+       button4 = state;
+
        
     if( (buttonFlag & 128) == 128 )
-       button5 = true;
-    else if( (buttonFlag & 128) == 0 )
-       button5 = false;
-       
+       button5 = state;
+
     if( (buttonFlag & 256) == 256 )
-       button6 = true;
-    else if( (buttonFlag & 256) == 0 )
-       button6 = false;
+       button6 = state;
        
     if( (buttonFlag & 512) == 512 )
-       button7 = true;
-    else if( (buttonFlag & 512) == 0 )
-       button7 = false;
+       button7 = state;
        
     if( (buttonFlag & 1024) == 1024 )
-       buttonUp = true;
-    else if( (buttonFlag & 1024) == 0 )
-      buttonUp = false;
+       buttonUp = state;
     
     if( (buttonFlag & 2048) == 2048 )
-       buttonDown = true;
-    else if( (buttonFlag & 2048) == 0 )
-      buttonDown = false;
+       buttonDown = state;
       
     if( (buttonFlag & 4096) == 4096 )
-       buttonLeft = true;
-    else if( (buttonFlag & 4096) == 0 )
-      buttonLeft = false;
+       buttonLeft = state;
       
     if( (buttonFlag & 8192) == 8192 )
-       buttonRight = true;
-    else if( (buttonFlag & 8192) == 0 )
-      buttonRight = false;
-      
+       buttonRight = state;
+    
+    println( buttonFlag + " " + state );
     updateTimer = programTimer;
   }// updateButton
   

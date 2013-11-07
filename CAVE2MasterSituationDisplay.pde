@@ -4,7 +4,7 @@
  * Description: CAVE2 Master Situation Display (MSD)
  *
  * Class: 
- * System: Processing 2.0a5, SUSE 12.1, Windows 7 x64
+ * System: Processing 2.0b6, SUSE 12.1, Windows 7 x64
  * Author: Arthur Nishimoto
  * Version: 0.4 (alpha)
  *
@@ -41,6 +41,8 @@ float targetHeight;
 boolean demoMode = true; // No active contollers and trackables enables demo mode (rotates CAVE2 image)
 boolean scaleScreen = true;
 
+boolean wandDebug = true;
+
 boolean showFullscreen = true;
 int windowWidth = 1600;
 int windowHeight = 1200;
@@ -63,8 +65,9 @@ float CAVE2_Scale = 65;
 float CAVE2_verticalScale = 0.33;
 
 // In meters:
-float CAVE2_diameter = 3.429 * 2;
-float CAVE2_innerDiameter = 3.2 * 2;
+float CAVE2_diameter = 3.602 * 2;       // EVL CAVE2: 3.628 * 2  CAVE2 AU: 3.95 * 2
+float CAVE2_innerDiameter = 3.429 * 2;  // EVL CAVE2: 3.429 * 2  CAVE2 AU: 3.696 * 2
+float CAVE2_screenDiameter = 3.3 * 2; // EVL CAVE2: 3.429 * 2  CAVE2 AU: 3.596 * 2
 float CAVE2_legBaseWidth = 0.254;
 float CAVE2_legHeight = 2.159;
 float CAVE2_lowerRingHeight = 0.3048;
@@ -72,6 +75,13 @@ float CAVE2_displayWidth = 1.02;
 float CAVE2_displayHeight = 0.579;
 float CAVE2_displayDepth = 0.08;
 float CAVE2_displayToFloor = 0.317;
+
+int nDisplayColumns = 18;   // EVL CAVE2: 18   CAVE2 AU: 20
+int nColumns = 20;          // EVL CAVE2: 20   CAVE2 AU: 22
+int columnOffset = 9;      // EVL CAVE2: 9    CAVE2 AU: 10
+int nodeOffset = 4;         // EVL CAVE2: 4    CAVE2 AU: 2
+int nodesPerColumn = 2;
+int nDisplaysPerColumn = 4;
 
 float speakerHeight = CAVE2_legHeight * 1.3;
 float speakerWidth = 0.2;
@@ -190,9 +200,10 @@ void setup() {
   readConfigFile("config.cfg");
   //size( 540, 960, P3D ); // Droid Razr
   if( showFullscreen )
-    size( screenWidth, screenHeight, P3D );
+    size( displayWidth, displayHeight, P3D );
   else
     size( windowWidth, windowHeight, P3D );
+  println(width + " " + height);
   //size( 1920, 1080, P3D );
   //size( 1600, 1200, P3D );
   
@@ -293,8 +304,9 @@ void setup() {
   wandButton4.setText("Wand 4", st_font, 16);
   wandButton4.fillColor = color( 10, 200, 125, 128 );
 
-  ortho(0, width, 0, height, -1000, 1000);
-
+  //ortho(0, width, 0, height, -1000, 1000);
+  ortho();
+  
   conduitLength[0] = 400;
 
   conduitLength[1] = 760;
@@ -455,7 +467,6 @@ void draw() {
 
   // Sets the background color
   //background(0);
-
   pushMatrix();
 
   switch( state )

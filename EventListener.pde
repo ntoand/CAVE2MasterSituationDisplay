@@ -68,7 +68,8 @@ class EventListener implements OmicronListener{
           wandTrackable3.updateButton( flag, true );
         else if( objectID == wandTrackable4.secondID )
           wandTrackable4.updateButton( flag, true );
-      //println("Wand ID " + objectID + " event: DOWN - Flag: " + flag);
+      if( wandDebug )
+        println("Wand ID " + objectID + " event: DOWN - Flag: " + flag);
     }
     else if( e.getEventType() == OmicronAPI.Type.Up )
     {
@@ -80,7 +81,8 @@ class EventListener implements OmicronListener{
           wandTrackable3.updateButton( flag, false );
       else if( objectID == wandTrackable4.secondID )
           wandTrackable4.updateButton( flag, false );
-      //println("Wand ID " + objectID + " event: UP - Flag: " + flag);
+      if( wandDebug )
+        println("Wand ID " + objectID + " event: UP - Flag: " + flag);
     }
     else if( e.getEventType() == OmicronAPI.Type.Update )
     {

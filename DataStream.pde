@@ -59,8 +59,8 @@ void getData()
    netOut = new int[37];
    memUsed = new int[37];
    */
-  try
-  {
+  //try
+  //{
     if (lines != null) {
       for (int node = 0 ; node < lines.length; node++) {
         String[] elements = splitTokens(lines[node]);
@@ -100,17 +100,17 @@ void getData()
         }
       }
     }
-  }
-  catch( Exception e )
-  {
-    e.printStackTrace();
-  }
+  //}
+  //catch( Exception e )
+  //{
+  //  e.printStackTrace();
+  //}
 }
 
 public void ping()
 {
-  try
-  {
+  //try
+  //{
     badNode = "";
 
     // check all the nodes from the first network interface
@@ -150,10 +150,10 @@ public void ping()
           nodeCavewavePing[node-1] = true;
       }
     }
-  }
-  catch( Exception e )
-  {
-    e.printStackTrace();
-  }
+  //}
+  //catch( Exception e )
+  //{
+  //  e.printStackTrace();
+  //}
 }
 
