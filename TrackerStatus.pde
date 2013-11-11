@@ -86,11 +86,11 @@ void drawTrackerStatus()
   
   popMatrix();
   
-  if( demoMode )
-  {
-    //CAVE2_3Drotation.x = constrain( CAVE2_3Drotation.x + deltaTime * 0.1, 0, radians(45) );
-    //CAVE2_3Drotation.y += deltaTime * 0.1;
-  }
+  //if( demoMode )
+  //{
+    CAVE2_3Drotation.x = constrain( CAVE2_3Drotation.x + deltaTime * 0.1, 0, radians(45) );
+    CAVE2_3Drotation.y += deltaTime * 0.1;
+  //}
   
   /*
   if( timeSinceLastTrackerUpdate < 2 )
@@ -148,7 +148,7 @@ void drawTrackerStatus()
   
   // Draw CAVE2 ------------------------------------------------------------------
   pushMatrix();
-  translate( CAVE2_screenPos.x, CAVE2_screenPos.y, CAVE2_worldZPos);
+  translate( CAVE2_screenPos.x * 1.5 , CAVE2_screenPos.y, CAVE2_worldZPos);
   rotateX( CAVE2_3Drotation.x ); 
   rotateZ( CAVE2_3Drotation.y );
   scale( 2, 2, 2 );

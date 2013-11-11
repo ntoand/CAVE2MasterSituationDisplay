@@ -520,7 +520,20 @@ void draw() {
       drawAudioStatus();
       break;
   }
-
+  
+  textFont( st_font, 64 );
+  textAlign(RIGHT);
+  String minuteStr = minute()+"";
+  String secondStr = second()+"";
+  if( minute() < 10 )
+    minuteStr = "0"+minuteStr;
+  if( second() < 10 )
+    secondStr = "0"+secondStr;
+  fill(255);
+  text(hour()+":"+minuteStr+":"+secondStr, targetWidth - 50, 105);
+  textAlign(LEFT);
+  textFont( st_font, 16 );
+  
   // Border
   noStroke();
   PVector textOffset = new PVector( targetWidth * 0.9, borderWidth );
@@ -541,10 +554,9 @@ void draw() {
   rect( borderDistFromEdge + textOffset.x, targetHeight - borderDistFromEdge - borderWidth/2, -(textWidth(systemText) + borderWidth * 2), borderWidth ); // Bottom
   fill(255);
   text(systemText, textOffset.x + borderWidth/2, targetHeight - borderDistFromEdge - borderWidth/2  + textOffset.y);
-  textFont( st_font, 16 );
   textAlign(LEFT);
-  //text("FPS: "+ (int)frameRate, 16, 16);
-    
+  textFont( st_font, 16 );
+  
   // For event and fullscreen processing, this must be called in draw()
   omicronManager.process();
   lastFrameTime = programTimer;
