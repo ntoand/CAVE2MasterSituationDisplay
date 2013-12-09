@@ -253,8 +253,14 @@ class Trackable
        button5 = state;
 
     if( (buttonFlag & 256) == 256 )
+    {
        button6 = state;
-       
+       if( state )
+       {
+         startTimer = millis();
+       }
+    }
+    
     if( (buttonFlag & 512) == 512 )
        button7 = state;
        

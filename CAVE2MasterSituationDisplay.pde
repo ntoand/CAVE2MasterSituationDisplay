@@ -35,6 +35,10 @@ float deltaTime;
 float lastFrameTime;
 float startTime;
 
+int startTimer;
+int countdown = 420000;
+boolean enableCountdown = false;
+
 float targetWidth;
 float targetHeight;
 
@@ -531,8 +535,45 @@ void draw() {
     secondStr = "0"+secondStr;
   fill(255);
   text(hour()+":"+minuteStr+":"+secondStr, targetWidth - 50, 105);
-  textAlign(LEFT);
-  textFont( st_font, 16 );
+  //textAlign(LEFT);
+  //textFont( st_font, 16 );
+  
+  if( enableCountdown )
+  {
+    int curTimeSec = millis() / 1000;
+    int minRemain = (countdown/1000 - millis()/1000 + startTimer/1000) / 60;
+    int secRemain = (countdown/1000 - millis()/1000 + startTimer/1000) % 60;
+    
+    if( minRemain <= 0 && secRemain > 0 )
+      fill(20,200,20);
+    else if( minRemain <= 0 && secRemain <= 0 )
+      fill(200,20,20);
+
+    
+    if( minRemain < 0 )
+    {
+      minRemain *= -1;
+    } 
+    minuteStr = minRemain+"";
+    if( minRemain < 10 )
+      minuteStr = "0"+minuteStr;
+    
+    if( secRemain < 0 )
+    {
+      secRemain *= -1;
+      minuteStr = "-"+minuteStr;
+    } 
+    
+    secondStr = secRemain+"";
+    
+    if( secRemain < 10 )
+      secondStr = "0"+secondStr;
+    
+    
+    text( minuteStr +":"+secondStr, targetWidth - 50, 2 * 105);
+    textFont( st_font, 16 );
+    textAlign(LEFT);
+  }
   
   // Border
   noStroke();
