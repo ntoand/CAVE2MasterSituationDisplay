@@ -13,12 +13,12 @@ void displayTrackableWindow( Trackable t, float xPos, float yPos )
   fill( t.currentMocapColor );
   
   textAlign(RIGHT);
-  text( String.format("%.2f", t.position.x) + " meters \n" + String.format("%.2f", t.position.y) + " meters \n" + String.format("%.2f", t.position.z) + " meters ", 16 * 1 + 180, 16 );
-  text( String.format("%.2f", t.rotation.x) + " degrees \n" + String.format("%.2f", t.rotation.y) + " degrees \n" + String.format("%.2f", t.rotation.z) + " degrees ", 16 + 450, 16 );
+  text( String.format("%.2f", t.position.x) + " meters \n" + String.format("%.2f", t.position.y) + " meters \n" + String.format("%.2f", t.position.z) + " meters ", 16 * 1 + 180, 16 * 2 );
+  text( String.format("%.2f", t.rotation.x) + " degrees \n" + String.format("%.2f", t.rotation.y) + " degrees \n" + String.format("%.2f", t.rotation.z) + " degrees ", 16 + 450, 16 * 2 );
   
   textAlign(LEFT);
-  text( "x: \ny: \nz: ", 16 * 1, 16 );
-  text( "roll: \npitch: \nyaw: ", 16 + 200, 16 );
+  text( "x: \ny: \nz: ", 16 * 1, 16 * 2 );
+  text( "roll: \npitch: \nyaw: ", 16 + 200, 16 * 2 );
   
   if( t.timeSinceLastMocapUpdate >= 5 )
   {
@@ -31,7 +31,9 @@ void displayTrackableWindow( Trackable t, float xPos, float yPos )
 
   }
   text( t.name+" Trackable Status", 16, 16 * -1 );
-    
+  
+  text( "Mocap ID: "+ t.ID, 16 * 1, 16 * 1 );
+  
   fill( t.colorMinor );
   text( "Minor Tracking Drops: " + t.minorDrops, 16 * 1, 16 * 6 );
   fill( t.colorModerate );
@@ -52,12 +54,12 @@ void displayControllerWindow( Trackable t, float xPos, float yPos )
 
   fill( t.currentMocapColor );
   textAlign(RIGHT);
-  text( String.format("%.2f", t.position.x) + " meters \n" + String.format("%.2f", t.position.y) + " meters \n" + String.format("%.2f", t.position.z) + " meters ", 16 * 1 + 180, 16 );
-  text( String.format("%.2f", t.rotation.x) + " degrees \n" + String.format("%.2f", t.rotation.y) + " degrees \n" + String.format("%.2f", t.rotation.z) + " degrees ", 16 + 450, 16 );
+  text( String.format("%.2f", t.position.x) + " meters \n" + String.format("%.2f", t.position.y) + " meters \n" + String.format("%.2f", t.position.z) + " meters ", 16 * 1 + 180, 16 + 16 * 1 );
+  text( String.format("%.2f", t.rotation.x) + " degrees \n" + String.format("%.2f", t.rotation.y) + " degrees \n" + String.format("%.2f", t.rotation.z) + " degrees ", 16 + 450, 16 + 16 * 1 );
   
   textAlign(LEFT);
-  text( "x: \ny: \nz: ", 16 * 1, 16 );
-  text( "roll: \npitch: \nyaw: ", 16 + 200, 16 );
+  text( "x: \ny: \nz: ", 16 * 1, 16 + 16 * 1 );
+  text( "roll: \npitch: \nyaw: ", 16 + 200, 16 + 16 * 1 );
   
   if( t.timeSinceLastUpdate < 2 )
   {
@@ -79,9 +81,13 @@ void displayControllerWindow( Trackable t, float xPos, float yPos )
   text( "Button 5", 16, 16 * 10 );
   text( "Button 6", 16, 16 * 11 );
   text( "Button 7", 16, 16 * 12 );
-  text( "Special Button 1", 16, 16 * 13 );
-  text( "Special Button 2", 16, 16 * 14 );
-  text( "Special Button 3", 16, 16 * 15 );
+  
+  text( "Button 8", 16, 16 * 13 );
+  text( "Button 9", 16, 16 * 14 );
+  
+  text( "Special Button 1", 16, 16 * 15 );
+  text( "Special Button 2", 16, 16 * 16 );
+  text( "Special Button 3", 16, 16 * 17 );
   text( "Button Up", 216, 16 * 6 );
   text( "Button Right", 216, 16 * 7 );
   text( "Button Down", 216, 16 * 8 );
@@ -116,18 +122,20 @@ void displayControllerWindow( Trackable t, float xPos, float yPos )
   }
   
   textAlign(RIGHT);
-  text( String.format("%.3f",t.analogStick1.x), 416, 16 * 11 );
-  text( String.format("%.3f",t.analogStick1.y), 416, 16 * 12 );
-  text( String.format("%.3f",t.analogStick2.x), 416, 16 * 13 );
-  text( String.format("%.3f",t.analogStick2.y), 416, 16 * 14 );
-  text( String.format("%.3f",t.analogStick3.x), 416, 16 * 15 );
+  text( String.format("%.3f",t.analogStick1.x), 416, 16 * 12 );
+  text( String.format("%.3f",t.analogStick1.y), 416, 16 * 13 );
+  text( String.format("%.3f",t.analogStick2.x), 416, 16 * 14 );
+  text( String.format("%.3f",t.analogStick2.y), 416, 16 * 15 );
+  text( String.format("%.3f",t.analogStick3.x), 416, 16 * 16 );
+  text( String.format("%.3f",t.analogStick3.y), 416, 16 * 17 );
   
   textAlign(LEFT);
-  text( "Analog 0: ", 216, 16 * 11 );
-  text( "Analog 1: ", 216, 16 * 12 );
-  text( "Analog 2: ", 216, 16 * 13 );
-  text( "Analog 3: ", 216, 16 * 14 );
-  text( "Analog 4: ", 216, 16 * 15 );
+  text( "Analog 0: ", 216, 16 * 12 );
+  text( "Analog 1: ", 216, 16 * 13 );
+  text( "Analog 2: ", 216, 16 * 14 );
+  text( "Analog 3: ", 216, 16 * 15 );
+  text( "Analog 4: ", 216, 16 * 16 );
+  text( "Analog 5: ", 216, 16 * 17 );
   
   if( t.timeSinceLastMocapUpdate >= 5 && t.timeSinceLastUpdate < 5 )
   {
@@ -151,7 +159,7 @@ void displayControllerWindow( Trackable t, float xPos, float yPos )
   {
     text( t.name+" Controller Status", 16, 16 * -1 );
   }
-  
+  text( "Mocap/Wand ID: "+ t.ID + "   Controller ID: " + t.secondID, 16 * 1, 16 + 16 * 0 );
   
   noFill();
   stroke(currentColor);
@@ -206,17 +214,26 @@ void displayControllerWindow( Trackable t, float xPos, float yPos )
     text( "Button 7", 16, 16 * 12 ); // L2
     image( psNavigation_L2, controllerImagePos.x, controllerImagePos.y );
   }
+  if( t.button8 )
+  {
+    text( "Button 8", 16, 16 * 13 ); // R1
+  }
+  if( t.button9 )
+  {
+    text( "Button 9", 16, 16 * 14 ); // R3
+  }
+  
   if( t.specialButton1 )
   {
-    text( "Special Button 1", 16, 16 * 13 );
+    text( "Special Button 1", 16, 16 * 15 );
   }
   if( t.specialButton2 )
   {
-    text( "Special Button 2", 16, 16 * 14 );
+    text( "Special Button 2", 16, 16 * 16 );
   }
   if( t.specialButton3 )
   {
-    text( "Special Button 3", 16, 16 * 15 );
+    text( "Special Button 3", 16, 16 * 17 );
   }
   if( t.buttonUp )
   {

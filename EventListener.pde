@@ -1,3 +1,6 @@
+// You must add 'import omicronAPI.Event;' in addition to 'omicronAPI.*'
+// Otherwise will throw an 'must implement inherited abstract method' error in
+// Processing 2.0+
 class EventListener implements OmicronListener{
  
   // This is called on every Omicron event
@@ -90,25 +93,25 @@ class EventListener implements OmicronListener{
       {
           wandTrackable1.updateAnalog( 1, e.getFloatData(0), e.getFloatData(1) );
           wandTrackable1.updateAnalog( 2, e.getFloatData(2), e.getFloatData(3) );
-          wandTrackable1.updateAnalog( 3, e.getFloatData(4), 0 );
+          wandTrackable1.updateAnalog( 3, e.getFloatData(4), e.getFloatData(5) );
       }
       else if( objectID == wandTrackable2.secondID )
       {
           wandTrackable2.updateAnalog( 1, e.getFloatData(0), e.getFloatData(1) );
           wandTrackable2.updateAnalog( 2, e.getFloatData(2), e.getFloatData(3) );
-          wandTrackable2.updateAnalog( 3, e.getFloatData(4), 0 );
+          wandTrackable2.updateAnalog( 3, e.getFloatData(4), e.getFloatData(5) );
       }
       else if( objectID == wandTrackable3.secondID )
       {
           wandTrackable3.updateAnalog( 1, e.getFloatData(0), e.getFloatData(1) );
           wandTrackable3.updateAnalog( 2, e.getFloatData(2), e.getFloatData(3) );
-          wandTrackable3.updateAnalog( 3, e.getFloatData(4), 0 );
+          wandTrackable3.updateAnalog( 3, e.getFloatData(4), e.getFloatData(5) );
       }
       else if( objectID == wandTrackable4.secondID )
       {
           wandTrackable4.updateAnalog( 1, e.getFloatData(0), e.getFloatData(1) );
           wandTrackable4.updateAnalog( 2, e.getFloatData(2), e.getFloatData(3) );
-          wandTrackable4.updateAnalog( 3, e.getFloatData(4), 0 );
+          wandTrackable4.updateAnalog( 3, e.getFloatData(4), e.getFloatData(5) );
       }
       
       //println("Wand ID " + objectID + " event: UPDATE");

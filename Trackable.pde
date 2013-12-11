@@ -21,6 +21,9 @@ class Trackable
   boolean button6; // L3
   boolean button7; // L2
   
+  boolean button8; // R1
+  boolean button9; // R3
+  
   boolean specialButton1; // Select
   boolean specialButton2; // Start
   boolean specialButton3; // PS
@@ -276,6 +279,12 @@ class Trackable
     if( (buttonFlag & 8192) == 8192 )
        buttonRight = state;
     
+    if( (buttonFlag & 131072 ) == 131072 )
+       button8 = state;
+       
+     if( (buttonFlag & 262144 ) == 262144 )
+       button9 = state;
+       
     println( buttonFlag + " " + state );
     updateTimer = programTimer;
   }// updateButton
@@ -292,6 +301,8 @@ class Trackable
       button5 = false;
       button6 = false;
       button7 = false;
+      button8 = false;
+      button9 = false;
       
       buttonUp = false;
       buttonDown = false;

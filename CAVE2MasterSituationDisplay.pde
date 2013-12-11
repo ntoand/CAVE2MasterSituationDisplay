@@ -4,13 +4,14 @@
  * Description: CAVE2 Master Situation Display (MSD)
  *
  * Class: 
- * System: Processing 2.0b6, SUSE 12.1, Windows 7 x64
+ * System: Processing 2.1, SUSE 12.1, Windows 7 x64
  * Author: Arthur Nishimoto
  * Version: 0.4 (alpha)
  *
  * Version Notes:
  * 11/6/12      - Initial version
  * 12/7/12      - Audio support, 3D view
+ * 12/9/13      - Updated for Processing 2.1
  * ---------------------------------------------
  */
 
@@ -18,6 +19,7 @@ import oscP5.*;
 import netP5.*;
 import processing.net.*;
 import omicronAPI.*;
+import omicronAPI.Event;
 
 OmicronAPI omicronManager;
 
@@ -227,6 +229,9 @@ void setup() {
   {
     println("Connecting to tracker '"+trackerIP+"' on port " + msgport );
     connectedToTracker = omicronManager.connectToTracker(dataport, msgport, trackerIP);
+    
+    if( connectedToTracker )
+      println("Connected to tracker");
   }
   // Create a listener to get events
   eventListener = new EventListener();
@@ -761,3 +766,36 @@ void keyPressed()
   
 }
 
+/**
+deepmatrixstack taken from http://wiki.processing.org/index.php/Matrix_stack
+to override the default stack just copy & paste the following code
+   to your sketch
+@author steve
+*/
+ /*
+// adjust this value to whatever depth is actually necessary
+public final int STACK_DEPTH = 512;
+public float[][] matrixStack = new float[STACK_DEPTH][6];
+public int matrixStackDepth;
+ 
+// this version will override the built-in version pushMatrix function
+public void pushMatrix() {
+  if (matrixStackDepth == 512) {
+    throw new RuntimeException("too many calls to pushMatrix()");
+  }
+  this.g.getMatrix().get(matrixStack[matrixStackDepth]);
+  matrixStackDepth++;
+}
+ 
+// this version will override the built-in version popMatrix function
+public void popMatrix() {
+  if (matrixStackDepth == 0) {
+    throw new RuntimeException("too many calls to popMatrix()" +
+                               "(or too few to pushMatrix)");
+  }
+  matrixStackDepth--;
+  PMatrix2D m = new PMatrix2D();
+  m.set(matrixStack[matrixStackDepth]);
+  this.g.setMatrix(m);
+}
+*/
