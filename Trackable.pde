@@ -279,10 +279,10 @@ class Trackable
     if( (buttonFlag & 8192) == 8192 )
        buttonRight = state;
     
-    if( (buttonFlag & 131072 ) == 131072 )
+    if( (buttonFlag & 32768 ) == 32768 )
        button8 = state;
        
-     if( (buttonFlag & 262144 ) == 262144 )
+     if( (buttonFlag & 65536 ) == 65536 )
        button9 = state;
        
     println( buttonFlag + " " + state );
