@@ -1,9 +1,25 @@
+/**
+ * ---------------------------------------------
+ * TrackerStatus.pde
+ * Description: CAVE2 Master Situation Display (MSD)
+ *
+ * Class: 
+ * System: Processing 2.1, SUSE 12.1, Windows 7 x64
+ * Author: Arthur Nishimoto
+ * Copyright (C) 2012-2014
+ * Electronic Visualization Laboratory, University of Illinois at Chicago
+ *
+ * Version Notes:
+ * ---------------------------------------------
+ */
+
 PVector demoPos = new PVector(0,1.2,0);
 float trackerPulseDelay = 0.1;
 float trackerPulseTimer;
 
 void drawTrackerStatus()
 {
+  pushMatrix();
   systemText = "TRACKING SYSTEM";
   
   CAVE2_Scale = 64;
@@ -71,12 +87,8 @@ void drawTrackerStatus()
     text("No active controllers or trackables in CAVE2", 16, 16 * 4);
     text("timeSinceLastTrackerUpdate " + timeSinceLastTrackerUpdate, 16, 16 * 5);
     
-    //if( timeSinceLastInteractionEvent >= 30 )
-    //{
-      CAVE2_3Drotation.x = constrain( CAVE2_3Drotation.x + deltaTime * 0.1, 0, radians(45) );
-      CAVE2_3Drotation.y += deltaTime * 0.1;
-      //demoMode = true;
-    //}
+    CAVE2_3Drotation.x = constrain( CAVE2_3Drotation.x + deltaTime * 0.1, 0, radians(45) );
+    CAVE2_3Drotation.y += deltaTime * 0.1;
   }
   else
   {
@@ -86,11 +98,10 @@ void drawTrackerStatus()
   
   popMatrix();
   
-  //if( demoMode )
-  //{
-    CAVE2_3Drotation.x = constrain( CAVE2_3Drotation.x + deltaTime * 0.1, 0, radians(45) );
-    CAVE2_3Drotation.y += deltaTime * 0.1;
-  //}
+  CAVE2_3Drotation.x = constrain( CAVE2_3Drotation.x + deltaTime * 0.1, 0, radians(45) );
+  CAVE2_3Drotation.y += deltaTime * 0.1;
+  if( CAVE2_3Drotation.y > 2 * PI )
+    CAVE2_3Drotation.y = 0;
   
   /*
   if( timeSinceLastTrackerUpdate < 2 )

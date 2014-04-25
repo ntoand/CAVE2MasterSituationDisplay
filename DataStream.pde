@@ -1,3 +1,18 @@
+/**
+ * ---------------------------------------------
+ * DataStream.pde
+ * Description: CAVE2 Master Situation Display (MSD)
+ *
+ * Class: 
+ * System: Processing 2.1, SUSE 12.1, Windows 7 x64
+ * Author(s): Andrew Johnson, Arthur Nishimoto
+ * Copyright (C) 2012-2014
+ * Electronic Visualization Laboratory, University of Illinois at Chicago
+ *
+ * Version Notes:
+ * ---------------------------------------------
+ */
+
 String[][] allElements = new String[37][25];
 int[][]allCPUs = new int[37][16];
 int[]allGPUs = new int[37];
@@ -30,7 +45,6 @@ void getData()
   else
   {
     ping();
-    println("ping " + millis() );
     clusterPingTimer = clusterUpdateInterval;
   }
 

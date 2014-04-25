@@ -1,3 +1,18 @@
+/**
+ * ---------------------------------------------
+ * NodeDisplay.pde
+ * Description: CAVE2 Master Situation Display (MSD)
+ *
+ * Class: 
+ * System: Processing 2.1, SUSE 12.1, Windows 7 x64
+ * Author: Arthur Nishimoto
+ * Copyright (C) 2012-2014
+ * Electronic Visualization Laboratory, University of Illinois at Chicago
+ *
+ * Version Notes:
+ * ---------------------------------------------
+ */
+
 class Pulse
 {
   float curPos = 0;
@@ -289,7 +304,7 @@ class NodeDisplay
   {
     update();
     
-    //pushMatrix();
+    pushMatrix();
     translate( 108, 0 );
     
     textAlign(RIGHT);
@@ -303,7 +318,7 @@ class NodeDisplay
     text("Avg. CPU: ", 20 - nodeWidth, -24 );
     fill(gpuBaseColor);
     text("GPU Mem.: ", 210 - nodeWidth, -24 );
-    //popMatrix();
+    popMatrix();
     
     rectMode(CENTER);
     pushMatrix();
@@ -314,7 +329,7 @@ class NodeDisplay
     float horzOffset = 0;
     float vertOffset = 0;
 
-    //pushMatrix();
+    pushMatrix();
     translate(horzOffset + 20 + nodeWidth + nSegments * (1000 / conduitSegments), vertOffset);
       
     rotate( radians(conduitAngle[nodeID]) );
@@ -323,21 +338,12 @@ class NodeDisplay
 
     if( conduitAngledLength[nodeID] > 0 )
       ellipse( 0, 0, conduitWidth, conduitWidth );
-    //popMatrix();
+    popMatrix();
     
     
     // Straight background segment
     fill(10, 100, 110);
     rect( 20 + nodeWidth + conduitLength[nodeID]/2, 0, conduitLength[nodeID], conduitWidth );
-    
-    /*
-    ArrayList nextPulseList = new ArrayList();
-    
-    for( int p = 0; p < conduitPulses.size(); p++ )
-    {
-      Pulse curPulse = (Pulse)conduitPulses.get(p);
-      curSegment = curPulse.getPosition();
-      */
     
     // Angled animated segment
     if( nodeDown )
@@ -355,11 +361,11 @@ class NodeDisplay
       
       fill(10,220 * segments[nSegments + i]/100.0, 110);
       
-      //pushMatrix();
+      pushMatrix();
       translate(horzOffset + 20 + nodeWidth + nSegments * (1000 / conduitSegments), vertOffset);
       rotate( radians(conduitAngle[nodeID]) );
       rect( i * (1000 / conduitSegments), 0, 5, conduitWidth );
-      //popMatrix();
+      popMatrix();
     }
 
     // Straight animated segment

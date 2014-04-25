@@ -1,3 +1,18 @@
+/**
+ * ---------------------------------------------
+ * Trackable.pde
+ * Description: CAVE2 Master Situation Display (MSD)
+ *
+ * Class: 
+ * System: Processing 2.1, SUSE 12.1, Windows 7 x64
+ * Author: Arthur Nishimoto
+ * Copyright (C) 2012-2014
+ * Electronic Visualization Laboratory, University of Illinois at Chicago
+ *
+ * Version Notes:
+ * ---------------------------------------------
+ */
+
 class Trackable
 {
   int ID;

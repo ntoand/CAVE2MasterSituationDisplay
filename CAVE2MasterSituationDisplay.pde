@@ -6,6 +6,8 @@
  * Class: 
  * System: Processing 2.1, SUSE 12.1, Windows 7 x64
  * Author: Arthur Nishimoto
+ * Copyright (C) 2012-2014
+ * Electronic Visualization Laboratory, University of Illinois at Chicago
  * Version: 0.4 (alpha)
  *
  * Version Notes:
@@ -71,9 +73,9 @@ float CAVE2_Scale = 65;
 float CAVE2_verticalScale = 0.33;
 
 // In meters:
-float CAVE2_diameter = 3.602 * 2;       // EVL CAVE2: 3.628 * 2  CAVE2 AU: 3.95 * 2
+float CAVE2_diameter = 3.628 * 2;       // EVL CAVE2: 3.628 * 2  CAVE2 AU: 3.95 * 2
 float CAVE2_innerDiameter = 3.429 * 2;  // EVL CAVE2: 3.429 * 2  CAVE2 AU: 3.696 * 2
-float CAVE2_screenDiameter = 3.3 * 2; // EVL CAVE2: 3.429 * 2  CAVE2 AU: 3.596 * 2
+float CAVE2_screenDiameter = 3.429 * 2; // EVL CAVE2: 3.429 * 2  CAVE2 AU: 3.596 * 2
 float CAVE2_legBaseWidth = 0.254;
 float CAVE2_legHeight = 2.159;
 float CAVE2_lowerRingHeight = 0.3048;
@@ -476,7 +478,6 @@ void draw() {
 
   // Sets the background color
   //background(0);
-  pushMatrix();
 
   switch( state )
   {
@@ -766,36 +767,3 @@ void keyPressed()
   
 }
 
-/**
-deepmatrixstack taken from http://wiki.processing.org/index.php/Matrix_stack
-to override the default stack just copy & paste the following code
-   to your sketch
-@author steve
-*/
- /*
-// adjust this value to whatever depth is actually necessary
-public final int STACK_DEPTH = 512;
-public float[][] matrixStack = new float[STACK_DEPTH][6];
-public int matrixStackDepth;
- 
-// this version will override the built-in version pushMatrix function
-public void pushMatrix() {
-  if (matrixStackDepth == 512) {
-    throw new RuntimeException("too many calls to pushMatrix()");
-  }
-  this.g.getMatrix().get(matrixStack[matrixStackDepth]);
-  matrixStackDepth++;
-}
- 
-// this version will override the built-in version popMatrix function
-public void popMatrix() {
-  if (matrixStackDepth == 0) {
-    throw new RuntimeException("too many calls to popMatrix()" +
-                               "(or too few to pushMatrix)");
-  }
-  matrixStackDepth--;
-  PMatrix2D m = new PMatrix2D();
-  m.set(matrixStack[matrixStackDepth]);
-  this.g.setMatrix(m);
-}
-*/
