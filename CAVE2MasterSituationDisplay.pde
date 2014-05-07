@@ -74,7 +74,7 @@ float CAVE2_verticalScale = 0.33;
 
 // In meters:
 float CAVE2_diameter = 3.628 * 2;       // EVL CAVE2: 3.628 * 2  CAVE2 AU: 3.95 * 2
-float CAVE2_innerDiameter = 3.429 * 2;  // EVL CAVE2: 3.429 * 2  CAVE2 AU: 3.696 * 2
+float CAVE2_innerDiameter =  3.429 * 2;  // EVL CAVE2: 3.429 * 2  CAVE2 AU: 3.696 * 2
 float CAVE2_screenDiameter = 3.429 * 2; // EVL CAVE2: 3.429 * 2  CAVE2 AU: 3.596 * 2
 float CAVE2_legBaseWidth = 0.254;
 float CAVE2_legHeight = 2.159;
@@ -100,6 +100,9 @@ PVector CAVE2_screenPos;
 PVector CAVE2_3Drotation = new PVector();
 
 float CAVE2_worldZPos = -300;
+
+// Stores the position and angle of display columns
+PVector[] displayColumnTransform = new PVector[nColumns];
 
 // How the display columns are represented in the CAVE2 model
 final int COLUMN = 0;
@@ -160,14 +163,11 @@ boolean connectToClusterData = false;
 float clusterUpdateInterval = 0.5; // seconds
 
 NodeDisplay[] nodes = new NodeDisplay[37];
-float[] columnPulse = new float[21];
+float[] columnPulse = new float[nColumns+1];
 float pulseDecay = 0.1;
 boolean connectedToClusterData = false;
 float clusterUpdateTimer;
 
-int[] conduitLength = new int[37];
-int[] conduitAngledLength = new int[37];
-int[] conduitAngle = new int[37];
 boolean[] nodePing = new boolean[37];
 boolean[] nodeCavewavePing = new boolean[37];
 
@@ -317,144 +317,6 @@ void setup() {
 
   //ortho(0, width, 0, height, -1000, 1000);
   ortho();
-  
-  conduitLength[0] = 400;
-
-  conduitLength[1] = 760;
-  conduitLength[2] = 700;
-  conduitLength[3] = 620;
-  conduitLength[4] = 580;
-  conduitLength[5] = 535;
-  conduitLength[6] = 525;
-  conduitLength[7] = 480;
-  conduitLength[8] = 510;
-
-  conduitLength[9] = 520;
-  conduitLength[10] = 520;
-
-  conduitLength[11] = 510;
-  conduitLength[12] = 480;
-  conduitLength[13] = 525;
-  conduitLength[14] = 535;
-  conduitLength[15] = 580;
-  conduitLength[16] = 620;
-  conduitLength[17] = 700;
-  conduitLength[18] = 760;
-
-  conduitAngledLength[1] = 210;
-  conduitAngledLength[2] = 175;
-  conduitAngledLength[3] = 140;
-  conduitAngledLength[4] = 105;
-  conduitAngledLength[5] = 95;
-  conduitAngledLength[6] = 60;
-  conduitAngledLength[7] = 70;
-  conduitAngledLength[8] = 5;
-  
-  conduitAngledLength[9] = 0;
-  conduitAngledLength[10] = 0;
-  
-  conduitAngledLength[11] = 5;
-  conduitAngledLength[12] = 70;
-  conduitAngledLength[13] = 60;
-  conduitAngledLength[14] = 95;
-  conduitAngledLength[15] = 105;
-  conduitAngledLength[16] = 140;
-  conduitAngledLength[17] = 175;
-  conduitAngledLength[18] = 210;
-
-  conduitAngle[1] = -72;
-  conduitAngle[2] = -72;
-  conduitAngle[3] = -54;
-  conduitAngle[4] = -54;
-  conduitAngle[5] = -35;
-  conduitAngle[6] = -40;
-  conduitAngle[7] = -20;
-  conduitAngle[8] = -5;
-  
-  conduitAngle[9] = 0;
-  conduitAngle[10] = 0;
-  
-  conduitAngle[11] = 5;
-  conduitAngle[12] = 20;
-  conduitAngle[13] = 40;
-  conduitAngle[14] = 35;
-  conduitAngle[15] = 54;
-  conduitAngle[16] = 54;
-  conduitAngle[17] = 72;
-  conduitAngle[18] = 72;
-
-  conduitLength[19] = 720;
-  conduitLength[20] = 670;
-
-  conduitLength[9] = 520;
-  conduitLength[10] = 520;
-  
-  // Right ----------------------------
-  conduitLength[36] = 620;
-  conduitLength[35] = 580;
-  conduitLength[34] = 535;
-  conduitLength[33] = 525;
-  conduitLength[32] = 480;
-  conduitLength[31] = 510;
-  
-  conduitLength[30] = 520;
-  conduitLength[29] = 520;
-  
-  conduitLength[28] = 510;
-  conduitLength[27] = 480;
-  conduitLength[26] = 525;
-  conduitLength[25] = 535;
-  conduitLength[24] = 580;
-  conduitLength[23] = 620;
-  conduitLength[22] = 700;
-  conduitLength[21] = 760;
-  
-  conduitLength[20] = 880;
-  conduitLength[19] = 880;
-  
-  conduitAngledLength[36] = 140;
-  conduitAngledLength[35] = 105;
-  conduitAngledLength[34] = 95;
-  conduitAngledLength[33] = 60;
-  conduitAngledLength[32] = 70;
-  conduitAngledLength[31] = 5;
-  
-  conduitAngledLength[30] = 0;
-  conduitAngledLength[29] = 0;
-  
-  conduitAngledLength[28] = 5;
-  conduitAngledLength[27] = 70;
-  conduitAngledLength[26] = 60;
-  conduitAngledLength[25] = 95;
-  conduitAngledLength[24] = 105;
-  conduitAngledLength[23] = 140;
-  conduitAngledLength[22] = 175;
-  conduitAngledLength[21] = 210;
-  
-  conduitAngledLength[20] = 270;
-  conduitAngledLength[19] = 270;
-  
-  conduitAngle[36] = 54;
-  conduitAngle[35] = 54;
-  conduitAngle[34] = 35;
-  conduitAngle[33] = 40;
-  conduitAngle[32] = 20;
-  conduitAngle[31] = 5;
-  
-  conduitAngle[30] = 0;
-  conduitAngle[29] = 0;
-  
-  conduitAngle[28] = -5;
-  conduitAngle[27] = -20;
-  conduitAngle[26] = -40;
-  conduitAngle[25] = -35;
-  conduitAngle[24] = -54;
-  conduitAngle[23] = -54;
-  conduitAngle[22] = -72;
-  conduitAngle[21] = -72;
-  
-  conduitAngle[20] = -90;
-  conduitAngle[19] = 90;
   
   for ( int i = 0; i < 37; i++)
   {

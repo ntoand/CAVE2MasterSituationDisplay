@@ -94,8 +94,8 @@ void drawClusterStatus()
   for( int i = 1; i < 20; i++ )
   {
     pushMatrix();
-    translate( 70 + borderDistFromEdge, targetHeight - verticalOffset - borderDistFromEdge + 70 * -i );
-    nodes[i].drawLeft();
+    //translate( 70 + borderDistFromEdge, targetHeight - verticalOffset - borderDistFromEdge + 70 * -i );
+    nodes[i].drawLeft( 70 + borderDistFromEdge, targetHeight - verticalOffset - borderDistFromEdge + 70 * -i  );
     popMatrix();
     
     averageCPU += nodes[i].avgCPU;
@@ -108,7 +108,7 @@ void drawClusterStatus()
   {
     pushMatrix();
     translate( targetWidth - 70 - borderDistFromEdge - 500, targetHeight - verticalOffset - borderDistFromEdge - 70 * 19 + 70 * (i - 20) );
-    nodes[i].drawRight();
+    //nodes[i].drawRight();
     popMatrix();
     
     averageCPU += nodes[i].avgCPU;

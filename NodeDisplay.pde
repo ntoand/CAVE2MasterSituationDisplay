@@ -62,9 +62,9 @@ class NodeDisplay
       
     gpuMem = (int)random(0,101);
     
-    nSegments =  conduitLength[nodeID] / (1000 / conduitSegments);
-    nAngledSegments = conduitAngledLength[nodeID] / (1000 / conduitSegments);
-    segments = new int[nSegments+nAngledSegments];
+    //nSegments =  conduitLength[nodeID] / (1000 / conduitSegments);
+    //nAngledSegments = conduitAngledLength[nodeID] / (1000 / conduitSegments);
+    //segments = new int[nSegments+nAngledSegments];
     
     conduitPulses.add( new Pulse() );
   }
@@ -80,7 +80,7 @@ class NodeDisplay
   float pulseSpeed = 20;
   
   void update()
-  {
+  {    
     pulseTimer += deltaTime;
     if( pulseTimer > pulseDelay )
     {
@@ -127,7 +127,7 @@ class NodeDisplay
     else
       nodeDown = false;
     
-    if( nodePing[nodeID] == false || nodeCavewavePing[nodeID] == false )
+    if( connectToClusterData && (nodePing[nodeID] == false || nodeCavewavePing[nodeID] == false) )
     {
       nodeDown = true;
       gpuMem = 0;
@@ -136,6 +136,13 @@ class NodeDisplay
     else
       nodeDown = false;
     
+    // Demo mode
+    if( !connectToClusterData && nodeID == 15 )
+    {
+      nodeDown = true;
+      gpuMem = 0;
+      avgCPU = 0;
+    }
     
     curSegment += gpuMem / pulseSpeed;
     
@@ -144,8 +151,65 @@ class NodeDisplay
     nodeColor = color( red(baseColor) * avgCPU, green(baseColor) * avgCPU, blue(baseColor) * avgCPU );
   }
   
-  void drawLeft()
+  void drawLeft( float xPos, float yPos )
   {  
+    int columnID = (nodeID - 1) / nodesPerColumn;
+    int columnPos = (nodeID - 1) % nodesPerColumn;
+    
+    float displayPosX = 0; // CAVE2 column screen position
+    float displayPosY = 0;
+    float angledDistance = 0;
+    float intersectionX = 0; // Vertical intersection point between line from CAVE2 column to node horizontal
+    float intersectionY = 0;
+    float angle = 0;
+    
+    if( displayColumnTransform[columnID] != null )
+    {
+      stroke( 255 );
+      displayPosX = displayColumnTransform[columnID].x * 2 + (targetWidth/2);
+      displayPosY = displayColumnTransform[columnID].y * 2 + (targetHeight/2 - 20);
+      angle = displayColumnTransform[columnID].z;
+      
+      float offset = CAVE2_displayWidth/nodesPerColumn * CAVE2_Scale;
+      if( nodesPerColumn == 2 )
+      {
+        float offsetAngle = 90;
+        if( columnPos == 0 )
+          offsetAngle = -90;
+        displayPosX += offset * cos(angle + radians(offsetAngle));
+        displayPosY += offset * sin(angle + radians(offsetAngle));
+      }
+      
+      // Position node display location vertically intersects ray from CAVE2 display
+      angledDistance = ((yPos - displayPosY) / sin(angle));
+      float intersectionDistX = (xPos - displayPosX) / cos(angle);
+      
+      if( angledDistance < 0 )
+        angledDistance = 0;
+      
+      // Line should stop at node display
+      if( angledDistance > displayPosX - xPos )
+        angledDistance = displayPosX - xPos;
+      
+      intersectionX = displayPosX + angledDistance * cos(angle);
+      intersectionY = displayPosY + angledDistance * sin(angle);
+
+      line( displayPosX, displayPosY, intersectionX, intersectionY );
+
+      noStroke();
+      
+      if( segments == null )
+      {
+        nSegments = (int)(intersectionX/2) / (1000 / conduitSegments);
+        nAngledSegments = (int)angledDistance / (1000 / conduitSegments);
+        segments = new int[nSegments+nAngledSegments];
+      }
+    }
+      
+    // Flip angle since origin is at intersection point, not the display column
+    angle += PI;
+    
+    translate( xPos, yPos );
     update();
     
     textAlign(RIGHT);
@@ -159,8 +223,7 @@ class NodeDisplay
     text("Avg. CPU: ", 20 + nodeWidth, -24 );
     fill(gpuBaseColor);
     text("GPU Mem.: ", 210 + nodeWidth, -24 );
-  
-    
+
     
     rectMode(CENTER);
 
@@ -169,35 +232,29 @@ class NodeDisplay
     float vertOffset = 0;
 
     pushMatrix();
-    translate(horzOffset + 20 + nodeWidth + nSegments * (1000 / conduitSegments), vertOffset);
+    translate( intersectionX - xPos, intersectionY - yPos );
       
-    rotate( radians(conduitAngle[nodeID]) );
+    rotate( angle );
     fill(10, 100, 110);
-    rect(conduitAngledLength[nodeID]/2, 0, conduitAngledLength[nodeID], conduitWidth );
+    rect(angledDistance/2, 0, angledDistance, conduitWidth );
 
-    if( conduitAngledLength[nodeID] > 0 )
+    if( angledDistance > 0 )
       ellipse( 0, 0, conduitWidth, conduitWidth );
     popMatrix();
     
     
     // Straight background segment
+    rectMode(CORNER);
     fill(10, 100, 110);
-    rect( 20 + nodeWidth + conduitLength[nodeID]/2, 0, conduitLength[nodeID], conduitWidth );
-    
-    /*
-    ArrayList nextPulseList = new ArrayList();
-    
-    for( int p = 0; p < conduitPulses.size(); p++ )
-    {
-      Pulse curPulse = (Pulse)conduitPulses.get(p);
-      curSegment = curPulse.getPosition();
-      */
-    
+    rect( nodeWidth, -conduitWidth/2, intersectionX - (xPos + nodeWidth), conduitWidth );
+
+    rectMode(CENTER);
     // Angled animated segment
     if( nodeDown )
       stroke(0,0,20);
     else
       stroke(200 * (gpuMem / 100.0), 50, 250 * ( 1 - (gpuMem / 100.0)) );
+
     for( int i = 0; i < nAngledSegments; i++ )
     {
       float segmentValue = 100 * (i / (float)nSegments);
@@ -210,12 +267,18 @@ class NodeDisplay
       fill(10,220 * segments[nSegments + i]/100.0, 110);
       
       pushMatrix();
-      translate(horzOffset + 20 + nodeWidth + nSegments * (1000 / conduitSegments), vertOffset);
-      rotate( radians(conduitAngle[nodeID]) );
+      translate( intersectionX - xPos, intersectionY - yPos, vertOffset);
+      
+      rotate( angle );
+      fill(10, 100, 110);
+      //rect(angledDistance/2, 0, angledDistance, conduitWidth );
+    
+      //translate(horzOffset + 20 + nodeWidth + nSegments * (1000 / conduitSegments), vertOffset);
+      //rotate( angle );
       rect( i * (1000 / conduitSegments), 0, 5, conduitWidth );
       popMatrix();
     }
-
+    
     // Straight animated segment
     for( int i = 0; i < nSegments; i++ )
     {
@@ -230,6 +293,7 @@ class NodeDisplay
       
       rect( 20 + nodeWidth + i * (1000 / conduitSegments), 0, 5, conduitWidth );
     }
+    
     if( curSegment > nSegments + nAngledSegments )
     {
       curSegment = 0;
@@ -302,6 +366,7 @@ class NodeDisplay
   
   void drawRight()
   {
+    /*
     update();
     
     pushMatrix();
@@ -442,5 +507,6 @@ class NodeDisplay
       rect( nodeWidth - 3 * cpuBorder + ( 2 + nodeWidth / 18) * i, cpuBorder - nodeHeight/2, (nodeWidth / 18), (1 - (CPU[i] / 100.0)) * (nodeHeight - cpuBorder * 2)  );
     }
     popMatrix();
+    */
   }
 }// class NodeDisplay

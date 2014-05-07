@@ -300,7 +300,7 @@ class Trackable
      if( (buttonFlag & 65536 ) == 65536 )
        button9 = state;
        
-    println( buttonFlag + " " + state );
+    //println( buttonFlag + " " + state );
     updateTimer = programTimer;
   }// updateButton
   

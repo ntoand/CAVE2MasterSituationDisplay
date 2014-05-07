@@ -74,7 +74,7 @@ void readConfigFile(String config_file) {
       if ( rawConfig[i].contains("clusterDataWebsite") ) {
         println(rawConfig[i]);
         clusterData = rawConfig[i].substring( rawConfig[i].indexOf("\"")+1, rawConfig[i].lastIndexOf("\"") );
-        connectToClusterData = true;
+        //connectToClusterData = true;
         continue;
       }
 
