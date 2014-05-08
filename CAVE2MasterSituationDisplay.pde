@@ -92,9 +92,8 @@ int nodesPerColumn = 2;
 int nDisplaysPerColumn = 4;
 
 int nNodes = 37; // Including master
-int nNodesLeft = 11; // Nodes on left half of CAVE2 - EVL CAVE2: 19  CAVE2 AU: 12
-int nNodesRight = 9; // Nodes on left half of CAVE2 - EVL CAVE2: 19  CAVE2 AU: 12
-int verticalNodeSpacing = 121; // EVL CAVE2: 70  CAVE2 AU: 121
+int nNodesLeft = 19; // Nodes on left half of CAVE2 - EVL CAVE2: 19  CAVE2 AU: 11
+int verticalNodeSpacing = 70; // EVL CAVE2: 70  CAVE2 AU: 121
 
 float speakerHeight = CAVE2_legHeight * 1.3;
 float speakerWidth = 0.2;

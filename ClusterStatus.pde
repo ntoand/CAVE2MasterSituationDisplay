@@ -84,8 +84,8 @@ void drawClusterStatus()
   
   // Master node
   pushMatrix();
-  translate( targetWidth - 70 - borderDistFromEdge - 500, targetHeight - verticalOffset - borderDistFromEdge - 70 * 19 + 70 * (38 - 20) );
-  nodes[0].drawRight();
+  nodes[0].drawRight(targetWidth - 70 - borderDistFromEdge - 500, targetHeight - verticalOffset - borderDistFromEdge - 70 * nNodesLeft + 70 * (38 - 20) );
+  
   averageCPU += nodes[0].avgCPU;
   averageGPU += nodes[0].gpuMem;
   popMatrix();
@@ -104,11 +104,11 @@ void drawClusterStatus()
   
   // Right display nodes
   
-  for( int i = 20; i < 37; i++ )
+  for( int i = nNodesLeft+1; i < nNodes; i++ )
   {
+    int rightOffset = 70; // Shifts right nodes down for clock
     pushMatrix();
-    translate( targetWidth - 70 - borderDistFromEdge - 500, targetHeight - verticalOffset - borderDistFromEdge - 70 * 19 + 70 * (i - 20) );
-    //nodes[i].drawRight();
+    nodes[i].drawRight(targetWidth - 70 - borderDistFromEdge - 500, targetHeight - verticalOffset + rightOffset - borderDistFromEdge - verticalNodeSpacing * nNodesLeft + verticalNodeSpacing * (i - (nNodesLeft+1)));
     popMatrix();
     
     averageCPU += nodes[i].avgCPU;

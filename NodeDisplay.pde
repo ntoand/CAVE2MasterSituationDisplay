@@ -92,6 +92,8 @@ class NodeDisplay
         {
           if( nodeID == 15 )
             CPU[i] = 0;
+          else if( nodeID == 0 ) // Master
+            CPU[i] = (int)random(23,100);
           else
             CPU[i] = (int)random(0,15);
         }
@@ -112,7 +114,6 @@ class NodeDisplay
     avgCPU = 0;
     for( int i = 0; i < 16; i++)
     {
-      //CPU[i] = (int)random(100,100);
       avgCPU += CPU[i];
     }
     
@@ -379,10 +380,11 @@ class NodeDisplay
     popMatrix();
   }
   
-  void drawRight()
+  void drawRight( float xPos, float yPos )
   {
-    /*
     update();
+    
+    translate( xPos, yPos );
     
     pushMatrix();
     translate( 108, 0 );
@@ -404,7 +406,7 @@ class NodeDisplay
     pushMatrix();
     translate( 500, 0 );
     rotate( radians(180) );
-    
+    /*
     // Angled background segments
     float horzOffset = 0;
     float vertOffset = 0;
@@ -468,7 +470,7 @@ class NodeDisplay
       if( nodeID > 0 )
         columnPulse[(nodeID-1)/2] = 1;
     }
-    
+    */
     popMatrix();
     
     rectMode(CORNER);
@@ -522,6 +524,5 @@ class NodeDisplay
       rect( nodeWidth - 3 * cpuBorder + ( 2 + nodeWidth / 18) * i, cpuBorder - nodeHeight/2, (nodeWidth / 18), (1 - (CPU[i] / 100.0)) * (nodeHeight - cpuBorder * 2)  );
     }
     popMatrix();
-    */
   }
 }// class NodeDisplay
