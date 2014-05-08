@@ -27,7 +27,6 @@ void generateCAVE2Geometry()
     yPos *= sin(angle);
     
     displayColumnTransform[i] = new PVector( xPos, yPos, angle );
-    println("Col: " + i + " ("+xPos+","+yPos+")"); 
   }
   generatedCAVE2Geometry = true;
 }

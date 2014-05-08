@@ -162,6 +162,7 @@ class NodeDisplay
     float intersectionX = 0; // Vertical intersection point between line from CAVE2 column to node horizontal
     float intersectionY = 0;
     float angle = 0;
+    float straightDistance = 0;
     
     if( displayColumnTransform[columnID] != null )
     {
@@ -189,8 +190,12 @@ class NodeDisplay
       
       // Line should stop at node display
       if( angledDistance > displayPosX - xPos )
-        angledDistance = displayPosX - xPos;
+        angledDistance = displayPosX - xPos - nodeWidth;
       
+      // Don't use really small angles - use a straight conduit instead
+      if( abs((180 - degrees(angle))) < 2 )
+        angledDistance = 0;
+          
       intersectionX = displayPosX + angledDistance * cos(angle);
       intersectionY = displayPosY + angledDistance * sin(angle);
 
@@ -198,14 +203,22 @@ class NodeDisplay
 
       noStroke();
       
+      straightDistance = intersectionX - (xPos + nodeWidth) - 5;
+      if( straightDistance < 0 )
+        straightDistance *= -1;
+          
       if( segments == null )
       {
-        nSegments = (int)(intersectionX/2) / (1000 / conduitSegments);
-        nAngledSegments = (int)angledDistance / (1000 / conduitSegments);
+        
+        nSegments = (int)(straightDistance - 10) / (1000 / conduitSegments);
+        nAngledSegments = ((int)angledDistance / (1000 / conduitSegments));
         segments = new int[nSegments+nAngledSegments];
+        
+        //println(nodeID + " " + straightDistance);
       }
     }
-      
+    
+    
     // Flip angle since origin is at intersection point, not the display column
     angle += PI;
     
@@ -246,9 +259,10 @@ class NodeDisplay
     // Straight background segment
     rectMode(CORNER);
     fill(10, 100, 110);
-    rect( nodeWidth, -conduitWidth/2, intersectionX - (xPos + nodeWidth), conduitWidth );
+    rect( nodeWidth, -conduitWidth/2, straightDistance, conduitWidth );
 
     rectMode(CENTER);
+    
     // Angled animated segment
     if( nodeDown )
       stroke(0,0,20);
@@ -279,6 +293,7 @@ class NodeDisplay
       popMatrix();
     }
     
+    rectMode(CORNER);
     // Straight animated segment
     for( int i = 0; i < nSegments; i++ )
     {
@@ -291,7 +306,7 @@ class NodeDisplay
       
       fill(10,220 * segments[i]/100.0, 110);
       
-      rect( 20 + nodeWidth + i * (1000 / conduitSegments), 0, 5, conduitWidth );
+      rect( 20 + nodeWidth + i * (1000 / conduitSegments), -conduitWidth/2, 5, conduitWidth );
     }
     
     if( curSegment > nSegments + nAngledSegments )

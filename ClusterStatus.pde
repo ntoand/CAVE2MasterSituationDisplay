@@ -91,11 +91,11 @@ void drawClusterStatus()
   popMatrix();
   
   // Left display nodes
-  for( int i = 1; i < 20; i++ )
+  for( int i = 1; i < nNodesLeft + 1; i++ )
   {
     pushMatrix();
     //translate( 70 + borderDistFromEdge, targetHeight - verticalOffset - borderDistFromEdge + 70 * -i );
-    nodes[i].drawLeft( 70 + borderDistFromEdge, targetHeight - verticalOffset - borderDistFromEdge + 70 * -i  );
+    nodes[i].drawLeft( 70 + borderDistFromEdge, targetHeight - verticalOffset - borderDistFromEdge + verticalNodeSpacing * -i  );
     popMatrix();
     
     averageCPU += nodes[i].avgCPU;

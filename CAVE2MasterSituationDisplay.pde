@@ -73,9 +73,9 @@ float CAVE2_Scale = 65;
 float CAVE2_verticalScale = 0.33;
 
 // In meters:
-float CAVE2_diameter = 3.628 * 2;       // EVL CAVE2: 3.628 * 2  CAVE2 AU: 3.95 * 2
-float CAVE2_innerDiameter =  3.429 * 2;  // EVL CAVE2: 3.429 * 2  CAVE2 AU: 3.696 * 2
-float CAVE2_screenDiameter = 3.429 * 2; // EVL CAVE2: 3.429 * 2  CAVE2 AU: 3.596 * 2
+float CAVE2_diameter = 3.95 * 2;       // EVL CAVE2: 3.628 * 2  CAVE2 AU: 3.95 * 2
+float CAVE2_innerDiameter =  3.696 * 2;  // EVL CAVE2: 3.429 * 2  CAVE2 AU: 3.696 * 2
+float CAVE2_screenDiameter = 3.696 * 2; // EVL CAVE2: 3.429 * 2  CAVE2 AU: 3.596 * 2
 float CAVE2_legBaseWidth = 0.254;
 float CAVE2_legHeight = 2.159;
 float CAVE2_lowerRingHeight = 0.3048;
@@ -90,6 +90,11 @@ int columnOffset = 9;      // EVL CAVE2: 9    CAVE2 AU: 10
 int nodeOffset = 4;         // EVL CAVE2: 4    CAVE2 AU: 2
 int nodesPerColumn = 2;
 int nDisplaysPerColumn = 4;
+
+int nNodes = 37; // Including master
+int nNodesLeft = 11; // Nodes on left half of CAVE2 - EVL CAVE2: 19  CAVE2 AU: 12
+int nNodesRight = 9; // Nodes on left half of CAVE2 - EVL CAVE2: 19  CAVE2 AU: 12
+int verticalNodeSpacing = 121; // EVL CAVE2: 70  CAVE2 AU: 121
 
 float speakerHeight = CAVE2_legHeight * 1.3;
 float speakerWidth = 0.2;
