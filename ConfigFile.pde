@@ -71,13 +71,27 @@ void readConfigFile(String config_file) {
         continue;
       }
 
-      if ( rawConfig[i].contains("clusterDataWebsite") ) {
-        println(rawConfig[i]);
+      if ( rawConfig[i].contains("clusterData_URL") ) {
+        println("Reading cluster data from: " + rawConfig[i]);
         clusterData = rawConfig[i].substring( rawConfig[i].indexOf("\"")+1, rawConfig[i].lastIndexOf("\"") );
-        //connectToClusterData = true;
+        connectToClusterData = true;
         continue;
       }
-
+      
+      if ( rawConfig[i].contains("clusterPing1_URL") ) {
+        println("Reading cluster network data 1 from: " + rawConfig[i]);
+        clusterPing1 = rawConfig[i].substring( rawConfig[i].indexOf("\"")+1, rawConfig[i].lastIndexOf("\"") );
+        usingPing1 = true;
+        continue;
+      }
+      
+      if ( rawConfig[i].contains("clusterPing2_URL") ) {
+        println("Reading cluster network data 2 from: " + rawConfig[i]);
+        clusterPing2 = rawConfig[i].substring( rawConfig[i].indexOf("\"")+1, rawConfig[i].lastIndexOf("\"") );
+        usingPing2 = true;
+        continue;
+      }
+      
       if ( rawConfig[i].contains("clusterUpdateInterval") ) {
         tempStr = rawConfig[i].substring( rawConfig[i].indexOf("=")+1, rawConfig[i].lastIndexOf(";") );
         clusterUpdateInterval = Float.valueOf( tempStr.trim() );

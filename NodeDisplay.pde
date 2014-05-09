@@ -269,7 +269,7 @@ class NodeDisplay
       stroke(0,0,20);
     else
       stroke(200 * (gpuMem / 100.0), 50, 250 * ( 1 - (gpuMem / 100.0)) );
-
+      
     for( int i = 0; i < nAngledSegments; i++ )
     {
       float segmentValue = 100 * (i / (float)nSegments);
@@ -493,6 +493,11 @@ class NodeDisplay
     rect( nodeWidth, -conduitWidth/2, straightDistance - 6, conduitWidth );
 
     // Straight animated segment
+    if( nodeDown )
+      stroke(0,0,20);
+    else
+      stroke(200 * (gpuMem / 100.0), 50, 250 * ( 1 - (gpuMem / 100.0)) );
+      
     rectMode(CORNER);
     for( int i = 0; i < nSegments; i++ )
     {
@@ -510,10 +515,6 @@ class NodeDisplay
     
     // Angled animated segment
     rectMode(CENTER);
-    if( nodeDown )
-      stroke(0,0,20);
-    else
-      stroke(200 * (gpuMem / 100.0), 50, 250 * ( 1 - (gpuMem / 100.0)) );
     
     for( int i = 0; i < nAngledSegments; i++ )
     {

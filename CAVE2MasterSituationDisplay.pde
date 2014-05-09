@@ -119,7 +119,7 @@ int CAVE2_displayMode = COLUMN;
 // Tracker ---------------------------------------
 boolean connectToTracker = false;
 boolean logErrors = false;
-String trackerIP = "cave2tracker.evl.uic.edu";
+String trackerIP = "";
 int msgport = 28000;
 int dataport = 7738;
 
@@ -161,9 +161,9 @@ OscP5 oscP5;
 int recvPort = 8000;
 
 // Cluster ---------------------------------------
-String clusterData = "http://lyra.evl.uic.edu:9000/html/cluster.txt";
-String clusterPing1 = "http://lyra.evl.uic.edu:9000/html/ping.txt";
-String clusterPing2 = "http://lyra.evl.uic.edu:9000/html/pingcavewave.txt";
+String clusterData = "";
+String clusterPing1 = "";
+String clusterPing2 = "";
 //String website = "S:/EVL/CAVE2/cluster2.txt";
 boolean connectToClusterData = false;
 float clusterUpdateInterval = 0.5; // seconds

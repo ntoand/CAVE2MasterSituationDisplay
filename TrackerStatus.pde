@@ -30,7 +30,7 @@ void drawTrackerStatus()
   translate( 50, 60 );
   
   fill(0,250,250);
-  text("CAVE2(TM) System Master Situation Display (Version 0.4 - alpha)", 16, 16);
+  text("CAVE2(TM) System Master Situation Display (Version 0.5 - alpha)", 16, 16);
   
   float timeSinceLastTrackerUpdate = programTimer - lastTrackerUpdateTime;
   
@@ -144,7 +144,7 @@ void drawTrackerStatus()
     {
       background(24);
       fill(0,250,250);
-      text("CAVE2(TM) System Locator (Version 0.2 - alpha)", 16, 16);
+      text("CAVE2(TM) System Locator (Version 0.5 - alpha)", 16, 16);
       text("Connected to '"+ trackerIP + "' on msgport: " + msgport, 16, 16 * 2);
       text("Receiving data on dataport: " + dataport, 16, 16 * 3);
       //reconnectTrackerTimer = programTimer + reconnectTrackerDelay;
