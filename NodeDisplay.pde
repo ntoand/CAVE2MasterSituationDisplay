@@ -200,7 +200,7 @@ class NodeDisplay
       intersectionX = displayPosX + angledDistance * cos(angle);
       intersectionY = displayPosY + angledDistance * sin(angle);
 
-      line( displayPosX, displayPosY, intersectionX, intersectionY );
+      //line( displayPosX, displayPosY, intersectionX, intersectionY );
 
       noStroke();
       
@@ -251,11 +251,11 @@ class NodeDisplay
     rotate( angle );
     fill(10, 100, 110);
     rect(angledDistance/2, 0, angledDistance, conduitWidth );
-
-    if( angledDistance > 0 )
+    
+    //println( nodeID + " " + angledDistance );
+    if( angledDistance > 10 )
       ellipse( 0, 0, conduitWidth, conduitWidth );
     popMatrix();
-    
     
     // Straight background segment
     rectMode(CORNER);
@@ -283,19 +283,13 @@ class NodeDisplay
       
       pushMatrix();
       translate( intersectionX - xPos, intersectionY - yPos, vertOffset);
-      
       rotate( angle );
-      fill(10, 100, 110);
-      //rect(angledDistance/2, 0, angledDistance, conduitWidth );
-    
-      //translate(horzOffset + 20 + nodeWidth + nSegments * (1000 / conduitSegments), vertOffset);
-      //rotate( angle );
       rect( i * (1000 / conduitSegments), 0, 5, conduitWidth );
       popMatrix();
     }
-    
-    rectMode(CORNER);
+
     // Straight animated segment
+    rectMode(CORNER);
     for( int i = 0; i < nSegments; i++ )
     {
       float segmentValue = 100 * (i / (float)nSegments);
@@ -317,19 +311,8 @@ class NodeDisplay
         columnPulse[(nodeID-1)/2] = 1;
     }
     
-    /*
-      if( curSegment < 100 )
-      {
-        curPulse.setPosition( curSegment + gpuMem / 55.0 );
-        nextPulseList.add( curPulse );
-      }
-    }
-    conduitPulses = nextPulseList;
-    */
-    
-    rectMode(CORNER);
-    
     // Node info
+    rectMode(CORNER);
     pushMatrix();
     translate(0,0,10);
     noStroke();
@@ -382,6 +365,87 @@ class NodeDisplay
   
   void drawRight( float xPos, float yPos )
   {
+    
+    int columnID = (nodeID - 1) / nodesPerColumn;
+    int columnPos = (nodeID - 1) % nodesPerColumn;
+    
+    float displayPosX = 0; // CAVE2 column screen position
+    float displayPosY = 0;
+    float angledDistance = 0;
+    float intersectionX = 0; // Vertical intersection point between line from CAVE2 column to node horizontal
+    float intersectionY = 0;
+    float angle = 0;
+    float straightDistance = 0;
+
+    if( columnID >= 0 && displayColumnTransform[columnID] != null )
+    {
+      stroke( 255 );
+      displayPosX = displayColumnTransform[columnID].x * 2 + (targetWidth/2);
+      displayPosY = displayColumnTransform[columnID].y * 2 + (targetHeight/2 - 20);
+      angle = displayColumnTransform[columnID].z + PI; // flip 180 for right nodes
+      
+      float offset = CAVE2_displayWidth/nodesPerColumn * CAVE2_Scale;
+      if( nodesPerColumn == 2 )
+      {
+        float offsetAngle = -90;
+        if( columnPos == 0 )
+          offsetAngle = 90;
+        displayPosX += offset * cos(angle + radians(offsetAngle));
+        displayPosY += offset * sin(angle + radians(offsetAngle));
+      }
+      
+      // Position node display location vertically intersects ray from CAVE2 display
+      angledDistance = ((yPos - displayPosY) / sin(angle));
+      float intersectionDistX = (xPos - displayPosX) / cos(angle);
+
+      if( angledDistance > 0 )
+        angledDistance *= -1;
+      
+      // Make sure angle is 0 to 360
+      if( angle > 2 * PI )
+        angle -= 2 * PI;
+        
+      // Don't use really small angles - use a straight conduit instead
+      int minAngle = 2;
+      if( abs((180 - degrees(angle))) < minAngle || abs((180 - degrees(angle))) > 360 - minAngle )
+        angledDistance = 0;
+      
+      intersectionX = displayPosX + angledDistance * cos(angle);
+      intersectionY = displayPosY + angledDistance * sin(angle);
+
+      //line( displayPosX, displayPosY, intersectionX, intersectionY );
+      //line( xPos, yPos, intersectionX, intersectionY );
+      
+      noStroke();
+      
+      straightDistance = intersectionX - (xPos + nodeWidth) - 5;
+      if( straightDistance < 0 )
+        straightDistance *= -1;
+      else
+        straightDistance = 0;
+      
+      //println(nodeID + " " + straightDistance);
+      
+      // Master node
+      if( nodeID == 0 )
+      {
+        straightDistance = 350;
+        angledDistance = 0;
+      }
+      
+      if( segments == null )
+      {
+        //println(nodeID + " " + straightDistance);
+        nSegments = (int)(straightDistance - 15) / (1000 / conduitSegments);
+        if( nSegments < 0 )
+          nSegments = 0;
+          
+        nAngledSegments = ((int)-angledDistance / (1000 / conduitSegments));
+        segments = new int[nSegments+nAngledSegments];
+        //println(nodeID + " " + nSegments + " " + nAngledSegments);
+      }
+    }
+    
     update();
     
     translate( xPos, yPos );
@@ -406,32 +470,51 @@ class NodeDisplay
     pushMatrix();
     translate( 500, 0 );
     rotate( radians(180) );
-    /*
+    
     // Angled background segments
     float horzOffset = 0;
     float vertOffset = 0;
 
     pushMatrix();
-    translate(horzOffset + 20 + nodeWidth + nSegments * (1000 / conduitSegments), vertOffset);
+    translate( xPos - intersectionX + 500, 0 );
       
-    rotate( radians(conduitAngle[nodeID]) );
+    rotate( angle );
     fill(10, 100, 110);
-    rect(conduitAngledLength[nodeID]/2, 0, conduitAngledLength[nodeID], conduitWidth );
-
-    if( conduitAngledLength[nodeID] > 0 )
+    rect(angledDistance/2, 0, angledDistance, conduitWidth );
+    
+    //println( nodeID + ": " + angledDistance );
+    if( angledDistance < -5 )
       ellipse( 0, 0, conduitWidth, conduitWidth );
     popMatrix();
     
-    
     // Straight background segment
+    rectMode(CORNER);
     fill(10, 100, 110);
-    rect( 20 + nodeWidth + conduitLength[nodeID]/2, 0, conduitLength[nodeID], conduitWidth );
+    rect( nodeWidth, -conduitWidth/2, straightDistance - 6, conduitWidth );
+
+    // Straight animated segment
+    rectMode(CORNER);
+    for( int i = 0; i < nSegments; i++ )
+    {
+      float segmentValue = 100 * (i / (float)nSegments);
+      
+      if( i > curSegment - segmentSizeRange && i < curSegment + segmentSizeRange )
+        segments[i] = 100;
+      else
+        segments[i] = segments[i] - decayRate;
+      
+      fill(10,220 * segments[i]/100.0, 110);
+      
+      rect( 20 + nodeWidth + i * (1000 / conduitSegments), -conduitWidth/2, 5, conduitWidth );
+    }
     
     // Angled animated segment
+    rectMode(CENTER);
     if( nodeDown )
       stroke(0,0,20);
     else
       stroke(200 * (gpuMem / 100.0), 50, 250 * ( 1 - (gpuMem / 100.0)) );
+    
     for( int i = 0; i < nAngledSegments; i++ )
     {
       float segmentValue = 100 * (i / (float)nSegments);
@@ -444,38 +527,25 @@ class NodeDisplay
       fill(10,220 * segments[nSegments + i]/100.0, 110);
       
       pushMatrix();
-      translate(horzOffset + 20 + nodeWidth + nSegments * (1000 / conduitSegments), vertOffset);
-      rotate( radians(conduitAngle[nodeID]) );
+      translate( xPos - intersectionX + 500, intersectionY - yPos, vertOffset);
+      //translate( intersectionX - xPos, intersectionY - yPos, vertOffset);
+      rotate( angle + PI );
       rect( i * (1000 / conduitSegments), 0, 5, conduitWidth );
       popMatrix();
     }
-
-    // Straight animated segment
-    for( int i = 0; i < nSegments; i++ )
-    {
-      float segmentValue = 100 * (i / (float)nSegments);
-      
-      if( i > curSegment - segmentSizeRange && i < curSegment + segmentSizeRange )
-        segments[i] = 100;
-      else
-        segments[i] = segments[i] - decayRate;
-      
-      fill(10,220 * segments[i]/100.0, 110);
-      
-      rect( 20 + nodeWidth + i * (1000 / conduitSegments), 0, 5, conduitWidth );
-    }
+        
+    // Update segments
     if( curSegment > nSegments + nAngledSegments )
     {
       curSegment = 0;
       if( nodeID > 0 )
         columnPulse[(nodeID-1)/2] = 1;
     }
-    */
+    
     popMatrix();
-    
-    rectMode(CORNER);
-    
+
     // Node info
+    rectMode(CORNER);
     pushMatrix();
     translate( 0, 0, 1 );
     noStroke();

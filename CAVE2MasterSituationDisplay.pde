@@ -8,12 +8,13 @@
  * Author: Arthur Nishimoto
  * Copyright (C) 2012-2014
  * Electronic Visualization Laboratory, University of Illinois at Chicago
- * Version: 0.4 (alpha)
+ * Version: 0.5 (alpha)
  *
  * Version Notes:
  * 11/6/12      - Initial version
  * 12/7/12      - Audio support, 3D view
  * 12/9/13      - Updated for Processing 2.1
+ * 5/9/14       - Cluster display draw based on CAVE2 meaasurements instead if being hardcoded
  * ---------------------------------------------
  */
 
@@ -73,9 +74,9 @@ float CAVE2_Scale = 65;
 float CAVE2_verticalScale = 0.33;
 
 // In meters:
-float CAVE2_diameter = 3.95 * 2;       // EVL CAVE2: 3.628 * 2  CAVE2 AU: 3.95 * 2
-float CAVE2_innerDiameter =  3.696 * 2;  // EVL CAVE2: 3.429 * 2  CAVE2 AU: 3.696 * 2
-float CAVE2_screenDiameter = 3.696 * 2; // EVL CAVE2: 3.429 * 2  CAVE2 AU: 3.596 * 2
+float CAVE2_diameter = 3.628 * 2;       // EVL CAVE2: 3.628 * 2  CAVE2 AU: 3.95 * 2
+float CAVE2_innerDiameter = 3.429 * 2;  // EVL CAVE2: 3.429 * 2  CAVE2 AU: 3.696 * 2
+float CAVE2_screenDiameter = 3.429 * 2; // EVL CAVE2: 3.429 * 2  CAVE2 AU: 3.596 * 2
 float CAVE2_legBaseWidth = 0.254;
 float CAVE2_legHeight = 2.159;
 float CAVE2_lowerRingHeight = 0.3048;
@@ -87,13 +88,14 @@ float CAVE2_displayToFloor = 0.317;
 int nDisplayColumns = 18;   // EVL CAVE2: 18   CAVE2 AU: 20
 int nColumns = 20;          // EVL CAVE2: 20   CAVE2 AU: 22
 int columnOffset = 9;      // EVL CAVE2: 9    CAVE2 AU: 10
-int nodeOffset = 4;         // EVL CAVE2: 4    CAVE2 AU: 2
-int nodesPerColumn = 2;
+int nodeOffset = 4;        // EVL CAVE2: 4    CAVE2 AU: 2
+int nodesPerColumn = 2;    // EVL CAVE2: 2    CAVE2 AU: 1
 int nDisplaysPerColumn = 4;
 
 int nNodes = 37; // Including master
 int nNodesLeft = 19; // Nodes on left half of CAVE2 - EVL CAVE2: 19  CAVE2 AU: 11
 int verticalNodeSpacing = 70; // EVL CAVE2: 70  CAVE2 AU: 121
+int rightNodeOffset = 0; // EVL CAVE2: 70 (0 for no clock), CAVE2 AU: 90?
 
 float speakerHeight = CAVE2_legHeight * 1.3;
 float speakerWidth = 0.2;
@@ -406,7 +408,8 @@ void draw() {
   if( second() < 10 )
     secondStr = "0"+secondStr;
   fill(255);
-  text(hour()+":"+minuteStr+":"+secondStr, targetWidth - 50, 105);
+  if( state != CLUSTER )
+    text(hour()+":"+minuteStr+":"+secondStr, targetWidth - 50, 105);
   //textAlign(LEFT);
   //textFont( st_font, 16 );
   
