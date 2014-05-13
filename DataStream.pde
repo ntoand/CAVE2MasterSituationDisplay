@@ -4,7 +4,7 @@
  * Description: CAVE2 Master Situation Display (MSD)
  *
  * Class: 
- * System: Processing 2.1, SUSE 12.1, Windows 7 x64
+ * System: Processing 2.2, SUSE 12.1, Windows 7 x64
  * Author(s): Andrew Johnson, Arthur Nishimoto
  * Copyright (C) 2012-2014
  * Electronic Visualization Laboratory, University of Illinois at Chicago

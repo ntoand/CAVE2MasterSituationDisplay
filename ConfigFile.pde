@@ -4,7 +4,7 @@
  * Description: Configuration file parser
  *
  * Class: 
- * System: Processing 2.1, SUSE 12.1, Windows 7 x64
+ * System: Processing 2.2, SUSE 12.1, Windows 7 x64
  * Author: Arthur Nishimoto
  * Copyright (C) 2012-2014
  * Electronic Visualization Laboratory, University of Illinois at Chicago
@@ -132,7 +132,7 @@ void readConfigFile(String config_file) {
             int displayFlag = Integer.valueOf(applicationData[4]);
             
             AppLabel app = new AppLabel(appName, gpu, cpu, flip, displayFlag);
-            appList.add( app );
+            appList.put( appName, app );
           }
         }
       }

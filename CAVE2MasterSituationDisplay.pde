@@ -4,7 +4,7 @@
  * Description: CAVE2 Master Situation Display (MSD)
  *
  * Class: 
- * System: Processing 2.1, SUSE 12.1, Windows 7 x64
+ * System: Processing 2.2, SUSE 12.1, Windows 7 x64
  * Author: Arthur Nishimoto
  * Copyright (C) 2012-2014
  * Electronic Visualization Laboratory, University of Illinois at Chicago
@@ -23,6 +23,7 @@ import netP5.*;
 import processing.net.*;
 import omicronAPI.*;
 import omicronAPI.Event;
+import java.util.*; // Hashtable
 
 OmicronAPI omicronManager;
 
@@ -50,7 +51,7 @@ float targetHeight;
 boolean demoMode = true; // No active contollers and trackables enables demo mode (rotates CAVE2 image)
 boolean scaleScreen = true;
 
-boolean wandDebug = true;
+boolean wandDebug = false;
 
 boolean showFullscreen = true;
 int windowWidth = 1600;
@@ -177,7 +178,7 @@ float clusterUpdateTimer;
 boolean[] nodePing = new boolean[37];
 boolean[] nodeCavewavePing = new boolean[37];
 
-ArrayList appList = new ArrayList();
+Hashtable appList = new Hashtable();
 
 // Override of PApplet init() which is called before setup()
 public void init() {

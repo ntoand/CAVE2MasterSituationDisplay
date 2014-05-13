@@ -4,7 +4,7 @@
  * Description: CAVE2 Master Situation Display (MSD)
  *
  * Class: 
- * System: Processing 2.1, SUSE 12.1, Windows 7 x64
+ * System: Processing 2.2, SUSE 12.1, Windows 7 x64
  * Author: Arthur Nishimoto
  * Copyright (C) 2012-2014
  * Electronic Visualization Laboratory, University of Illinois at Chicago
@@ -222,10 +222,12 @@ void drawClusterStatus()
   rect( horzBarPosX, horzBarPosY + barWidth/2, barLength * (targetCPU / 100.0), barWidth/2 );
   
   popMatrix();
-  
-  for( int i = 0; i < appList.size(); i++ )
-  {
-    AppLabel app = (AppLabel)appList.get(i);
+
+  Enumeration e = appList.keys();
+  int i  = 0;
+  while( e.hasMoreElements() ){
+    AppLabel app = (AppLabel)appList.get(e.nextElement());
+
     if( app != null )
     {
       float gpuAppLabelHeight = gpuMarkerHeight/2;
