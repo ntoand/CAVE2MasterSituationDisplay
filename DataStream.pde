@@ -13,12 +13,12 @@
  * ---------------------------------------------
  */
 
-String[][] allElements = new String[37][25];
-int[][]allCPUs = new int[37][16];
-int[]allGPUs = new int[37];
-int[]netIn = new int[37];
-int[]netOut = new int[37];
-int[]memUsed = new int[37];
+String[][] allElements = new String[21][41];
+int[][]allCPUs = new int[21][32];
+int[]allGPUs = new int[21];
+int[]netIn = new int[21];
+int[]netOut = new int[21];
+int[]memUsed = new int[21];
 
 String badNode = "";
 String pings[];
@@ -56,12 +56,12 @@ void getData()
   {
     clusterReconnectTimer = clusterReconnectDelay;
     connectedToClusterData = false;
-    allElements = new String[37][25];
-    allCPUs = new int[37][16];
-    allGPUs = new int[37];
-    netIn = new int[37];
-    netOut = new int[37];
-    memUsed = new int[37];
+    allElements = new String[21][41];
+    allCPUs = new int[21][32];
+    allGPUs = new int[21];
+    netIn = new int[21];
+    netOut = new int[21];
+    memUsed = new int[21];
   }
   else
   {
@@ -80,14 +80,14 @@ void getData()
 
         // uptime may be missing the Days field so we need to handle the special case
 
-        if (elements.length == 25) {
-          for (int j = 2 ; j < 25; j++) {
+        if (elements.length == 41) {
+          for (int j = 2 ; j < 41; j++) {
             allElements[node][j] = elements[j];
           }
         }
 
-        if (elements.length < 25) {
-          for (int j = 4 ; j < 25; j++) {
+        if (elements.length < 39) {
+          for (int j = 4 ; j < 41; j++) {
             allElements[node][j] = elements[j-2];
           }
           allElements[node][2] = "0";
@@ -95,13 +95,16 @@ void getData()
         }   
 
         // grab the GPU and Network data
-        allGPUs[node] = int(allElements[node][21]);
-        netIn[node]   = int(allElements[node][22]);
-        netOut[node]  = int(allElements[node][23]);
-        memUsed[node]  = int(allElements[node][24]) * 100 / 64;
+        allGPUs[node] = int(allElements[node][37]);
+        netIn[node]   = int(allElements[node][38]);
+        netOut[node]  = int(allElements[node][39]);
+        if (node == 0)
+          memUsed[node]  = int(allElements[node][40]) * 100 / 256;
+        else
+          memUsed[node]  = int(allElements[node][40]) * 100 / 192;
 
         // grab the CPU core data
-        for (int core = 0 ; core < 16; core++) {
+        for (int core = 0 ; core < 32; core++) {
           allCPUs[node][core] = int(allElements[node][core+5]);
         }
       }
