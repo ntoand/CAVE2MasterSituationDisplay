@@ -106,7 +106,7 @@ void drawClusterStatus()
   for( int i = nNodesLeft+1; i < nNodes; i++ )
   {
     pushMatrix();
-    nodes[i].drawRight(targetWidth - 70 - borderDistFromEdge - 500, targetHeight - verticalOffset + rightNodeOffset - borderDistFromEdge - verticalNodeSpacing * nNodesLeft + verticalNodeSpacing * (i - (nNodesLeft+1)));
+    nodes[i].drawRight(targetWidth - 70 - borderDistFromEdge - 500, targetHeight - verticalOffset + rightNodeOffset - borderDistFromEdge - verticalNodeSpacing * nNodesLeft + verticalNodeSpacing * (i - (nNodesLeft)));
     popMatrix();
     
     averageCPU += nodes[i].avgCPU;

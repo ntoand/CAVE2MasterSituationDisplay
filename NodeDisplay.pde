@@ -411,8 +411,8 @@ class NodeDisplay
       if( abs((180 - degrees(angle))) < minAngle || abs((180 - degrees(angle))) > 360 - minAngle )
         angledDistance = 0;
       
-      intersectionX = displayPosX + angledDistance * cos(angle);
-      intersectionY = displayPosY + angledDistance * sin(angle);
+      intersectionX = displayPosX + angledDistance * cos(angle); // - ???
+      intersectionY = displayPosY + angledDistance * sin(angle); // - ???
 
       //line( displayPosX, displayPosY, intersectionX, intersectionY );
       //line( xPos, yPos, intersectionX, intersectionY );
