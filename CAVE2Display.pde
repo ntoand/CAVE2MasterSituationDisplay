@@ -18,7 +18,7 @@ void generateCAVE2Geometry()
 {
   for( int i = 0; i < nColumns; i++ )
   {
-    float angle = radians(108) + radians(360 / nColumns) * i; 
+    float angle = radians(106) + radians(360 / nColumns) * i; //108
       
     float xPos = CAVE2_screenDiameter/2 * CAVE2_Scale - (CAVE2_legBaseWidth - CAVE2_displayDepth) * CAVE2_Scale;
     float yPos = CAVE2_screenDiameter/2 * CAVE2_Scale - (CAVE2_legBaseWidth - CAVE2_displayDepth) * CAVE2_Scale;
@@ -43,7 +43,7 @@ void drawCAVE2()
   stroke(20,200,200);
   //strokeWeight(2);
   
-  // TOAN:draw trusses
+  // draw trusses
   for( int i = 0; i < 9; i++ )
   {
     pushMatrix();
@@ -61,8 +61,7 @@ void drawCAVE2()
     
     // Display individual screens
     if( CAVE2_displayMode == DISPLAY )
-    
-      // draw screen panels
+      // draw screen panels 
       for( int j = 0; j < nDisplaysPerColumn; j++ )
       {
         pushMatrix();
@@ -99,7 +98,7 @@ void drawCAVE2()
     
     */
     // Display as a single column
-    
+ 
     if( CAVE2_displayMode == COLUMN )
     {
       pushMatrix();
@@ -116,7 +115,6 @@ void drawCAVE2()
         box( CAVE2_displayDepth * CAVE2_Scale, CAVE2_displayWidth * CAVE2_Scale, nDisplaysPerColumn * CAVE2_displayHeight * CAVE2_Scale );
       popMatrix();
     }
-    
     noFill();
   }
   

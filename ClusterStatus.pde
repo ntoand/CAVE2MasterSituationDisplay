@@ -103,7 +103,25 @@ void drawClusterStatus()
   }
   
   // Right display nodes 
-  for( int i = nNodesLeft+1; i < nNodes; i++ )
+  for( int i = nNodesLeft+1; i < 17; i++ )
+  {
+    pushMatrix();
+    nodes[i].drawRight(targetWidth - 70 - borderDistFromEdge - 500, targetHeight - verticalOffset + rightNodeOffset - borderDistFromEdge - verticalNodeSpacing * nNodesLeft + verticalNodeSpacing * (i - (nNodesLeft +1)));
+    popMatrix();
+    
+    averageCPU += nodes[i].avgCPU;
+    averageGPU += nodes[i].gpuMem;
+  }
+  for( int i = 17; i < 18; i++ )
+  {
+    pushMatrix();
+    nodes[i].drawRight(targetWidth - 70 - borderDistFromEdge - 500, targetHeight - verticalOffset + rightNodeOffset - borderDistFromEdge - verticalNodeSpacing * nNodesLeft + verticalNodeSpacing * (i - (nNodesLeft)) - verticalNodeSpacing/2);
+    popMatrix();
+    
+    averageCPU += nodes[i].avgCPU;
+    averageGPU += nodes[i].gpuMem;
+  }
+  for( int i = 18; i < nNodes; i++ )
   {
     pushMatrix();
     nodes[i].drawRight(targetWidth - 70 - borderDistFromEdge - 500, targetHeight - verticalOffset + rightNodeOffset - borderDistFromEdge - verticalNodeSpacing * nNodesLeft + verticalNodeSpacing * (i - (nNodesLeft)));
@@ -125,7 +143,6 @@ void drawClusterStatus()
   drawCAVE2();
   popMatrix();
   
-
   for( int i = 0; i < columnPulse.length; i++ )
   {
     if( columnPulse[i] > 0 )

@@ -90,21 +90,23 @@ class NodeDisplay
       {
         for( int i = 0; i < 32; i++)
         {
-          if( nodeID == 15 ) //15 ???
-            CPU[i] = 0;
-          else if( nodeID == 0 ) // Master
-            CPU[i] = (int)random(23,100);
+          //if( nodeID == 15 )
+          //  CPU[i] = 0;
+          //else if( nodeID == 0 ) // Master
+          if( nodeID == 0 ) // Master
+            CPU[i] = (int)random(10,50);
           else
-            CPU[i] = (int)random(0,15);
+            CPU[i] = (int)random(0,40);
         }
         
         gpuMem = (int)random(25,70);
         
-        
+        /*
         if( nodeID == 15 )
         {
           gpuMem = 0;
         }
+        */
       }
     }
 
@@ -138,12 +140,14 @@ class NodeDisplay
       nodeDown = false;
     
     // Demo mode
+    /*
     if( !connectToClusterData && nodeID == 15 )
     {
       nodeDown = true;
       gpuMem = 0;
       avgCPU = 0;
     }
+    */
     
     curSegment += gpuMem / pulseSpeed;
     
@@ -308,7 +312,7 @@ class NodeDisplay
     {
       curSegment = 0;
       if( nodeID > 0 )
-        columnPulse[(nodeID-1)/2] = 1;
+        columnPulse[nodeID-1] = 1; //columnPulse[(nodeID-1)/2] = 1;
     }
     
     // Node info
@@ -355,10 +359,20 @@ class NodeDisplay
     for( int i = 0; i < 16; i++ )
     {
       fill(210,100,10);
-      rect( 10 + 3 * cpuBorder + ( 2 + nodeWidth / 18) * i, cpuBorder - nodeHeight/2, (nodeWidth / 18), nodeHeight - cpuBorder * 2 );
+      rect( 10 + 3 * cpuBorder + ( 2 + nodeWidth / 18) * i, cpuBorder - nodeHeight/2, (nodeWidth / 18), nodeHeight/2 - cpuBorder * 2 );
       
       fill(0);
-      rect( 10 + 3 * cpuBorder + ( 2 + nodeWidth / 18) * i, cpuBorder - nodeHeight/2, (nodeWidth / 18), (1 - (CPU[i] / 100.0)) * (nodeHeight - cpuBorder * 2)  );
+      rect( 10 + 3 * cpuBorder + ( 2 + nodeWidth / 18) * i, cpuBorder - nodeHeight/2, (nodeWidth / 18), (1 - (CPU[i] / 100.0)) * (nodeHeight/2 - cpuBorder * 2)  );
+    }
+   
+    for( int i = 16; i < 32; i++ )
+    {
+      int j = i - 16;
+      fill(210,100,10);
+      rect( 10 + 3 * cpuBorder + ( 2 + nodeWidth / 18) * j, cpuBorder, (nodeWidth / 18), nodeHeight/2 - cpuBorder * 2 );
+      
+      fill(0);
+      rect( 10 + 3 * cpuBorder + ( 2 + nodeWidth / 18) * j, cpuBorder, (nodeWidth / 18), (1 - (CPU[i] / 100.0)) * (nodeHeight/2 - cpuBorder * 2)  );
     }
     popMatrix();
     
@@ -541,7 +555,7 @@ class NodeDisplay
     {
       curSegment = 0;
       if( nodeID > 0 )
-        columnPulse[(nodeID-1)/2] = 1;
+        columnPulse[nodeID-1] = 1; //columnPulse[(nodeID-1)/2] = 1;
     }
     
     popMatrix();
@@ -590,10 +604,19 @@ class NodeDisplay
     for( int i = 0; i < 16; i++ )
     {
       fill(200,100,10);
-      rect( nodeWidth - 3 * cpuBorder + ( 2 + nodeWidth / 18) * i, cpuBorder - nodeHeight/2, (nodeWidth / 18), nodeHeight - cpuBorder * 2 );
+      rect( nodeWidth - 3 * cpuBorder + ( 2 + nodeWidth / 18) * i, cpuBorder - nodeHeight/2, (nodeWidth / 18), nodeHeight/2 - cpuBorder * 2 );
       
       fill(0);
-      rect( nodeWidth - 3 * cpuBorder + ( 2 + nodeWidth / 18) * i, cpuBorder - nodeHeight/2, (nodeWidth / 18), (1 - (CPU[i] / 100.0)) * (nodeHeight - cpuBorder * 2)  );
+      rect( nodeWidth - 3 * cpuBorder + ( 2 + nodeWidth / 18) * i, cpuBorder - nodeHeight/2, (nodeWidth / 18), (1 - (CPU[i] / 100.0)) * (nodeHeight/2 - cpuBorder * 2)  );
+    }
+    for( int i = 16; i < 32; i++ )
+    {
+      int j = i - 16;
+      fill(210,100,10);
+      rect( nodeWidth - 3 * cpuBorder + ( 2 + nodeWidth / 18) * j, cpuBorder, (nodeWidth / 18), nodeHeight/2 - cpuBorder * 2 );
+      
+      fill(0);
+      rect( nodeWidth - 3 * cpuBorder + ( 2 + nodeWidth / 18) * j, cpuBorder, (nodeWidth / 18), (1 - (CPU[i] / 100.0)) * (nodeHeight/2 - cpuBorder * 2)   );
     }
     popMatrix();
   }
