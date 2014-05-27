@@ -102,8 +102,7 @@ void drawClusterStatus()
     averageGPU += nodes[i].gpuMem;
   }
   
-  // Right display nodes
-  
+  // Right display nodes 
   for( int i = nNodesLeft+1; i < nNodes; i++ )
   {
     pushMatrix();
@@ -115,6 +114,7 @@ void drawClusterStatus()
   }
   
   // Draw CAVE2 ------------------------------------------------------------------
+  
   pushMatrix();
   translate( targetWidth/2, targetHeight/2 - 20, 0);
   rotateX( CAVE2_3Drotation.x ); 
@@ -125,6 +125,7 @@ void drawClusterStatus()
   drawCAVE2();
   popMatrix();
   
+
   for( int i = 0; i < columnPulse.length; i++ )
   {
     if( columnPulse[i] > 0 )
@@ -137,8 +138,8 @@ void drawClusterStatus()
   noStroke();
   rect( 0, targetHeight - 200, targetWidth, 180 );
   
-  averageCPU = averageCPU / 37 * 100 - 10;
-  averageGPU = (averageGPU - 10) / 37; // Remember the 10% padding done for vis?
+  averageCPU = averageCPU / 21 * 100 - 10;
+  averageGPU = (averageGPU - 10) / 21; // Remember the 10% padding done for vis?
   
   if( targetCPU > averageCPU )
     targetCPU -= updateTransitionTime;

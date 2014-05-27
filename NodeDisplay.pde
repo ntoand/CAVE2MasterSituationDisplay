@@ -39,7 +39,7 @@ class NodeDisplay
   color baseColor = color(250,200,10);
   color nodeColor = color(10,50,10);
 
-  int[] CPU = new int[16];
+  int[] CPU = new int[32];
    
   int gpuMem;
   int nSegments;
@@ -55,7 +55,7 @@ class NodeDisplay
   {
     nodeID = id;
     
-    for( int i = 0; i < 16; i++)
+    for( int i = 0; i < 32; i++)
     {
       CPU[i] = (int)random(0,101);
     }
@@ -88,9 +88,9 @@ class NodeDisplay
       
       if( !connectToClusterData )
       {
-        for( int i = 0; i < 16; i++)
+        for( int i = 0; i < 32; i++)
         {
-          if( nodeID == 15 )
+          if( nodeID == 15 ) //15 ???
             CPU[i] = 0;
           else if( nodeID == 0 ) // Master
             CPU[i] = (int)random(23,100);
@@ -112,12 +112,12 @@ class NodeDisplay
       CPU = allCPUs[nodeID];
     
     avgCPU = 0;
-    for( int i = 0; i < 16; i++)
+    for( int i = 0; i < 32; i++)
     {
       avgCPU += CPU[i];
     }
     
-    avgCPU /= 16 * 100;
+    avgCPU /= 32 * 100;
     
     // GPU conduit 
     if( connectToClusterData )
@@ -361,6 +361,7 @@ class NodeDisplay
       rect( 10 + 3 * cpuBorder + ( 2 + nodeWidth / 18) * i, cpuBorder - nodeHeight/2, (nodeWidth / 18), (1 - (CPU[i] / 100.0)) * (nodeHeight - cpuBorder * 2)  );
     }
     popMatrix();
+    
   }
   
   void drawRight( float xPos, float yPos )

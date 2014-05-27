@@ -42,6 +42,8 @@ void drawCAVE2()
   noFill();
   stroke(20,200,200);
   //strokeWeight(2);
+  
+  // TOAN:draw trusses
   for( int i = 0; i < 9; i++ )
   {
     pushMatrix();
@@ -54,12 +56,13 @@ void drawCAVE2()
   }
   
   // CAVE2 displays
-  
   for( int i = 0; i < nColumns; i++ )
   {
     
     // Display individual screens
     if( CAVE2_displayMode == DISPLAY )
+    
+      // draw screen panels
       for( int j = 0; j < nDisplaysPerColumn; j++ )
       {
         pushMatrix();
@@ -75,7 +78,7 @@ void drawCAVE2()
           box( CAVE2_displayDepth * CAVE2_Scale, CAVE2_displayWidth * CAVE2_Scale, CAVE2_displayHeight * CAVE2_Scale );
         popMatrix();
       }
-    
+      
     
     /*
     // Display as individual computers
@@ -96,6 +99,7 @@ void drawCAVE2()
     
     */
     // Display as a single column
+    
     if( CAVE2_displayMode == COLUMN )
     {
       pushMatrix();
@@ -117,6 +121,7 @@ void drawCAVE2()
   }
   
   // CAVE2 top truss bottom
+  
   pushMatrix();
   translate( 0, 0, (CAVE2_legHeight - 0.0762) * CAVE2_Scale );
   stroke(20,200,200);
