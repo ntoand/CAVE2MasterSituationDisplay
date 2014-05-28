@@ -347,6 +347,16 @@ void draw() {
 
   // Sets the background color
   //background(0);
+  if (state == TRACKING && timeSinceLastInteractionEvent > 30)
+  {
+    state = CLUSTER;
+    lastInteractionTime = programTimer;
+  }  
+  else if (state == CLUSTER && timeSinceLastInteractionEvent > 60)
+  {
+    state = TRACKING;
+    lastInteractionTime = programTimer;
+  }  
 
   switch( state )
   {
