@@ -67,6 +67,7 @@ float borderDistFromEdge = 30;
 final int TRACKING = 0;
 final int CLUSTER = 1;
 final int AUDIO = 2;
+final int CLUSTER_OLD = 3;
 int state = TRACKING;
 
 // CAVE2 model -----------------------------------
@@ -180,6 +181,11 @@ boolean[] nodeCavewavePing = new boolean[21];
 
 Hashtable appList = new Hashtable();
 
+// For ClusterStatus_old
+PFont myFontSmall;
+PFont myFontBig;
+PFont myFontHuge;
+
 // Override of PApplet init() which is called before setup()
 public void init() {
   super.init();
@@ -218,7 +224,6 @@ void setup() {
     size( displayWidth, displayHeight, P3D );
   else
     size( windowWidth, windowHeight, P3D );
-  println(width + " " + height);
   //size( 1920, 1080, P3D );
   //size( 1600, 1200, P3D );
   
@@ -330,6 +335,14 @@ void setup() {
     nodes[i] = new NodeDisplay(i);
   }
   
+  // for ClusterStatus_old
+  myFontSmall = loadFont("SpaceAge-24.vlw");
+  myFontBig = loadFont("SpaceAge-36.vlw");
+  myFontHuge = loadFont("SpaceAge-72.vlw");
+  
+  //smooth();
+  frameRate(30);
+  
   background(0);
 }// setup
 
@@ -408,8 +421,29 @@ void draw() {
     case(AUDIO):
       drawAudioStatus();
       break;
+      
+    case(CLUSTER_OLD):
+      if( connectToClusterData )
+      {
+        if( clusterUpdateTimer >= clusterUpdateInterval )
+        {
+          clusterUpdateTimer = 0;
+        }
+        else
+        {
+          clusterUpdateTimer += deltaTime;
+        }
+      }
+      else
+      {
+        fill(250,250,0);
+        text("DEMO MODE - NOT CONNECTED TO CLUSTER", 216, 16);
+      }
+      
+      drawClusterStatus_old();
+      break;
   }
-  
+
   textFont( st_font, 64 );
   textAlign(RIGHT);
   String minuteStr = minute()+"";
@@ -462,28 +496,30 @@ void draw() {
   }
   
   // Border
-  noStroke();
-  PVector textOffset = new PVector( targetWidth * 0.9, borderWidth );
+  if (state != CLUSTER_OLD)
+  {
+    noStroke();
+    PVector textOffset = new PVector( targetWidth * 0.9, borderWidth );
 
-  fill(50);
-  rect( borderDistFromEdge + borderWidth/2, borderDistFromEdge, targetWidth - borderDistFromEdge * 2 - borderWidth/2, borderWidth ); //Top
-  ellipse( borderDistFromEdge + borderWidth/2, borderDistFromEdge + borderWidth/2, borderWidth, borderWidth ); // Top-Left
-  ellipse( targetWidth - borderDistFromEdge, borderDistFromEdge + borderWidth/2, borderWidth, borderWidth ); // Top-Right
-  rect( borderDistFromEdge, borderDistFromEdge + borderWidth/2, borderWidth, targetHeight - borderDistFromEdge * 2 - borderWidth/2 ); //Left
-  rect( targetWidth - borderDistFromEdge - borderWidth/2, borderDistFromEdge + borderWidth/2, borderWidth, targetHeight - borderDistFromEdge * 2 - borderWidth/2 ); //Right
-  ellipse( borderDistFromEdge + borderWidth/2, targetHeight - borderDistFromEdge, borderWidth, borderWidth ); // Bottom-Left
-  ellipse( targetWidth - borderDistFromEdge, targetHeight - borderDistFromEdge, borderWidth, borderWidth ); // Bottom-Right
-  rect( borderDistFromEdge + borderWidth/2, targetHeight - borderDistFromEdge - borderWidth/2, targetWidth - borderDistFromEdge * 2 - borderWidth/2, borderWidth ); // Bottom
+    fill(50);
+    rect( borderDistFromEdge + borderWidth/2, borderDistFromEdge, targetWidth - borderDistFromEdge * 2 - borderWidth/2, borderWidth ); //Top
+    ellipse( borderDistFromEdge + borderWidth/2, borderDistFromEdge + borderWidth/2, borderWidth, borderWidth ); // Top-Left
+    ellipse( targetWidth - borderDistFromEdge, borderDistFromEdge + borderWidth/2, borderWidth, borderWidth ); // Top-Right
+    rect( borderDistFromEdge, borderDistFromEdge + borderWidth/2, borderWidth, targetHeight - borderDistFromEdge * 2 - borderWidth/2 ); //Left
+    rect( targetWidth - borderDistFromEdge - borderWidth/2, borderDistFromEdge + borderWidth/2, borderWidth, targetHeight - borderDistFromEdge * 2 - borderWidth/2 ); //Right
+    ellipse( borderDistFromEdge + borderWidth/2, targetHeight - borderDistFromEdge, borderWidth, borderWidth ); // Bottom-Left
+    ellipse( targetWidth - borderDistFromEdge, targetHeight - borderDistFromEdge, borderWidth, borderWidth ); // Bottom-Right
+    rect( borderDistFromEdge + borderWidth/2, targetHeight - borderDistFromEdge - borderWidth/2, targetWidth - borderDistFromEdge * 2 - borderWidth/2, borderWidth ); // Bottom
   
-  textAlign(RIGHT);
-  textFont( st_font, 32 );
-  fill(10);
-  rect( borderDistFromEdge + textOffset.x, targetHeight - borderDistFromEdge - borderWidth/2, -(textWidth(systemText) + borderWidth * 2), borderWidth ); // Bottom
-  fill(255);
-  text(systemText, textOffset.x + borderWidth/2, targetHeight - borderDistFromEdge - borderWidth/2  + textOffset.y);
-  textAlign(LEFT);
-  textFont( st_font, 16 );
-  
+    textAlign(RIGHT);
+    textFont( st_font, 32 );
+    fill(10);
+    rect( borderDistFromEdge + textOffset.x, targetHeight - borderDistFromEdge - borderWidth/2, -(textWidth(systemText) + borderWidth * 2), borderWidth ); // Bottom
+    fill(255);
+    text(systemText, textOffset.x + borderWidth/2, targetHeight - borderDistFromEdge - borderWidth/2  + textOffset.y);
+    textAlign(LEFT);
+    textFont( st_font, 16 );
+  }
   // For event and fullscreen processing, this must be called in draw()
   omicronManager.process();
   lastFrameTime = programTimer;
@@ -629,14 +665,22 @@ void keyPressed()
   if ( key == '1' )
   {
     state = TRACKING;
+    omicronManager.enableScreenScale(true);
   }
   if ( key == '2' )
   {
     state = CLUSTER;
+    omicronManager.enableScreenScale(true);
   }
   if ( key == '3' )
   {
     state = AUDIO;
+    omicronManager.enableScreenScale(true);
+  }
+  if ( key == '4' )
+  {
+    state = CLUSTER_OLD;
+    omicronManager.enableScreenScale(false);
   }
   
   if ( key == ' ' )

@@ -19,6 +19,9 @@ float trackerPulseTimer;
 
 void drawTrackerStatus()
 {
+  background(0);
+  frame.setTitle(int(frameRate) + " fps");
+  
   pushMatrix();
   systemText = "TRACKING SYSTEM";
   

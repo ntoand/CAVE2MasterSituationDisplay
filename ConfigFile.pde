@@ -108,6 +108,11 @@ void readConfigFile(String config_file) {
         println("Default screen set to CLUSTER");
         continue;
       }
+      if( rawConfig[i].contains("defaultScreen") && rawConfig[i].contains("OLD_INTERFACE") ){
+        state = CLUSTER_OLD;
+        println("Default screen set to CLUSTER_OLD");
+        continue;
+      }
       
       if ( rawConfig[i].indexOf("}") != -1 ) // check block contents after this this
       {

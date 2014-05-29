@@ -70,6 +70,9 @@ float targetGPU = 1;
 
 void drawClusterStatus()
 {
+  background(0);
+  frame.setTitle(int(frameRate) + " fps");
+  
   systemText = "CLUSTER PROCESSING UNIT STATUS";
   
   CAVE2_Scale = 64;
