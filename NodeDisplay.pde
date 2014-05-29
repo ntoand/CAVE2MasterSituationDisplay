@@ -41,6 +41,7 @@ class NodeDisplay
 
   int[] CPU = new int[32];
    
+  int gpuUsage;
   int gpuMem;
   int nSegments;
   int nAngledSegments;
@@ -99,6 +100,7 @@ class NodeDisplay
             CPU[i] = (int)random(0,40);
         }
         
+        gpuUsage = (int)random(10,50);
         gpuMem = (int)random(25,70);
         
         /*
@@ -123,7 +125,10 @@ class NodeDisplay
     
     // GPU conduit 
     if( connectToClusterData )
-      gpuMem = allGPUs[nodeID];
+    {
+      gpuUsage = allGPUs_usage[nodeID];
+      gpuMem = allGPUs_mem[nodeID];
+    }
  
     if( gpuMem == 0 && avgCPU == 0 )
       nodeDown = true;
@@ -133,6 +138,7 @@ class NodeDisplay
     if( connectToClusterData && (nodePing[nodeID] == false || nodeCavewavePing[nodeID] == false) )
     {
       nodeDown = true;
+      gpuUsage = 0;
       gpuMem = 0;
       avgCPU = 0;
     }
@@ -234,13 +240,13 @@ class NodeDisplay
     fill(cpuBaseColor);
     text(String.format("%.2f", avgCPU * 100), 20 + nodeWidth + 180, -24 );
     fill(gpuBaseColor);
-    text(gpuMem, 365 + nodeWidth, -24 );
+    text(gpuUsage+ " | " + gpuMem, 365 + nodeWidth, -24 );
     
     textAlign(LEFT);
     fill(cpuBaseColor);
     text("Avg. CPU: ", 20 + nodeWidth, -24 );
     fill(gpuBaseColor);
-    text("GPU Mem.: ", 210 + nodeWidth, -24 );
+    text("GPU0: ", 210 + nodeWidth, -24 );
 
     
     rectMode(CENTER);
@@ -472,13 +478,13 @@ class NodeDisplay
     fill(cpuBaseColor);
     text(String.format("%.2f", avgCPU * 100), 20 - nodeWidth + 180, -24 );
     fill(gpuBaseColor);
-    text(gpuMem, 365 - nodeWidth, -24 );
+    text(gpuUsage + " | " + gpuMem, 365 - nodeWidth, -24 );
     
     textAlign(LEFT);
     fill(cpuBaseColor);
     text("Avg. CPU: ", 20 - nodeWidth, -24 );
     fill(gpuBaseColor);
-    text("GPU Mem.: ", 210 - nodeWidth, -24 );
+    text("GPU0: ", 210 - nodeWidth, -24 );
     popMatrix();
     
     rectMode(CENTER);
