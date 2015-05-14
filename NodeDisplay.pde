@@ -238,7 +238,7 @@ class NodeDisplay
     
     textAlign(RIGHT);
     fill(cpuBaseColor);
-    text(String.format("%.2f", avgCPU * 100), 20 + nodeWidth + 180, -24 );
+    text(String.format("%.2f", (avgCPU-0.1) * 100), 20 + nodeWidth + 180, -24 );
     fill(gpuBaseColor);
     text(gpuUsage+ " | " + gpuMem, 365 + nodeWidth, -24 );
     
@@ -476,7 +476,7 @@ class NodeDisplay
     
     textAlign(RIGHT);
     fill(cpuBaseColor);
-    text(String.format("%.2f", avgCPU * 100), 20 - nodeWidth + 180, -24 );
+    text(String.format("%.2f", (avgCPU-0.1) * 100), 20 - nodeWidth + 180, -24 );
     fill(gpuBaseColor);
     text(gpuUsage + " | " + gpuMem, 365 - nodeWidth, -24 );
     

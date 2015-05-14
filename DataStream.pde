@@ -89,7 +89,7 @@ void getData()
           }
         }
 
-        if (elements.length < NUM_ELEMENTS-2) {
+        if (elements.length == NUM_ELEMENTS-2) {
           for (int j = 4 ; j < NUM_ELEMENTS; j++) {
             allElements[node][j] = elements[j-2];
           }
